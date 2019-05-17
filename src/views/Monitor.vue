@@ -2,9 +2,7 @@
   <Content>
     <Tabs   name='tabs' :animated="false" :value='tabs' @on-click="ChangeTabs">
       <TabPane label="实时预览" name="LivePreview" tab='tabs'>
-        <div>
           <router-view name="LivePreview"></router-view>
-        </div>
       </TabPane>
       <TabPane label="录像回放" name="VideoPlayback" tab='tabs'>
         <router-view name="VideoPlayback"></router-view>
@@ -41,6 +39,15 @@ export default {
 <style lang="less">
 .ivu-tabs-bar{
   padding-left: 20px;
+}
+.ivu-tabs.ivu-tabs-no-animation{
+  height: 100%;
+}
+.ivu-tabs-content{
+  height: 100%;
+  .ivu-tabs-tabpane{
+    height: 100%;
+  }
 }
 </style>
 

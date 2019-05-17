@@ -4,7 +4,7 @@
       <Header>
         <Menu mode="horizontal" theme="dark" active-name="1">
           <div class="layout-nav">
-            <MenuItem name="Home" to="/"  :style="{'background':this.Name=='Home'?'rgb(30, 87, 163)':''}" >
+            <MenuItem name="Home" to="/Home"  :style="{'background':this.Name=='Home'?'rgb(30, 87, 163)':''}" >
               首页
             </MenuItem>
             <MenuItem name="Monitor" :to="{name:'Monitor'}" :style="{'background':this.Name=='Monitor'?'rgb(30, 87, 163)':''}">
@@ -71,7 +71,7 @@ export default {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 
 .layout{
     height: 100%;
@@ -80,6 +80,9 @@ export default {
     position: relative;
     border-radius: 4px;
     overflow: hidden;
+}
+.ivu-layout{
+  height: 100%;
 }
 .ivu-layout-header{
   background: rgb(43, 100, 176);

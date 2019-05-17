@@ -6,7 +6,10 @@ import './plugins/iview.js'
 import VueVideoPlayer from 'vue-video-player'
 import 'videojs-contrib-hls'
 import 'video.js/dist/video-js.css'
+import 'font-awesome/css/font-awesome.css'
+import tools from './plugins/tools.js'
 
+Vue.prototype.$tools = tools
 Vue.config.productionTip = false
 Vue.use(VueVideoPlayer)
 

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "core-js": "^2.6.5",
+    "font-awesome": "^4.7.0",
     "iview": "^3.0.1",
     "less-loader": "^5.0.0",
     "videojs-contrib-hls": "^5.15.0",
