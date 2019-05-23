@@ -5,32 +5,39 @@
         <Menu mode="horizontal" theme="dark" active-name="1">
           <div class="layout-nav">
             <MenuItem name="Home" to="/Home"  :style="{'background':this.Name=='Home'?'rgb(30, 87, 163)':''}" >
-              首页
+              {{$t('tab.Home')}}
             </MenuItem>
             <MenuItem name="Monitor" :to="{name:'Monitor'}" :style="{'background':this.Name=='Monitor'?'rgb(30, 87, 163)':''}">
-              监控中心
+              {{$t('tab.monitor')}}
             </MenuItem>
             <MenuItem name="3" :style="{'background':this.Name=='123'?'rgb(30, 87, 163)':''}">
-              查询中心
+              {{$t('tab.inquiry')}}
             </MenuItem>
             <MenuItem name="4" :style="{'background':this.Name=='334'?'rgb(30, 87, 163)':''}">
-              配置中心
+              {{$t('tab.Configuration')}}
             </MenuItem>
             <li style="float:left;font-size:16px;font-weight:700;color:#fff;margin-right:10px">|</li>
             
-            <Dropdown style="float:left;">             
+            <!-- <Dropdown style="float:left;margin-right:10px" @on-click="ChangeLanguage">             
+              <span style="color:#fff">{{$t('lang')}}</span></Icon><Icon type="ios-arrow-down" size='16' style="color:#fff"></Icon>
+              <DropdownMenu slot="list">
+                  <DropdownItem name='zh'>{{$t('lang_zh')}}</DropdownItem>
+                  <DropdownItem name='en'>{{$t('lang_en')}}</DropdownItem>
+              </DropdownMenu>
+            </Dropdown> -->
+            <Dropdown style="float:left;"  @on-click="ChangePersonal">             
               <Icon type="md-person" size='20' style="color:#fff"></Icon><Icon type="ios-arrow-down" size='16' style="color:#fff"></Icon>
               <DropdownMenu slot="list">
-                  <DropdownItem>基本信息</DropdownItem>
-                  <DropdownItem>密码修改</DropdownItem>
-                  <DropdownItem>退出</DropdownItem>
+                  <DropdownItem>{{$t('tab.Personal.Basic_Info')}}</DropdownItem>
+                  <DropdownItem>{{$t('tab.Personal.change_Password')}}</DropdownItem>
+                  <DropdownItem name='exit'>{{$t('tab.Personal.exit')}}</DropdownItem>
               </DropdownMenu>
             </Dropdown>
 
             <Dropdown style="float:left;margin:0 10px">             
               <Icon type="md-settings" size='20' style="color:#fff"></Icon><Icon type="ios-arrow-down" size='16' style="color:#fff"></Icon>
               <DropdownMenu slot="list">
-                  <DropdownItem>本地配置</DropdownItem>
+                  <DropdownItem>{{$t('tab.Configuration')}}</DropdownItem>
               </DropdownMenu>
             </Dropdown>
 
@@ -56,6 +63,20 @@ export default {
       Name: ''
     }
   },
+  methods:{
+    ChangeLanguage(name){
+      this.$i18n.locale = name
+      localStorage.setItem('locale',name)
+    },
+    ChangePersonal(name){
+      switch (name){
+        case 'exit':
+
+          this.$store.state.session.swLogout()
+        break;
+      }
+    }
+  },
   watch: {
     $route(to, from) {
       // to表示的是你要去的那个组件，from 表示的是你从哪个组件过来的，它们是两个对象，你可以把它打印出来，它们也有一个param 属性
@@ -66,7 +87,23 @@ export default {
     }
   },
   created(){
+    if(this.$store.state.session==undefined)this.$router.push({name: 'login'})
+
     this.Name = this.$route.meta.Name;
+    if(this.$store.state.session == undefined){
+      this.$router.push({path:'/login'})
+    }else{
+      this.$store.state.session.swAddCallBack('logout', (sender, event, json)=>{
+        if ('logout' == event) {
+          if (json.code == jSW.RcCode.RC_CODE_S_OK) {
+              this.$store.state.session = undefined
+              this.$router.push({path:'/login'})
+          } else{
+            this.$Message.error('Fail, error code: ' + json.code)
+          }
+        }
+      });
+    }
   }
 };
 </script>
@@ -107,9 +144,9 @@ export default {
     left: 20px;
 }
 .layout-nav{
-    width: 480px;
-    margin: 0 auto;
+    float: right;
     margin-right: 2px;
+    
 }
 .layout-footer-center{
     text-align: center;

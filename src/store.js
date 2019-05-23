@@ -5,7 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    ip_port: 'http://192.168.0.68:8081',
+    ip_port: 'http://127.0.0.1:8081',
     session: undefined
   },
   mutations: {

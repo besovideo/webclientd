@@ -7,13 +7,21 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: '/Monitor'
+      redirect: '/login'
+    },
+    {
+      path: '/login',
+      name: 'login',
+      meta: {
+        title: 'Login'
+      },
+      component: () => import(/* webpackChunkName: "Login" */ './views/login/login.vue')
     },
     {
       path: '/Home',
       name: 'Home',
       meta: {
-        title: '首页',
+        title: 'tab.Home',
         Name: 'Home'
       },
       component: () => import(/* webpackChunkName: "Home" */ './views/Home.vue'),
@@ -22,7 +30,7 @@ export default new Router({
           path: '',
           name: 'index',
           meta: {
-            title: '首页',
+            title: 'tab.Home',
             Name: 'Home'
           },
           component: () => import(/* webpackChunkName: "Home" */ './views/index.vue')
@@ -32,7 +40,7 @@ export default new Router({
           name: 'Monitor',
           redirect: '/Monitor/LivePreview',
           meta: {
-            title: '监控中心',
+            title: 'tab.monitor',
             Name: 'Monitor'
           },
           children: [
@@ -40,7 +48,7 @@ export default new Router({
               path: 'LivePreview',
               name: 'LivePreview',
               meta: {
-                title: '监控中心',
+                title: 'tab.monitor',
                 keepAlive: true,
                 Name: 'Monitor'
               },
@@ -52,7 +60,7 @@ export default new Router({
               path: 'VideoPlayback',
               name: 'VideoPlayback',
               meta: {
-                title: '录像回放',
+                title: 'home.Video_playback',
                 Name: 'Monitor'
               },
               components: {

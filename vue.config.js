@@ -6,5 +6,12 @@ module.exports = {
         javascriptEnabled: true
       }
     }
-  }
+  },
+
+  publicPath: '',
+  outputDir: undefined,
+  assetsDir: undefined,
+  runtimeCompiler: undefined,
+  productionSourceMap: undefined,
+  parallel: undefined
 }

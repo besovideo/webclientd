@@ -19,4 +19,13 @@ export default {
       document.webkitExitFullscreen()
     }
   }
+  // getCookie: (name, defaultValue) => {
+  //   let reg = new RegExp('(^| )' + name + '=([^;]*)(;|$)')
+  //   var arr = document.cookie.match(reg)
+  //   if (arr) {
+  //     return unescape(arr[2])
+  //   } else {
+  //     return defaultValue
+  //   }
+  // }
 }

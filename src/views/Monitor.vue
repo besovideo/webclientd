@@ -1,13 +1,14 @@
 <template>
   <Content>
     <Tabs   name='tabs' :animated="false" :value='tabs' @on-click="ChangeTabs">
-      <TabPane label="实时预览" name="LivePreview" tab='tabs'>
+      <TabPane :label="$t('home.LivePreview')" name="LivePreview" tab='tabs'>
           <router-view name="LivePreview"></router-view>
       </TabPane>
-      <TabPane label="录像回放" name="VideoPlayback" tab='tabs'>
-        <router-view name="VideoPlayback"></router-view>
+      <TabPane :label="$t('home.Video_playback')" name="VideoPlayback" tab='tabs'>
+        <!-- <router-view name="VideoPlayback"></router-view> -->
+        {{$t('home.Video_playback')}}
       </TabPane>
-      <TabPane label="实时定位" name="name3">标签三的内容</TabPane>
+      <!-- <TabPane :label="$t('home.location')" name="VideoPlayback">{{$t('home.location')}}</TabPane> -->
     </Tabs>
   </Content>
 </template>
@@ -42,6 +43,8 @@ export default {
 }
 .ivu-tabs.ivu-tabs-no-animation{
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 .ivu-tabs-content{
   height: 100%;
