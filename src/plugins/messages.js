@@ -1,8 +1,8 @@
 module.exports = {
   'zh': {
     login: {
-      login: '登陆',
-      login_tip: '欢迎登陆',
+      login: '登录',
+      login_tip: '欢迎登录',
       plzuser: '请输入用户名',
       plzpasswd: '请输入密码',
       error_nouser: '账号不能为空',
@@ -43,7 +43,11 @@ module.exports = {
       Showonlyonlinedevices: '只显示在线设备',
       Server: '服务器',
       Server_Port: '端口',
-      channel: '通道'
+      channel: '通道',
+      noTerm: '无此设备',
+      isopenchannel: '视频通道已打开',
+      otheropenfail: '视频打开失败',
+      Pleasecloseavideowindowfirst: '请先关闭一个视频窗口'
     }
   },
   'en': {
@@ -90,7 +94,12 @@ module.exports = {
       Showonlyonlinedevices: 'Show only online devices',
       Server: 'Server',
       Server_Port: 'Port',
-      channel: 'channel'
+      channel: 'channel',
+      noTerm: 'No such device',
+      isopenchannel: 'Video channel is open',
+      otheropenfail: 'Video open failed',
+      Pleasecloseavideowindowfirst: 'Please close a video window first'
+
     }
   }
 }

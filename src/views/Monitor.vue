@@ -42,7 +42,7 @@ export default {
   padding-left: 20px;
 }
 .ivu-tabs.ivu-tabs-no-animation{
-  height: 100%;
+  flex:1;
   display: flex;
   flex-direction: column;
 }

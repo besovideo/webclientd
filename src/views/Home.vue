@@ -125,6 +125,9 @@ export default {
   background: rgb(43, 100, 176);
   padding: 0 0 0 50px;
 }
+.ivu-layout-content{
+  display: flex;
+}
 .ivu-menu {
   background: rgb(43, 100, 176);
   height: 64px;

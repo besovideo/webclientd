@@ -28,13 +28,16 @@
         </span>
       </Input>
     </FormItem>
-    <FormItem prop="password">
+    <FormItem prop="password" style="">
       <Input type="password" v-model="form.password" :placeholder="$t('login.plzpasswd')">
         <span slot="prepend">
           <Icon :size="16" type="md-lock"></Icon>
         </span>
       </Input>
     </FormItem>
+    <div id="cb_rember">
+      <Checkbox>记住密码</Checkbox>
+    </div>
     <FormItem>
       <Button @click="handleSubmit" type="primary" long>{{$t('login.login')}}</Button>
     </FormItem>
@@ -90,3 +93,11 @@ export default {
   }
 }
 </script>
+
+<style lang="less">
+#cb_rember{
+  display: none;
+  margin-bottom:10px
+}
+</style>
+

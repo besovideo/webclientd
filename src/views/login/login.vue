@@ -50,6 +50,10 @@ export default {
       localStorage.setItem('locale',name)
     },
     handleSubmit ({userName, password }) {
+      let url = window.location.origin
+      if(process.env.NODE_ENV=='development'){
+        url = 'http://115.28.79.237:8081'
+      }
       this.spinShow = true
       // this.Server = Server
       // this.Server_Port = Server_Port
@@ -59,13 +63,14 @@ export default {
       // window.onload = ()=>{
         window.jSW.swInit({
           // url: window.location.origin, //bv_nginx.exe服务器地址
-          url: 'http://115.28.79.237:8081',
+          url,
+          // url: 'http://115.28.79.237:8081',
           calltype: window.jSW.CallProtoType.HTTP, // AUTO: IE优先使用OCX, 如果希望IE仍然使用HTTP通信, 请使用jSW.CallProtoType.HTTP
           oninit: (code)=>{
             if(code==jSW.RcCode.RC_CODE_S_OK){
                 this.$store.state.session = new window.jSW.SWSession({
                 // server: Server,
-                // port: parseInt(Server_Port),
+                // port: 9700,
                 onopen: sess => {
                   sess.swLogin({
                     user: userName,
@@ -83,12 +88,18 @@ export default {
                   case jSW.RcCode.RC_CODE_E_INVALIDPORT:
                     this.$Message.error('Server Port Error')
                   break;
+                  case jSW.RcCode.RC_CODE_E_BVCU_CONNECTFAILED:
+                    this.$Message.error('Connect Failed')
+                  break;
                   case jSW.RcCode.RC_CODE_E_USERNAME:
                   case jSW.RcCode.RC_CODE_E_PASSWORD:
                     this.$Message.error('No User Or Password error')
                   break;
                   case jSW.RcCode.RC_CODE_E_BVCU_AUTHORIZE_FAILED:
                     this.$Message.error('Authorize Failed')
+                  break;
+                  case jSW.RcCode.RC_CODE_E_BVCU_CONNECTFAILED:
+                    this.$Message.error('ConnectFailed')
                   break;
                   default:
                     this.$Message.error('Fail, error code: ' + code)
@@ -122,6 +133,9 @@ export default {
               break;
               case jSW.RcCode.RC_CODE_E_BVCU_AUTHORIZE_FAILED:
                 this.$Message.error('Authorize Failed');
+              break;
+              case jSW.RcCode.RC_CODE_E_BVCU_CONNECTFAILED:
+                this.$Message.error('ConnectFailed')
               break;
               default:
                 this.$Message.error('Fail, error code: ' + json.code)
