@@ -564,13 +564,13 @@ export default {
         });
       }
     },
-    // "$store.state.session._arr_pu"(val) {
-    //   this.GetPu(this.isOnline ? 1 : 0);
-    // },
-    "$store.state.session._arr_pu_online"(val) {
-      console.log('do');
+    "$store.state.session._arr_pu"(val) {
+      console.log('_arr_pu_change');
       this.GetPu(this.isOnline ? 1 : 0);
-      
+    },
+    "$store.state.session._arr_pu_online"(val) {
+      console.log('_arr_pu_online_change');
+      this.GetPu(this.isOnline ? 1 : 0);
     },
     isOnline(val) {
       this.CurrentPage = 1;
