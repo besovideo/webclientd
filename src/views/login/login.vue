@@ -64,7 +64,7 @@ export default {
         window.jSW.swInit({
           // url: window.location.origin, //bv_nginx.exe服务器地址
           url,
-          // url: 'http://115.28.79.237:8081',
+          // url: '',
           calltype: window.jSW.CallProtoType.HTTP, // AUTO: IE优先使用OCX, 如果希望IE仍然使用HTTP通信, 请使用jSW.CallProtoType.HTTP
           oninit: (code)=>{
             if(code==jSW.RcCode.RC_CODE_S_OK){
