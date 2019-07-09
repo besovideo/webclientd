@@ -10,6 +10,11 @@ import 'font-awesome/css/font-awesome.css'
 import tools from './plugins/tools.js'
 import VueI18n from 'vue-i18n'
 Vue.use(VueI18n)
+
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
+Vue.use(ElementUI)
+
 const i18n = new VueI18n({
   locale: localStorage.getItem('locale') || 'zh',
   messages: require('./plugins/messages.js')

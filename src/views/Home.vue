@@ -44,7 +44,9 @@
           </div>
         </Menu>
       </Header>
-      <router-view></router-view>
+    <keep-alive>
+    <router-view></router-view>
+  </keep-alive>
       <!-- <Footer class="layout-footer-center">2011-2016 &copy; TalkingData</Footer> -->
     </Layout>
   </div>
@@ -126,7 +128,9 @@ export default {
   padding: 0 0 0 50px;
 }
 .ivu-layout-content{
-  display: flex;
+  // display: flex;
+  height: calc(100% - 64px);
+  background: #fff;
 }
 .ivu-menu {
   background: rgb(43, 100, 176);
@@ -149,7 +153,6 @@ export default {
 .layout-nav{
     float: right;
     margin-right: 2px;
-    
 }
 .layout-footer-center{
     text-align: center;

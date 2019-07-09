@@ -1,6 +1,6 @@
 <template>
   <Content :style="{margin: '0 auto',height: '100%',width: '1250px'}">
-    <div style="height: 100%;width: 100%;margin-top:20px">
+    <div style="height: 100%;width: 100%;padding-top:20px;background:#f5f7f9">
       <Row>
         <Col span='18' style="background:#fff;height:250px;padding-top:20px">
           <Col span="6" style="height:100px;line-height:100px">
@@ -22,7 +22,7 @@
             </div>
           </Col>
           <Col span="6" style="height:100px;line-height:100px" >
-            <div class="item_box" @click="$router.push({name:'Monitor'})">
+            <div class="item_box" @click="$router.push({name:'Locate'})">
                 <div class="img"><img style="margin-top:-10px"  src="../assets/images/icon3.png" alt=""></div>
                 <div class="content">
                     <p class="title">{{$t('home.location')}}</p>

@@ -38,9 +38,10 @@ export default new Router({
         {
           path: '/Monitor',
           name: 'Monitor',
-          redirect: '/Monitor/LivePreview',
+          redirect: '/Monitor/Locate',
           meta: {
             title: 'tab.monitor',
+            keepAlive: true,
             Name: 'Monitor'
           },
           children: [
@@ -52,9 +53,17 @@ export default new Router({
                 keepAlive: true,
                 Name: 'Monitor'
               },
-              components: {
-                LivePreview: () => import(/* webpackChunkName: "Monitor" */ './views/Monitor/LivePreview.vue')
-              }
+              component: () => import(/* webpackChunkName: "Monitor" */ './views/Monitor/LivePreview.vue')
+            },
+            {
+              path: 'Locate',
+              name: 'Locate',
+              meta: {
+                title: 'home.Locate',
+                keepAlive: true,
+                Name: 'Monitor'
+              },
+              component: () => import(/* webpackChunkName: "Monitor" */ './views/Monitor/Locate.vue')
             },
             {
               path: 'VideoPlayback',
@@ -63,9 +72,7 @@ export default new Router({
                 title: 'home.Video_playback',
                 Name: 'Monitor'
               },
-              components: {
-                VideoPlayback: () => import(/* webpackChunkName: "Monitor" */ './views/Monitor/VideoPlayback.vue')
-              }
+              component: () => import(/* webpackChunkName: "Monitor" */ './views/Monitor/VideoPlayback.vue')
             }
           ],
           component: () => import(/* webpackChunkName: "Monitor" */ './views/Monitor.vue')

@@ -28,7 +28,7 @@ module.exports = {
       more: '更多',
       online: '在线',
       Online_rate_statistics: '在线率统计',
-      LivePreview: '实现预览',
+      LivePreview: '实时预览',
       LivePreview_tip: '设备视频实时预览及操作',
       Video_playback: '录像回放',
       Video_playback_tip: '历史视频查询,点播,下载',
@@ -37,7 +37,8 @@ module.exports = {
       Track_playback: '轨迹回放',
       Track_playback_tip: '移动设备历史轨迹回放',
       Picture_monitor: '图片监控',
-      Picture_monitor_tip: '设备推送图片信息实时监控'
+      Picture_monitor_tip: '设备推送图片信息实时监控',
+      Locate: '实时定位'
     },
     Monitor: {
       Showonlyonlinedevices: '只显示在线设备',
@@ -88,7 +89,8 @@ module.exports = {
       Track_playback: 'Track playback',
       Track_playback_tip: 'Mobile device history track playback',
       Picture_monitor: 'Picture monitor',
-      Picture_monitor_tip: 'Device push picture information real-time monitoring'
+      Picture_monitor_tip: 'Device push picture information real-time monitoring',
+      Locate: 'Locate'
     },
     Monitor: {
       Showonlyonlinedevices: 'Show only online devices',

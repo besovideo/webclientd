@@ -487,7 +487,7 @@ export default {
         var result = this.videoDivList[target].chanel.swOpenEx({
           // ismuti: true,
           div: strVideoDivId,
-          prototype: "hls", //rtmp > hls
+          prototype: "auto", //rtmp > hls
           bovertcp: true,
           callback: (options, response, dlghandle) => {
             console.log(options, response, dlghandle);
@@ -592,10 +592,10 @@ export default {
   },
   beforeDestroy() {
     this.videoDivList.forEach(el => {
-      if (el.chanel != undefined) {
-        el.chanel.swClose({ hdlg: 1 });
-      }
-    });
+        if (el.chanel != undefined) {
+          el.chanel.swClose({ hdlg: 1 });
+        }
+      });
   },
   mounted() {
 

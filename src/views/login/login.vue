@@ -52,7 +52,8 @@ export default {
     handleSubmit ({userName, password }) {
       let url = window.location.origin
       if(process.env.NODE_ENV=='development'){
-        url = 'http://115.28.79.237:8081'
+        // url = 'http://115.28.79.237:8081'
+        url = 'http://127.0.0.1:8081'
       }
       this.spinShow = true
       // this.Server = Server
@@ -61,59 +62,61 @@ export default {
       this.password = password
       // console.log('-------------------------',Server ,Server_Port, userName, password )
       // window.onload = ()=>{
-        window.jSW.swInit({
-          // url: window.location.origin, //bv_nginx.exe服务器地址
-          url,
-          // url: '',
-          calltype: window.jSW.CallProtoType.HTTP, // AUTO: IE优先使用OCX, 如果希望IE仍然使用HTTP通信, 请使用jSW.CallProtoType.HTTP
-          oninit: (code)=>{
-            if(code==jSW.RcCode.RC_CODE_S_OK){
-                this.$store.state.session = new window.jSW.SWSession({
-                // server: Server,
-                // port: 9700,
-                onopen: sess => {
-                  sess.swLogin({
-                    user: userName,
-                    password: password
-                  })
-                }
-              })
-              this.$store.state.session.swAddCallBack('login', this.sessionCallback);
-            }else{
-              console.log(code)
-              switch (parseInt(code)){
-                  case jSW.RcCode.RC_CODE_E_INVALIDIP:
-                    this.$Message.error('Server IP Error')
-                  break;
-                  case jSW.RcCode.RC_CODE_E_INVALIDPORT:
-                    this.$Message.error('Server Port Error')
-                  break;
-                  case jSW.RcCode.RC_CODE_E_BVCU_CONNECTFAILED:
-                    this.$Message.error('Connect Failed')
-                  break;
-                  case jSW.RcCode.RC_CODE_E_USERNAME:
-                  case jSW.RcCode.RC_CODE_E_PASSWORD:
-                    this.$Message.error('No User Or Password error')
-                  break;
-                  case jSW.RcCode.RC_CODE_E_BVCU_AUTHORIZE_FAILED:
-                    this.$Message.error('Authorize Failed')
-                  break;
-                  case jSW.RcCode.RC_CODE_E_BVCU_CONNECTFAILED:
-                    this.$Message.error('ConnectFailed')
-                  break;
-                  default:
-                    this.$Message.error('Fail, error code: ' + code)
-                  break
+      let initCode = window.jSW.swInit({
+        // url: window.location.origin, //bv_nginx.exe服务器地址
+        url,
+        // url: '',
+        calltype: window.jSW.CallProtoType.HTTP, // AUTO: IE优先使用OCX, 如果希望IE仍然使用HTTP通信, 请使用jSW.CallProtoType.HTTP
+        oninit: (code)=>{
+          if(code==jSW.RcCode.RC_CODE_S_OK){
+              this.$store.state.session = new window.jSW.SWSession({
+              // server: Server,
+              // port: 9700,
+              onopen: sess => {
+                sess.swLogin({
+                  user: userName,
+                  password: password
+                })
               }
+            })
+            this.$store.state.session.swAddCallBack('login', this.sessionCallback);
+          }else{
+            console.log(code)
+            switch (parseInt(code)){
+                case jSW.RcCode.RC_CODE_E_INVALIDIP:
+                  this.$Message.error('Server IP Error')
+                break;
+                case jSW.RcCode.RC_CODE_E_INVALIDPORT:
+                  this.$Message.error('Server Port Error')
+                break;
+                case jSW.RcCode.RC_CODE_E_BVCU_CONNECTFAILED:
+                  this.$Message.error('Connect Failed')
+                break;
+                case jSW.RcCode.RC_CODE_E_USERNAME:
+                case jSW.RcCode.RC_CODE_E_PASSWORD:
+                  this.$Message.error('No User Or Password error')
+                break;
+                case jSW.RcCode.RC_CODE_E_BVCU_AUTHORIZE_FAILED:
+                  this.$Message.error('Authorize Failed')
+                break;
+                case jSW.RcCode.RC_CODE_E_BVCU_CONNECTFAILED:
+                  this.$Message.error('ConnectFailed')
+                break;
+                default:
+                  this.$Message.error('Fail, error code: ' + code)
+                break
             }
           }
-        })
-        
+        }
+      })
+      console.log('initCode:',initCode);
+      
       // }
 
      
     },
     sessionCallback(sender, event, json){
+        console.log("Login:",json);
         if (json.code == jSW.RcCode.RC_CODE_S_OK) {
           // window.localStorage.setItem('Server',this.Server)
           // window.localStorage.setItem('Server_Port',this.Server_Port)
