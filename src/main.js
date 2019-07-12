@@ -3,6 +3,8 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import './plugins/iview.js'
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
 import VueVideoPlayer from 'vue-video-player'
 import 'videojs-contrib-hls'
 import 'video.js/dist/video-js.css'
@@ -11,8 +13,6 @@ import tools from './plugins/tools.js'
 import VueI18n from 'vue-i18n'
 Vue.use(VueI18n)
 
-import ElementUI from 'element-ui';
-import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(ElementUI)
 
 const i18n = new VueI18n({

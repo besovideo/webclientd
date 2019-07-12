@@ -3,7 +3,7 @@
     <div id="_container"></div>
     <Modal footer-hide v-model="VideoModal" draggable scrollable>
       <p slot="header" style="color:#000;text-align:center">
-        <span>实时视频</span>
+        <span>{{ $t("Monitor.LiveVideo")}}</span>
       </p>
       <div style="text-align:center;height:500px;">
         <video-box v-if="VideoModal" :tag="tag" :puid="puid" :tagEl="tagEl"/>
@@ -84,7 +84,7 @@ export default {
 
           var info = `
               <p style="display:flex;width:220px;line-height:20px;height:20px">
-                <span style='font-size:16px;font-weight:600'>位置 :</span> 
+                <span style='font-size:16px;font-weight:600'>${this.$t("Monitor.Position")} :</span> 
                 <span style="display:inline-block;flex:1;text-align:center">${
                   this.position[0]
                 }</span>   
@@ -93,8 +93,8 @@ export default {
                 }</span>
               </p>
               <p style="margin-top:10px;text-align:center">
-                <button class="openVideo ivu-btn ivu-btn-success" onclick="MapOpenVideo()">实时视频</button>
-                <button class="ivu-btn ivu-btn-success">实时图片</button>
+                <button class="openVideo ivu-btn ivu-btn-success" onclick="MapOpenVideo()">${this.$t("Monitor.LiveVideo")}</button>
+                <button class="ivu-btn ivu-btn-success">${this.$t("Monitor.LivePhoto")}</button>
               </p>
                     `;
           let infoWindow = new AMap.InfoWindow({

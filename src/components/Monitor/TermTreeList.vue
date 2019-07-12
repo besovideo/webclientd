@@ -1,6 +1,6 @@
 <template>
   <div id="TermList">
-    <Input class="search" @on-search="" search clearable placeholder />
+    <Input class="search" @on-search="TermSearch" search clearable placeholder />
     <div class="showonline">
       <Checkbox class="cb" v-model="Cb_isOnline">{{$t('Monitor.Showonlyonlinedevices')}}</Checkbox>
     </div>
@@ -86,6 +86,9 @@ export default {
     };
   },
   methods: {
+    TermSearch(val){
+      console.log(val);
+    },
     HandleCentContentShow(target) {
       for (const key in this.CentCenterShowList) {
         if (this.CentCenterShowList.hasOwnProperty(key)) {

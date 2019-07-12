@@ -1,8 +1,8 @@
 <template>
   <div class="videobox">
     <div class="head">
-      通道{{tag}}
-      <span v-if="Type">类型:({{Type}})</span>
+      {{$t("Monitor.channel")}}{{tag}}
+      <span v-if="Type">{{$t("Monitor.Type")}}:({{Type}})</span>
     </div>
     <div class="videoEl">
       <div class="video_div"></div>
@@ -54,7 +54,7 @@ export default {
     },
     Play() {
       if (this.puid == undefined) {
-        this.$Message.error("请选择一个设备");
+        this.$Message.error(this.$t("Monitor.plaseselectterm"));
         return;
       }
       this.channel = this.session.swGetPuChanel(this.puid, parseInt(this.tag));
@@ -65,7 +65,7 @@ export default {
         ismuti: false,
         div: videoEl,
         // bstretch: true,
-        prototype: "auto",
+        prototype: "rtmp",
         bstretch: true,
         callback: (options, response, dlg) => {
           this.Type = options.prototype;
@@ -73,7 +73,7 @@ export default {
           this.Loading = false;
           if (response.emms.code == 0) {
           } else {
-            this.$Message.error("视频打开失败" + response.emms.code);
+            this.$Message.error(this.$t("Monitor.otheropenfail") + response.emms.code);
             this.Close();
           }
         }
@@ -99,12 +99,12 @@ export default {
       console.log(val);
       if (val != jSW.RcCode.RC_CODE_S_OK) {
         if (val == jSW.RcCode.RC_CODE_E_ALREADYEXIST) {
-          this.$Message.error("该通道已打开");
+          this.$Message.error(this.$t("Monitor.isopenchannel"));
         } else if (val == jSW.RcCode.RC_CODE_E_UNSUPPORTED) {
-          this.$Message.error("视频打开失败,请开启网站Flash功能");
+          this.$Message.error(this.$t("Monitor.otheropenfail_rtmp")+val);
           this.Close();
         } else {
-          this.$Message.error("通道打开失败" + val);
+          this.$Message.error(this.$t("Monitor.channelopenerror") + val);
         }
         this.Close();
       }

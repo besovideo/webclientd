@@ -48,7 +48,14 @@ module.exports = {
       noTerm: '无此设备',
       isopenchannel: '视频通道已打开',
       otheropenfail: '视频打开失败',
-      Pleasecloseavideowindowfirst: '请先关闭一个视频窗口'
+      channelopenerror: '通道打开失败',
+      otheropenfail_rtmp: '视频打开失败,请开启网站rtmp功能',
+      plaseselectterm: '请选择一个设备',
+      Pleasecloseavideowindowfirst: '请先关闭一个视频窗口',
+      LiveVideo: '实时视频',
+      LivePhoto: '实时图片',
+      Type: '类型',
+      Position: '位置'
     }
   },
   'en': {
@@ -100,7 +107,14 @@ module.exports = {
       noTerm: 'No such device',
       isopenchannel: 'Video channel is open',
       otheropenfail: 'Video open failed',
-      Pleasecloseavideowindowfirst: 'Please close a video window first'
+      channelopenerror: 'Channel open failed',
+      otheropenfail_rtmp: 'Video open failed,Please open the website rtmp ',
+      plaseselectterm: 'Please select a device',
+      Pleasecloseavideowindowfirst: 'Please close a video window first',
+      LiveVideo: 'LiveVideo',
+      LivePhoto: 'LivePhoto',
+      Type: 'Type',
+      Position: 'Position'
 
     }
   }
