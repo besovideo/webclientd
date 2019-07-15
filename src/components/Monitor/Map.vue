@@ -102,10 +102,17 @@ export default {
             content: info //使用默认信息窗体框样式，显示信息内容
           });
           
-          // infoWindow.on('open',()=>{})
-          // infoWindow.on('close',showInfoClose)
+          let infoWindowClose = false;
+          infoWindow.on('close',()=>{
+            infoWindowClose = true
+          })
           infoWindow.open(this.map, resLnglat);
-
+          m2.on('click', ()=>{
+            if(infoWindowClose){
+              infoWindow.open(this.map, resLnglat);
+              infoWindowClose = false
+            }
+          });
         }
       });
     },
