@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <div class="left">
-      <term-tree-list key="LocateTree" @on-click='ChanelClick'/>
+      <term-tree-list key="LocateTree" :noShowChannel="true" @on-term-click='ChanelClick'/>
     </div>
     <div class="body">
       <Map :position="position"  key="LocateMap" />
@@ -21,20 +21,15 @@ export default {
     };
   },
   methods: {
-    ChanelClick(channel,index){
-      let videoChannel = channel
-      if (index < channel._parent._arr_gps.length) {
-        channel = channel._parent._arr_gps[index];
-      } else {
-        channel = channel._parent._arr_gps[0];
-      }
+    ChanelClick(channel){
+      channel = channel._parent._arr_gps[0];
       channel.swOpen({
         callback: (options, response) => {
           let lat = response.gps.lat / 10000000;
           let long = response.gps.long / 10000000;
           // this.ChannelContent = true;
-          this.position = [long, lat, videoChannel];
-        }
+          this.position = [long, lat];
+        } 
       });
     }
   },

@@ -59,6 +59,7 @@
 <script>
 import { mapState } from "vuex";
 export default {
+  props: ['noShowChannel'],
   data() {
     return {
       VideoState: require('@/assets/images/video2.png'),
@@ -101,6 +102,12 @@ export default {
       });
     },
     HandleChannelClick(data, node) {
+      if (data.isTerm) {
+        let channel = this.session.swGetPuChanel(data.pu_id, 0);
+        this.$emit('on-term-click',channel)
+        return;
+      }
+      
       if (data.$treeNodeId == 1) {
         return;
       }
@@ -216,24 +223,29 @@ export default {
         ) {
 
           let children = [];
-          ele._arr_channel.forEach((el,i)=>{
-            if(ele._info_pu.onlinestatus!=0)
-            children.push(
-              {
-                label:this.$t('Monitor.channel')+i,
-                index: i,
-                pu_id: ele._id_pu,
-                isChannel: true
-              }
-            )
-          })
+          if(this.noShowChannel){
+
+          }else{
+            ele._arr_channel.forEach((el,i)=>{
+              if(ele._info_pu.onlinestatus!=0)
+              children.push(
+                {
+                  label:this.$t('Monitor.channel')+i,
+                  index: i,
+                  pu_id: ele._id_pu,
+                  isChannel: true
+                }
+              )
+            })
+          }
           temp.push({
-            label: ele._name_pu || ele._id_pu,
-            pu_id: ele._id_pu,
-            isTerm: true,
-            isOnline: ele._info_pu.onlinestatus,
-            children
+              label: ele._name_pu || ele._id_pu,
+              pu_id: ele._id_pu,
+              isTerm: true,
+              isOnline: ele._info_pu.onlinestatus,
+              children
           });
+          
         }
       });
 
@@ -306,7 +318,10 @@ export default {
       session: "session"
     })
   },
+
   created() {
+    console.log('created');
+    this.GetTermList()
     this.session.swAddCallBack('pulist',(sender, cmd, data)=>{
       if(this.isFirst){
         this.GetTermList();

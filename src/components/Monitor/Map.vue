@@ -6,7 +6,7 @@
         <span>{{ $t("Monitor.LiveVideo")}}</span>
       </p>
       <div style="text-align:center;height:500px;">
-        <video-box v-if="VideoModal" :tag="tag" :puid="puid" :tagEl="tagEl"/>
+        <video-box v-if="VideoModal" :tag="tag" :puid="puid" :tagEl="tagEl" />
       </div>
       <!-- <div slot="footer">
         <Button type="error" size="large" long >Delete</Button>
@@ -187,20 +187,6 @@ export default {
   created() {
     console.log("created");
     this.loading = true;
-    // if (!document.querySelector("#Mmap")) {
-    //   var url =
-    //     "https://webapi.amap.com/maps?v=1.4.15&key=2d7458fc3ae350eb4b0b40bd82cc3f94";
-    //   var jsapi = document.createElement("script");
-    //   jsapi.id = "Mmap";
-    //   jsapi.charset = "utf-8";
-    //   jsapi.src = url;
-    //   document.head.appendChild(jsapi);
-    //   jsapi.onload = () => {
-    //     this.SetMap();
-    //   };
-    // } else {
-    //   this.SetMap();
-    // }
     this.MP("2d7458fc3ae350eb4b0b40bd82cc3f94").then(data => {
       console.log(data);
       this.SetMap();

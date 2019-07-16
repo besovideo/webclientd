@@ -617,7 +617,7 @@ export default {
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .body {
   height: 100%;
   display: flex;

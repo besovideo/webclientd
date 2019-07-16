@@ -1,15 +1,15 @@
 <template>
   <div class="videobox">
     <div class="head">
-      {{$t("Monitor.channel")}}{{tag}}
-      <span v-if="Type">{{$t("Monitor.Type")}}:({{Type}})</span>
+      <span v-if="ShowTag">{{$t("Monitor.channel")}}{{tag}}</span>
+      <span v-if="Type" style="padding-left:10px;">{{$t("Monitor.Type")}}:({{Type}})</span>
     </div>
     <div class="videoEl">
       <div class="video_div"></div>
-      <img class="playloading" v-if="playLoading" :src="playbtn" width="100" alt @click="Play">
+      <img class="playloading" v-if="playLoading&&!noPlay" :src="playbtn" width="100" alt @click="Play">
       <img
         class="playloading loading"
-        v-if="!playLoading&&Loading"
+        v-if="(!playLoading&&Loading)"
         :src="playLoadingSrc"
         width="100"
       >
@@ -28,7 +28,7 @@
 <script>
 import { mapState } from "vuex";
 export default {
-  props: ["tag", "puid","tagEl"],
+  props: ["tag", "puid","tagEl","noPlay",'isopen'],
   data() {
     return {
       tagdata: undefined,
@@ -39,19 +39,29 @@ export default {
       Loading: true,
       channel: undefined,
       Type: undefined,
+      ShowTag: false,
       OpenResult: undefined
     };
   },
   methods: {
+    //全屏
     FullScreen() {
       this.session.swGetPuChanel(this.puid, parseInt(this.tag)).swFullScreen(0);
     },
+    //停止播放
     Close() {
+      console.log("===========close",this.tagEl)
+      this.$emit("on-open",this.tagEl,false)
+      if(this.noPlay){
+        this.ShowTag = false
+        this.Type = false
+      }
       if (!this.channel) return;
-      this.channel.swClose(0);
+      this.channel.swClose(this.tag);
       this.playLoading = true;
       this.Loading = true;
     },
+    //播放逻辑
     Play() {
       if (this.puid == undefined) {
         this.$Message.error(this.$t("Monitor.plaseselectterm"));
@@ -68,13 +78,14 @@ export default {
         prototype: "rtmp",
         bstretch: true,
         callback: (options, response, dlg) => {
-          this.Type = options.prototype;
           console.log(options, response, dlg);
           this.Loading = false;
           if (response.emms.code == 0) {
+            this.ShowTag = true
+            this.Type = options.prototype;
+            this.$emit("on-open",this.tagEl,true)
           } else {
             this.$Message.error(this.$t("Monitor.otheropenfail") + response.emms.code);
-            this.Close();
           }
         }
       });
@@ -88,25 +99,36 @@ export default {
   watch: {
     puid(val) {
       if (val != undefined) {
-        this.tagdata = parseInt(this.tag);
-        let id = setInterval(() => {
-          if (this.tagdata == 20) clearInterval(id);
-          this.tagdata += 1;
-        }, 1000);
+        // this.tagdata = parseInt(this.tag);
+        // let id = setInterval(() => {
+        //   if (this.tagdata == 20) clearInterval(id);
+        //   this.tagdata += 1;
+        // }, 1000);
+        
+      }
+    },
+    tag(val,oldVal){
+      if(val!=undefined){
+        if(oldVal!=undefined){
+          this.Close()
+        }
+        if(this.noPlay){
+          this.Play()
+        }
       }
     },
     OpenResult(val) {
       console.log(val);
+      this.Loading = false;
       if (val != jSW.RcCode.RC_CODE_S_OK) {
         if (val == jSW.RcCode.RC_CODE_E_ALREADYEXIST) {
           this.$Message.error(this.$t("Monitor.isopenchannel"));
         } else if (val == jSW.RcCode.RC_CODE_E_UNSUPPORTED) {
           this.$Message.error(this.$t("Monitor.otheropenfail_rtmp")+val);
-          this.Close();
         } else {
           this.$Message.error(this.$t("Monitor.channelopenerror") + val);
         }
-        this.Close();
+        this.channel = undefined
       }
     }
   },

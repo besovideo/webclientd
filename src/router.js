@@ -53,7 +53,7 @@ export default new Router({
                 keepAlive: true,
                 Name: 'Monitor'
               },
-              component: () => import(/* webpackChunkName: "Monitor" */ './views/Monitor/LivePreview.vue')
+              component: () => import(/* webpackChunkName: "Monitor" */ './views/Monitor/_LivePreview.vue')
             },
             {
               path: 'Locate',
