@@ -6,7 +6,7 @@
         <span>{{ $t("Monitor.LiveVideo")}}</span>
       </p>
       <div style="text-align:center;height:500px;">
-        <video-box v-if="VideoModal" :tag="tag" :puid="puid" :tagEl="tagEl" />
+        <video-box v-if="VideoModal" :tag="tag" :puid="puid" :puname="puname" :tagEl="tagEl" />
       </div>
       <!-- <div slot="footer">
         <Button type="error" size="large" long >Delete</Button>
@@ -28,12 +28,15 @@ export default {
       VideoModal: false,
       tag:undefined,
       tagEl:undefined,
-      puid:undefined
+      puid:undefined,
+      puname:undefined,
     };
   },
   watch: {
-    position(val) {
-      this.VideoModal = false;
+    position(val,oldVal) {
+      if(oldVal[2]!=val[2]){
+        this.VideoModal = false;
+      }
       this.SetMap();
     }
   },
@@ -58,8 +61,9 @@ export default {
     },
     Open(){
       let channel = this.position[2]
-      this.tag = channel._id_chanel;
+      this.tag = 0;
       this.puid = channel._parent._id_pu;
+      this.puname = channel._parent._name_pu||channel._parent._id_pu;
       this.tagEl = 0;
       this.VideoModal = true;
     },

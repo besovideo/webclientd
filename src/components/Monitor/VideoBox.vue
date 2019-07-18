@@ -1,7 +1,7 @@
 <template>
   <div class="videobox">
     <div class="head">
-      <span v-if="ShowTag">{{$t("Monitor.channel")}}{{tag}}</span>
+      <span v-if="ShowTag">{{puname||""}}  {{$t("Monitor.channel")}}{{tag}}</span>
       <span v-if="Type" style="padding-left:10px;">{{$t("Monitor.Type")}}:({{Type}})</span>
     </div>
     <div class="videoEl">
@@ -28,7 +28,7 @@
 <script>
 import { mapState } from "vuex";
 export default {
-  props: ["tag", "puid","tagEl","noPlay",'isopen'],
+  props: ["tag", "puid","tagEl","noPlay",'isopen','puname'],
   data() {
     return {
       tagdata: undefined,
@@ -67,6 +67,7 @@ export default {
         this.$Message.error(this.$t("Monitor.plaseselectterm"));
         return;
       }
+      this.Close()
       this.channel = this.session.swGetPuChanel(this.puid, parseInt(this.tag));
       this.playLoading = false;
       
@@ -107,16 +108,16 @@ export default {
         
       }
     },
-    tag(val,oldVal){
-      if(val!=undefined){
-        if(oldVal!=undefined){
-          this.Close()
-        }
-        if(this.noPlay){
-          this.Play()
-        }
-      }
-    },
+    // tag(val,oldVal){
+    //   if(val!=undefined){
+    //     if(oldVal!=undefined){
+    //       this.Close()
+    //     }
+    //     if(this.noPlay){
+    //       this.Play()
+    //     }
+    //   }
+    // },
     OpenResult(val) {
       console.log(val);
       this.Loading = false;

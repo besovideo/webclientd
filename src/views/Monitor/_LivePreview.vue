@@ -6,7 +6,7 @@
     <div class="lp_body">
       <div id="right_VideoContent">
         <div :style="videoboxclass"  v-for="(val,i) in videosize" >
-          <video-box :tag="videoinfo[i].tag" :key="i" :noPlay="true" @on-open="openState" :puid="videoinfo[i].puid" :isopen='videoinfo[i].isopen' :tagEl="i" :ref="'video'+i"/>
+          <video-box :tag="videoinfo[i].tag" :key="i" :noPlay="true" @on-open="openState" :puid="videoinfo[i].puid" :puname="videoinfo[i].puname" :isopen='videoinfo[i].isopen' :tagEl="i" :ref="'video'+i"/>
         </div>
       </div>
       <div id="lp_right_bottom">
@@ -38,6 +38,7 @@
               <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" command="1">1X1</el-dropdown-item>
               <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" command="4">2X2</el-dropdown-item>
               <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" command="9">3X3</el-dropdown-item>
+              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" command="16">4X4</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
@@ -86,6 +87,11 @@ export default {
       }
       temp.puid = channel._parent._id_pu;
       temp.tag = channel._id_chanel;
+      temp.puname = channel._parent._name_pu||channel._parent._id_pu;
+      console.log(channel);
+      this.$nextTick(()=>{
+        this.$refs['video'+temp.index][0].Play()
+      })
       // if((this.videoTarget+1)==this.videosize){
       //   this.videoTarget=0
       // }else{
@@ -117,6 +123,9 @@ export default {
         case 9:
           this.videoboxclass = {width:"33.333%",height:"33.333%",float:'left',border:"1px solid rgb(72, 123, 194)"}
           break
+        case 16:
+          this.videoboxclass = {width:"25%",height:"25%",float:'left',border:"1px solid rgb(72, 123, 194)"}
+          break
       }  
     },
   },
@@ -126,19 +135,19 @@ export default {
       session: "session"
     })
   },
-  beforeDestroy() {
-    // this.videoDivList.forEach(el => {
-    //     if (el.chanel != undefined) {
-    //       el.chanel.swClose({ hdlg: 1 });
-    //     }
-    //   });
-  },
-  mounted() {
+  activated(){
 
   },
+  deactivated(){
+    this.videoinfo.forEach((el,i)=>{
+      if(el.isopen){
+        this.$refs['video'+i][0].Close()
+      }
+    })
+  },
   created() {
-    for(var i=0;i<9;i++){
-      this.videoinfo.push({index:i,puid:undefined,tag:undefined,isopen:undefined})
+    for(var i=0;i<16;i++){
+      this.videoinfo.push({index:i,puid:undefined,puname:undefined,tag:undefined,isopen:undefined})
     }
     this.session.swSearchPuList({
         iPosition: 0,
@@ -170,7 +179,7 @@ export default {
     display: block;
     #right_VideoContent{
       width: 100%;
-      height: calc(100% - 30px);
+      height: calc(100% - 29px);
       background-color: #ccc;
     }
     #lp_right_bottom{

@@ -18,19 +18,37 @@ export default {
   data() {
     return {
       position: [],
+      openChannel:undefined,
     };
   },
   methods: {
     ChanelClick(channel){
+      console.log(channel);
+      if(channel._parent._arr_gps.length==0){
+        this.$Message.error(this.$t("Monitor.noGPSChannel"))
+        return
+      }
       channel = channel._parent._arr_gps[0];
-      channel.swOpen({
-        callback: (options, response) => {
-          let lat = response.gps.lat / 10000000;
-          let long = response.gps.long / 10000000;
-          // this.ChannelContent = true;
-          this.position = [long, lat];
-        } 
-      });
+      if(channel!=this.openChannel){
+        if(this.openChannel!=undefined){
+          this.openChannel.swClose()
+        }
+        this.openChannel = channel
+        this.openChannel.swOpen({
+          // interval:5000,
+          // repeat:-1,
+          callback: (options, response) => {
+            let lat = response.gps.lat / 10000000;
+            let long = response.gps.long / 10000000;
+            // this.ChannelContent = true;
+            this.position = [long, lat,this.openChannel];
+          }
+        });
+      }
+      // this.session.swAddCallBack("pugpsdata",(sender, cmd, data)=>{
+      //   console.log(Math.random()," Math.random()")
+      //   console.log("gps==========",sender,cmd,data);
+      // })
     }
   },
   watch: {
@@ -48,7 +66,7 @@ export default {
     //     this.GetTermList();
     //   }, 2000);
     // });
-    // this.GetTermList();
+    // this.GetTermList(); 
   }
 };
 </script>

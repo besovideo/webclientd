@@ -65,7 +65,7 @@ export default {
       VideoState: require('@/assets/images/video2.png'),
       VideoErrorState: require('@/assets/images/video2-error.png'),
       ChannelUrl: require('@/assets/images/channel.png'),
-      Cb_isOnline:false,
+      Cb_isOnline:true,
       TreeLoading:true,
       isFirst: true,
       NameSearch: "",
@@ -149,31 +149,10 @@ export default {
       this.ChannelContent = false;
       this.ReloadContent = true;
       this.ReloadContent = false;
-      // (this.VideoKey = [
-      //   new Date()
-      //     .getTime()
-      //     .toString()
-      //     .slice(5),
-      //   1 +
-      //     new Date()
-      //       .getTime()
-      //       .toString()
-      //       .slice(5),
-      //   2 +
-      //     new Date()
-      //       .getTime()
-      //       .toString()
-      //       .slice(5),
-      //   3 +
-      //     new Date()
-      //       .getTime()
-      //       .toString()
-      //       .slice(5)
-      // ]),
+     
         (this.pu_id = data.pu_id);
       this.CurrentPuInfo = data;
-      // let chanel = this.session.swGetPuChanel(data.pu_id,0)
-      // console.log(chanel);
+      
     },
     ChangePage(page) {
       this.SetTreeData("_arr_pu");
@@ -271,12 +250,16 @@ export default {
       if (this.isFirst) this.isFirst = false;
     },
     GetTermList() {
+      if(this.session._arr_pu_online.length>0){
+        this.SetTreeData("_arr_pu_online");
+      }
       this.session.swSearchPuList({
         iPosition: 0,
-        iCount: 0,
+        iCount: 60,
         callback: (options, response, data) => {
+          console.log("searchlist============================\n",options, response, data);
           if (this.isFirst) {
-            this.SetTreeData("_arr_pu");
+            this.SetTreeData("_arr_pu_online");
           }
         }
       });
@@ -293,14 +276,19 @@ export default {
   watch: {
     "session._arr_pu_offline"(val) {
       console.log("Offline_Update");
-      if (!this.isFirst) {
+      if(!this.Cb_isOnline){
         this.SetTreeData("_arr_pu");
       }
+      // if (!this.isFirst) {
+      // }
     },
     "session._arr_pu_online"(val) {
-      if (!this.isFirst) {
-        this.SetTreeData("_arr_pu");
-      }
+        console.log('ONline');
+        if(this.Cb_isOnline){
+          this.SetTreeData("_arr_pu_online");
+        }
+      // if (!this.isFirst) {
+      // }
     },
     Cb_isOnline(val){
       if (!this.isFirst) {
@@ -321,8 +309,10 @@ export default {
 
   created() {
     console.log('created');
+    console.log(this.session);
     this.GetTermList()
     this.session.swAddCallBack('pulist',(sender, cmd, data)=>{
+      console.log("pulist============================\n",sender, cmd, data);
       if(this.isFirst){
         this.GetTermList();
       }
