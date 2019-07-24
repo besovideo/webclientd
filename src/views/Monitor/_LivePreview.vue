@@ -1,7 +1,7 @@
 <template>
   <div class="lp_content">
     <div class="lp_left">
-      <term-tree-list key="LivePreviewTree" @on-click='ChanelClick'/>
+      <term-tree-list  @on-click='ChanelClick'/>
     </div>
     <div class="lp_body">
       <div id="right_VideoContent">
@@ -149,13 +149,7 @@ export default {
     for(var i=0;i<16;i++){
       this.videoinfo.push({index:i,puid:undefined,puname:undefined,tag:undefined,isopen:undefined})
     }
-    this.session.swSearchPuList({
-        iPosition: 0,
-        iCount: 0,
-        callback: (options, response, data) => {
-          
-        }
-      });
+    
   },
   updated() {
   }

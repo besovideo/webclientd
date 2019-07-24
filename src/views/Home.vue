@@ -44,7 +44,7 @@
           </div>
         </Menu>
       </Header>
-    <keep-alive>
+  <keep-alive>
     <router-view></router-view>
   </keep-alive>
       <!-- <Footer class="layout-footer-center">2011-2016 &copy; TalkingData</Footer> -->

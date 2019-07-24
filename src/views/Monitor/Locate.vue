@@ -18,7 +18,7 @@ export default {
   data() {
     return {
       position: [],
-      openChannel:undefined,
+      openChannel:undefined
     };
   },
   methods: {

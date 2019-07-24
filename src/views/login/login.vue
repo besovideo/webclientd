@@ -52,8 +52,8 @@ export default {
     handleSubmit ({userName, password }) {
       let url = window.location.origin
       if(process.env.NODE_ENV=='development'){
-        // url = 'http://115.28.79.237:8081'
-        url = 'http://127.0.0.1:8081'
+        url = 'http://115.28.79.237:8081'
+        // url = 'http://192.168.6.66:8081'
       }
       this.spinShow = true
       // this.Server = Server
@@ -67,6 +67,9 @@ export default {
         url,
         // url: '',
         calltype: window.jSW.CallProtoType.HTTP, // AUTO: IE优先使用OCX, 如果希望IE仍然使用HTTP通信, 请使用jSW.CallProtoType.HTTP
+        config:{
+          bManualLP:true
+        },
         oninit: (code)=>{
           if(code==jSW.RcCode.RC_CODE_S_OK){
               this.$store.state.session = new window.jSW.SWSession({

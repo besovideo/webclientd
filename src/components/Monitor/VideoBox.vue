@@ -15,10 +15,10 @@
       >
       <div class="control">
         <div class="left">
-          <img :src="closePng" class="close item" @click="Close()">
+          <img :src="closePng" class="close item unselectable" @click="Close()">
         </div>
         <div class="right">
-          <Icon type="md-expand item" size="20" style="line-height:25px" @click="FullScreen()"/>
+          <Icon type="md-expand item unselectable" size="20" style="line-height:25px" @click="FullScreen()"/>
         </div>
       </div>
     </div>
@@ -46,7 +46,8 @@ export default {
   methods: {
     //全屏
     FullScreen() {
-      this.session.swGetPuChanel(this.puid, parseInt(this.tag)).swFullScreen(0);
+      if(this.channel!=undefined)
+        this.session.swGetPuChanel(this.puid, parseInt(this.tag)).swFullScreen(0);
     },
     //停止播放
     Close() {
@@ -58,6 +59,7 @@ export default {
       }
       if (!this.channel) return;
       this.channel.swClose(this.tag);
+      this.channel = undefined;
       this.playLoading = true;
       this.Loading = true;
     },

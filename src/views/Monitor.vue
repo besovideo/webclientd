@@ -13,9 +13,9 @@
       </TabPane>
       <!-- <TabPane :label="$t('home.location')" name="VideoPlayback">{{$t('home.location')}}</TabPane> -->
     </Tabs>
-  <keep-alive>
+  <!-- <keep-alive> -->
     <router-view></router-view>
-  </keep-alive>
+  <!-- </keep-alive> -->
 
   </Content>
 </template>
