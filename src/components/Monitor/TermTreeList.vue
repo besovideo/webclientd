@@ -37,6 +37,10 @@
             @dblclick.stop.prevent="HandleTreeClick(data,node)"
             :style="{color:data.isOnline==0?'#ccc':'inherit',paddingLeft:10}"
           >{{ node.label }}</span>
+          <span class="pu_id" v-if="data.isTerm">
+            <!-- {{node.label==node.pu_id?"":`(${node.pu_id})`}} -->
+            ({{data.pu_id.slice(3)}})
+          </span>
         </span>
       </el-tree>
     </div>
@@ -225,16 +229,16 @@ export default {
       // });
       // this.$set(this.TermListData[0], "children", list);
       this.TreeLoading = true;
-      // let CurrentPage = this.CurrentPage;
-      // if(this.CurrentPage > Math.ceil(this.session[name].length / 100)){
-      //   CurrentPage 
-      // }
+      let CurrentPage = this.CurrentPage;
+      if(this.CurrentPage > Math.ceil(this.session[name].length / 100)){
+        CurrentPage =  Math.ceil(this.session[name].length / 100)
+      }
 
       let temp = [];
       if (name == "_arr_pu") {
         let num = [];
         if (
-          (this.CurrentPage - 1) * 100 <
+          (CurrentPage - 1) * 100 <
           this.session["_arr_pu_online"].length
         ) {
           this.session[name].forEach((el, i) => {
@@ -258,8 +262,8 @@ export default {
       this.session[name].forEach((ele, i) => {
         // this.Total = this.session[name].length;
         if (
-          i >= (this.CurrentPage - 1) * 100 &&
-          i < (this.CurrentPage - 1) * 100 + 100
+          i >= (CurrentPage - 1) * 100 &&
+          i < (CurrentPage - 1) * 100 + 100
         ) {
           let children = [];
           if (this.noShowChannel) {
@@ -449,7 +453,7 @@ export default {
     //   }
     // },
     "session._arr_pu_online"(val) {
-      if(this.TreeLoading)return
+      // if(this.TreeLoading)return
       console.log("ONline");
       if (this.Cb_isOnline && !this.isFirst) {
         this.GetTermList(this.CurrentPage - 1, 100, true);
@@ -514,8 +518,12 @@ export default {
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12), 0 0 6px 0 rgba(0, 0, 0, 0.04);
     overflow: auto;
     .el-tree-node__content {
+      overflow: initial!important;
       height: 30px !important;
       font-size: 16px !important;
+    }
+    .pu_id{
+      color:#ccc
     }
   }
   div.Page {

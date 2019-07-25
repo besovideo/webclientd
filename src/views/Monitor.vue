@@ -7,10 +7,9 @@
       <TabPane :label="$t('home.LivePreview')" name="LivePreview" tab='tabs'>
           <!-- <router-view name="LivePreview"></router-view> -->
       </TabPane>
-      <TabPane :label="$t('home.Video_playback')" name="VideoPlayback" tab='tabs'>
-        <!-- <router-view name="VideoPlayback"></router-view> -->
-        <!-- {{$t('home.Video_playback')}} -->
-      </TabPane>
+      <!-- <TabPane :label="$t('home.Video_playback')" name="VideoPlayback" tab='tabs'>
+        
+      </TabPane> -->
       <!-- <TabPane :label="$t('home.location')" name="VideoPlayback">{{$t('home.location')}}</TabPane> -->
     </Tabs>
   <!-- <keep-alive> -->
