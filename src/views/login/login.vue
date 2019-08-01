@@ -52,8 +52,8 @@ export default {
     handleSubmit ({userName, password }) {
       let url = window.location.origin
       if(process.env.NODE_ENV=='development'){
-        url = 'http://115.28.79.237:8081'
-        // url = 'http://192.168.6.66:8081'
+        // url = 'http://115.28.79.237:8081'
+        url = 'http://192.168.6.66:8081'
       }
       this.spinShow = true
       // this.Server = Server

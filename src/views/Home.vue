@@ -73,8 +73,11 @@ export default {
     ChangePersonal(name){
       switch (name){
         case 'exit':
-
-          this.$store.state.session.swLogout()
+          let code = this.$store.state.session.swLogout()
+          if(code==jSW.RcCode.RC_CODE_E_DISCONNECTED){
+            this.$store.state.session = undefined
+            this.$router.push({path:'/login'})
+          }
         break;
       }
     }

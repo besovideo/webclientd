@@ -10,7 +10,7 @@ export default {
       element.msRequestFullscreen()
     }
   },
-  checkFlash () {
+  checkFlash: () => {
     let hasFlash = false
     let flashVersion
     if (navigator.plugins && navigator.plugins.length > 0) {

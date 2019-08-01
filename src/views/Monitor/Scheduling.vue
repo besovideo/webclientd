@@ -1,27 +1,35 @@
 <template>
   <div class="content">
     <div class="left">
-      <term-tree-list key="LocateTree" :noShowChannel="true" @on-term-click='ChanelClick'/>
+      <scheduling-tree-list key="LocateTree" :noShowChannel="true" @on-term-click='ChanelClick' @on-get-termgps='GetTermGps'/>
     </div>
     <div class="body">
-      <Map :position="position"  key="LocateMap" />
+      <Map :position="position"  key="LocateMap" :SchedulingList='GpsList' ref="Scheduling"/>
     </div>
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
-import TermTreeList from "@/components/Monitor/TermTreeList.vue"
+import SchedulingTreeList from "@/components/Monitor/SchedulingTreeList.vue"
 import Map from "@/components/Monitor/Map.vue"
 export default {
-  components:{TermTreeList,Map},
+  components:{SchedulingTreeList,Map},
   data() {
     return {
       position: [],
-      openChannel:undefined
+      openChannel:undefined,
+      GpsList:undefined,
     };
   },
   methods: {
+    GetTermGps(list){
+      console.log('GetGps',list)
+      this.GpsList = list
+      this.$nextTick(()=>{
+        this.$refs['Scheduling'].SetSchedulingMap()
+      })
+    },
     ChanelClick(channel){
       if(null == channel){
         this.$Message.error(this.$t("Monitor.noGPSChannel"))        
@@ -83,13 +91,16 @@ export default {
   height: calc(100% - 42px);
   display: flex;
   .left{
-    width: 255px;
+    width: 280px;
     height: 100%;
   }
   .body{
     flex:1;
     margin-left: 5px;
     height: 100%;
+  }
+  .el-tree-node>.el-tree-node__children{
+    overflow: hidden!important;
   }
 }
 </style>

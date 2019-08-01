@@ -19,7 +19,7 @@
 import VideoBox from "../../components/Monitor/VideoBox.vue";
 export default {
   components:{VideoBox},
-  props: ["position"],
+  props: ["position",'SchedulingList'],
   data() {
     return {
       loading: false,
@@ -30,6 +30,7 @@ export default {
       tagEl:undefined,
       puid:undefined,
       puname:undefined,
+      IntervalGetGpsID:undefined,
     };
   },
   watch: {
@@ -41,6 +42,57 @@ export default {
     }
   },
   methods: {
+    SetSchedulingMap(){
+      this.SchedulingList.forEach(el=>{el.marker=undefined})
+      if(this.IntervalGetGpsID!=undefined){
+        clearInterval(this.IntervalGetGpsID)
+      }
+      let func = ()=>{
+        this.SchedulingList.forEach((el)=>{
+          let code = el.swOpen({
+            // interval:5000,
+            // repeat:-1,
+            callback: (options, response) => {
+              
+              let lat = response.gps.lat / 10000000;
+              let long = response.gps.long / 10000000;
+              // this.ChannelContent = true;
+              // this.position = [long, lat,this.openChannel];
+              AMap.convertFrom([long, lat], "gps", (status, result) => {
+                if (result.info === "ok") {
+                  var resLnglat = result.locations[0];
+                  let marker
+                  if(!el.marker){
+                    marker = new AMap.Marker({
+                      position: resLnglat
+                      // icon: require('@/assets/images/video2.png')
+                    });
+                    let markerContent = document.createElement("div");
+                    let markerSpan = document.createElement("span");
+                    let markerImg = document.createElement("img");
+                    markerImg.className = "markerlnglat";
+                    markerImg.src = "//a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png";
+                    markerContent.appendChild(markerImg);
+                    markerSpan.className = 'marker';
+                    markerSpan.innerHTML = el._parent._name_pu||el._parent._id_pu;
+                    markerContent.appendChild(markerSpan);
+                    marker.setContent(markerContent);
+
+                    el.marker = marker
+
+                    this.map.add(marker);
+                  }else{
+                    el.marker.setPosition(resLnglat)
+                  }
+                  // this.map.setFitView();
+              }})
+            }
+          })
+        })
+      }
+      func()
+      this.IntervalGetGpsID = setInterval(func,5000)
+    },
     SetUi() {
       window.initAMapUI();
       AMapUI.loadUI(["control/BasicControl"], BasicControl => {
@@ -98,9 +150,10 @@ export default {
               </p>
               <p style="margin-top:10px;text-align:center">
                 <button class="openVideo ivu-btn ivu-btn-success" onclick="MapOpenVideo()">${this.$t("Monitor.LiveVideo")}</button>
-                <button class="ivu-btn ivu-btn-success">${this.$t("Monitor.LivePhoto")}</button>
               </p>
                     `;
+                // <button class="ivu-btn ivu-btn-success">${this.$t("Monitor.LivePhoto")}</button>
+
           let infoWindow = new AMap.InfoWindow({
             anchor: "top-center",
             content: info //使用默认信息窗体框样式，显示信息内容
@@ -188,13 +241,17 @@ export default {
         });
     }
   },
+  mounted(){
+    this.SetMap();
+  },
   created() {
     console.log("created");
     this.loading = true;
-    this.MP("2d7458fc3ae350eb4b0b40bd82cc3f94").then(data => {
-      console.log(data);
-      this.SetMap();
-    });
+    // this.MP("2d7458fc3ae350eb4b0b40bd82cc3f94").then(data => {
+    //   console.log(data);
+    //   this.SetMap();
+    // });
+    
     window.MapOpenVideo = this.Open
     // AMap.plugin("AMap.Geolocation", function() {
     //   var geolocation = new AMap.Geolocation({
@@ -215,6 +272,9 @@ export default {
     // });
   },
   destroyed() {
+    if(undefined != this.IntervalGetGpsID){
+      clearInterval(this.IntervalGetGpsID)
+    }
     this.map.destroy();
   }
 };
@@ -228,6 +288,37 @@ export default {
     width: 100%;
     height: 100%;
   }
+  .amap-icon img,
+  .amap-marker-content img{
+      width: 25px;
+      height: 34px;
+  }
+
+  .marker {
+      position: absolute;
+      // top: -20px;
+      // right: -118px;
+      color: #fff;
+      padding: 4px 10px;
+      box-shadow: 1px 1px 1px rgba(10, 10, 10, .2);
+      white-space: nowrap;
+      font-size: 12px;
+      font-family: "";
+      background-color: #25A5F7;
+      border-radius: 3px;
+  }
+    .input-card{
+      width: 18rem;
+      z-index: 170;
+    }
+
+    .input-card .btn{
+      margin-right: .8rem;
+    }
+
+    .input-card .btn:last-child{
+      margin-right: 0;
+    }
 }
 </style>
 

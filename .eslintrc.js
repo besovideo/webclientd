@@ -11,7 +11,10 @@ module.exports = {
     'no-console': 'off',
     'no-debugger': 'off',
     'no-multiple-empty-lines': 'off',
-    'no-trailing-spaces': 'off'
+    'no-trailing-spaces': 'off',
+    'vue/attributes-order': 'off',
+    'vue/max-attributes-per-line': 'off',
+    'vue/html-closing-bracket-spacing': 'off', 
   },
   parserOptions: {
     parser: 'babel-eslint'

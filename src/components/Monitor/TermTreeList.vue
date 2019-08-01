@@ -134,7 +134,8 @@ export default {
     },
     HandleChannelClick(data, node) {
       if (data.isTerm) {
-        let channel = this.session.swGetPuChanel(data.pu_id, 0);
+        let channel = this.session.swGetPuChanel(data.pu_id, 65536);
+        console.log(channel);
         this.$emit("on-term-click", channel);
         return;
       }
@@ -309,103 +310,11 @@ export default {
       this.TreeLoading = false;
       if (this.isFirst) this.isFirst = false;
     },
-    _SetTreeData(name) {
-      if (this.SearchStatus) return;
-      // let list = [];
-      // this.session._arr_pu.forEach(item => {
-      //   list.push({
-      //     label: item._name_pu || item._id_pu,
-      //     pu_id: item._id_pu,
-      //     isOnline: item._info_pu.onlinestatus
-      //   });
-      // });
-      // this.$set(this.TermListData[0], "children", list);
-      this.TreeLoading = true;
-      // let CurrentPage = this.CurrentPage;
-      // if(this.CurrentPage > Math.ceil(this.session[name].length / 100)){
-      //   CurrentPage 
-      // }
-
-      let temp = [];
-      if (name == "_arr_pu") {
-        let num = [];
-        if (
-          (this.CurrentPage - 1) * 100 <
-          this.session["_arr_pu_online"].length
-        ) {
-          this.session[name].forEach((el, i) => {
-            if (el._info_pu.onlinestatus == 1) {
-              num.push(i);
-            }
-          });
-          num
-            .filter(el => el > 99)
-            .forEach(_i => {
-              this.session[name].forEach((el, i) => {
-                if (el._info_pu.onlinestatus != 1) {
-                  let temp = this.session[name][i];
-                  this.session[name][i] = this.session[name][_i];
-                  this.session[name][_i] = temp;
-                }
-              });
-            });
-        }
-      }
-      this.session[name].forEach((ele, i) => {
-        // this.Total = this.session[name].length;
-        if (
-          i >= (this.CurrentPage - 1) * 100 &&
-          i < (this.CurrentPage - 1) * 100 + 100
-        ) {
-          let children = [];
-          if (this.noShowChannel) {
-          } else {
-            ele._arr_channel.forEach((el, i) => {
-              if (ele._info_pu.onlinestatus != 0)
-                children.push({
-                  label: this.$t("Monitor.channel") + i,
-                  index: i,
-                  pu_id: ele._id_pu,
-                  isChannel: true
-                });
-            });
-          }
-          temp.push({
-            label: ele._name_pu || ele._id_pu,
-            pu_id: ele._id_pu,
-            isTerm: true,
-            isOnline: ele._info_pu.onlinestatus,
-            children
-          });
-        }
-      });
-
-      if (this.Total == 0) {
-        this.$set(this.TermListData[0], "children", []);
-        this.TreeLoading = false;
-        return;
-      }
-
-      let SortTemp = [];
-      temp.forEach(el => {
-        if (el.isOnline) {
-          SortTemp.unshift(el);
-        } else {
-          SortTemp.push(el);
-        }
-      });
-      this.$set(this.TermListData[0], "children", []);
-      this.$set(this.TermListData[0], "children", SortTemp);
-      if (document.querySelector(".TreeList"))
-        document.querySelector(".TreeList").scrollTop = 0;
-      this.TreeLoading = false;
-      if (this.isFirst) this.isFirst = false;
-    },
     GetTermList(page, pagesize, isOnline) {
       // if(this.session._arr_pu_online.length>0){
       //   this.SetTreeData("_arr_pu_online");
       // }
-      this.TreeLoading = true
+      // this.TreeLoading = true
       let code = this.session.swSearchPuList({
         iPosition: page * 100,
         iCount: pagesize,
@@ -520,7 +429,7 @@ export default {
     .el-tree-node__content {
       overflow: initial!important;
       height: 30px !important;
-      font-size: 16px !important;
+      font-size: 14px !important;
     }
     .pu_id{
       color:#ccc
@@ -536,5 +445,8 @@ export default {
     // background-color: #ccc;
   }
 }
+// .el-tree-node>.el-tree-node__children{
+//   overflow: initial!important;
+// }
 </style>
 

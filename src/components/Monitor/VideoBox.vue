@@ -1,12 +1,14 @@
 <template>
   <div class="videobox">
     <div class="head">
-      <span v-if="ShowTag">{{puname||""}}  {{$t("Monitor.channel")}}{{tag}}</span>
-      <span v-if="Type" style="padding-left:10px;">{{$t("Monitor.Type")}}:({{Type}})</span>
+      <span v-if="ShowTag">{{ puname||"" }}  {{ $t("Monitor.channel") }}{{ tag }}</span>
+      <span v-if="Type" style="padding-left:10px;">{{ $t("Monitor.Type") }}:({{ Type }})</span>
     </div>
     <div class="videoEl">
-      <div class="video_div"></div>
-      <img class="playloading" v-if="playLoading&&!noPlay" :src="playbtn" width="100" alt @click="Play">
+      <div class="video_div" />
+      <img 
+        v-if="playLoading&&!noPlay" class="playloading"
+       :src="playbtn" width="100" alt @click="Play">
       <img
         class="playloading loading"
         v-if="(!playLoading&&Loading)"
@@ -136,9 +138,9 @@ export default {
     }
   },
   destroyed() {
-    this.Close();
+    this.Close()
   }
-};
+}
 </script>
 <style lang="less" scoped>
 .videobox {

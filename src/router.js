@@ -73,6 +73,15 @@ export default new Router({
                 Name: 'Monitor'
               },
               component: () => import(/* webpackChunkName: "Monitor" */ './views/Monitor/VideoPlayback.vue')
+            },
+            {
+              path: 'Scheduling',
+              name: 'Scheduling',
+              meta: {
+                title: 'home.Scheduling',
+                Name: 'Monitor'
+              },
+              component: () => import(/* webpackChunkName: "Monitor" */ './views/Monitor/Scheduling.vue')
             }
           ],
           component: () => import(/* webpackChunkName: "Monitor" */ './views/Monitor.vue')

@@ -38,11 +38,14 @@ module.exports = {
       Track_playback_tip: '移动设备历史轨迹回放',
       Picture_monitor: '图片监控',
       Picture_monitor_tip: '设备推送图片信息实时监控',
-      Locate: '实时定位'
+      Locate: '实时定位',
+      Scheduling: '集群调度'      
+
     },
     Monitor: {
       Showonlyonlinedevices: '只显示在线设备',
       Server: '服务器',
+      Meeting: '会议列表',
       Server_Port: '端口',
       channel: '通道',
       noTerm: '无此设备',
@@ -98,11 +101,13 @@ module.exports = {
       Track_playback_tip: 'Mobile device history track playback',
       Picture_monitor: 'Picture monitor',
       Picture_monitor_tip: 'Device push picture information real-time monitoring',
-      Locate: 'Locate'
+      Locate: 'Locate',
+      Scheduling: 'Cluster scheduling'
     },
     Monitor: {
       Showonlyonlinedevices: 'Show only online devices',
       Server: 'Server',
+      Meeting: 'Meeting List',
       Server_Port: 'Port',
       channel: 'channel',
       noTerm: 'No such device',

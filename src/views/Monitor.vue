@@ -7,6 +7,9 @@
       <TabPane :label="$t('home.LivePreview')" name="LivePreview" tab='tabs'>
           <!-- <router-view name="LivePreview"></router-view> -->
       </TabPane>
+      <TabPane :label="$t('home.Scheduling')" name="Scheduling" tab='tabs'>
+          <!-- <router-view name="LivePreview"></router-view> -->
+      </TabPane>
       <!-- <TabPane :label="$t('home.Video_playback')" name="VideoPlayback" tab='tabs'>
         
       </TabPane> -->
