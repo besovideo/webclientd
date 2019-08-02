@@ -38,7 +38,7 @@ export default new Router({
         {
           path: '/Monitor',
           name: 'Monitor',
-          redirect: '/Monitor/Locate',
+          redirect: '/Monitor/Scheduling',
           meta: {
             title: 'tab.monitor',
             keepAlive: true,

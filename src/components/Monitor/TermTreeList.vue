@@ -11,35 +11,39 @@
         :data="TermListData"
         :highlight-current="true"
         node-key="key"
+        :indent="8"
         :default-expanded-keys="['0']"
         @node-click="HandleChannelClick"
       >
         <span class="custom-tree-node" slot-scope="{ node, data }">
-          <i v-if="node.label==''" class="el-icon-s-data" style="padding-right:5px;"></i>
-          <img
-            v-if="data.isTerm"
-            :src="data.isOnline==0?VideoErrorState:VideoState"
-            width="15"
-            height="15"
-            style="display:block;float: left;margin:3px 5px 0 0 ;"
-            alt
-          />
-          <img
-            v-if="data.isChannel"
-            :src="ChannelUrl"
-            width="15"
-            height="15"
-            style="display:block;float: left;margin:3px 5px 0 0 ;"
-            alt
-          />
-          <span
-            class="unselectable"
-            @dblclick.stop.prevent="HandleTreeClick(data,node)"
-            :style="{color:data.isOnline==0?'#ccc':'inherit',paddingLeft:10}"
-          >{{ node.label }}</span>
-          <span class="pu_id" v-if="data.isTerm">
-            <!-- {{node.label==node.pu_id?"":`(${node.pu_id})`}} -->
-            ({{data.pu_id.slice(3)}})
+
+          <span>
+            <i v-if="node.label==''" class="el-icon-s-data" style="padding-right:5px;"></i>
+            <img
+              v-if="data.isTerm"
+              :src="data.isOnline==0?VideoErrorState:VideoState"
+              width="15"
+              height="15"
+              style="display:block;float: left;margin:3px 5px 0 0 ;"
+              alt
+            />
+            <img
+              v-if="data.isChannel"
+              :src="ChannelUrl"
+              width="15"
+              height="15"
+              style="display:block;float: left;margin:3px 5px 0 0 ;"
+              alt
+            />
+            <span
+              class="unselectable"
+              @dblclick.stop.prevent="HandleTreeClick(data,node)"
+              :style="{color:data.isOnline==0?'#ccc':'inherit',paddingLeft:10}"
+            >{{ node.label }}</span>
+            <span class="pu_id" v-if="data.isTerm">
+              <!-- {{node.label==node.pu_id?"":`(${node.pu_id})`}} -->
+              ({{data.pu_id.slice(3)}})
+            </span>
           </span>
         </span>
       </el-tree>
