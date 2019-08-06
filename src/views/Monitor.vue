@@ -42,7 +42,8 @@ export default {
     }
   },
   created(){
-      this.tabs = this.$route.name;
+    console.log(this)
+    this.tabs = this.$route.name;
   },
 };
 </script>

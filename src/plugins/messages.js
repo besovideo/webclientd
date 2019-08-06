@@ -49,7 +49,9 @@ module.exports = {
       Server_Port: '端口',
       channel: '通道',
       noTerm: '无此设备',
+      Term: '设备',
       noGPSChannel: '该设备无GPS通道',
+      GPSLocationError: '获取GPS位置失败',
       isopenchannel: '视频通道已打开',
       otheropenfail: '视频打开失败',
       channelopenerror: '通道打开失败',
@@ -58,6 +60,7 @@ module.exports = {
       Pleasecloseavideowindowfirst: '请先关闭一个视频窗口',
       LiveVideo: '实时视频',
       LivePhoto: '实时图片',
+      Intercom: '实时对讲',
       Type: '类型',
       Position: '位置'
     }
@@ -111,7 +114,9 @@ module.exports = {
       Server_Port: 'Port',
       channel: 'channel',
       noTerm: 'No such device',
+      Term: 'Device',
       noGPSChannel: 'The device has no GPS channel',
+      GPSLocationError: 'Failed to get GPS location',
       isopenchannel: 'Video channel is open',
       otheropenfail: 'Video open failed',
       channelopenerror: 'Channel open failed',
@@ -120,6 +125,7 @@ module.exports = {
       Pleasecloseavideowindowfirst: 'Please close a video window first',
       LiveVideo: 'LiveVideo',
       LivePhoto: 'LivePhoto',
+      Intercom: 'Intercom',
       Type: 'Type',
       Position: 'Position'
 

@@ -1,3 +1,4 @@
+
 export default {
   launchIntoFullscreen: (element) => {
     if (element.requestFullscreen) {
@@ -33,6 +34,11 @@ export default {
       document.mozCancelFullScreen()
     } else if (document.webkitExitFullscreen) {
       document.webkitExitFullscreen()
+    }
+  },
+  ErrorHandle: (code, cb) => {
+    if (code == jSW.RcCode.RC_CODE_E_DISCONNECTED) {
+      cb()
     }
   }
   // getCookie: (name, defaultValue) => {

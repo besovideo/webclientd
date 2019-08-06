@@ -37,11 +37,16 @@ export default {
           this.openChannel.swClose()
         }
         this.openChannel = channel
-        let code = this.openChannel.swOpen({
+        let code = undefined
+        this.$store.state.ErrorCode = code = this.openChannel.swOpen({
           // interval:5000,
           // repeat:-1,
           callback: (options, response) => {
-            
+            this.$store.state.ErrorCode = response.emms.code
+            if(response.gps.lat==0&&response.gps.long==0){
+              this.$Message.error(this.$t("Monitor.GPSLocationError"))
+              return
+            }
             let lat = response.gps.lat / 10000000;
             let long = response.gps.long / 10000000;
             // this.ChannelContent = true;
@@ -49,7 +54,6 @@ export default {
           }
         })
         console.log(code)
-        
       }
       // this.session.swAddCallBack("pugpsdata",(sender, cmd, data)=>{
       //   console.log(Math.random()," Math.random()")

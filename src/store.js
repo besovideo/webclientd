@@ -6,11 +6,12 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     ip_port: 'http://127.0.0.1:8081',
-    session: undefined
+    session: undefined,
+    ErrorCode: -1
   },
   mutations: {
   },
   actions: {
-
+    
   }
 })

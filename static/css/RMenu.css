@@ -1,0 +1,49 @@
+.RCM-Main{
+	position: absolute;
+}
+.RCM-container{
+	border: 1px solid #ccc;
+	padding: 5px 0px;
+	display: block;
+	box-shadow: 0px 0px 2px #ccc;
+	font-size: 14px;
+	border-radius: 3px;
+	z-index: 10000;
+	background: #fff;
+	color: #000;
+}
+.RCM-container ul{
+	list-style: none;
+	padding: 0px;
+	margin: 0px;
+}
+
+.RCM-container ul li{
+	/* width: 70px; */
+	height: 30px;
+	line-height: 30px;
+	/* text-align: center; */
+	padding:0px 18px 0px 15px;
+	cursor: pointer;
+	position: relative;
+}
+
+.RCM-container ul li:hover{
+	background-color: rgba(52, 58, 64, 1.0);
+	color: #fff;
+}
+
+.textcenter{
+	text-align: center;
+}
+
+.fa-align-right{
+	position: absolute;
+	right: 0px;
+	top: 10px;
+}
+.RCM-child{
+	position: absolute;
+	top: 0px;
+	width: 100%;
+}

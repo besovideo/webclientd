@@ -40,7 +40,7 @@
               @dblclick.stop.prevent="HandleTreeClick(data,node)"
               :style="{color:data.isOnline==0?'#ccc':'inherit',paddingLeft:10}"
             >{{ node.label }}</span>
-            <span class="pu_id" v-if="data.isTerm">
+            <span class="pu_id" v-if="data.isTerm" :title="data.pu_id.slice(3)">
               <!-- {{node.label==node.pu_id?"":`(${node.pu_id})`}} -->
               ({{data.pu_id.slice(3)}})
             </span>
@@ -319,7 +319,8 @@ export default {
       //   this.SetTreeData("_arr_pu_online");
       // }
       // this.TreeLoading = true
-      let code = this.session.swSearchPuList({
+      let code = undefined
+      this.$store.state.ErrorCode = code = this.session.swSearchPuList({
         iPosition: page * 100,
         iCount: pagesize,
         stFilter: {
@@ -328,6 +329,7 @@ export default {
           iTimeEnd: 0
         },
         callback: (options, response, data) => {
+          this.$store.state.ErrorCode = response.emms.code 
           console.log(
             "searchlist============================\n",
             options,

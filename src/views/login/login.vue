@@ -84,6 +84,7 @@ export default {
             })
             this.$store.state.session.swAddCallBack('login', this.sessionCallback);
           }else{
+            this.$store.state.ErrorCode = code
             console.log(code)
             switch (parseInt(code)){
                 case jSW.RcCode.RC_CODE_E_INVALIDIP:
@@ -113,8 +114,6 @@ export default {
         }
       })
       console.log('initCode:',initCode);
-      
-      // }
 
      
     },
@@ -126,6 +125,7 @@ export default {
           window.localStorage.setItem('userName',this.userName)
           this.$router.push({path:'/Monitor'})
         } else {
+          this.$store.state.ErrorCode = json.code
           switch (parseInt(json.code)){
               case jSW.RcCode.RC_CODE_E_INVALIDIP:
                 this.$Message.error('Server IP Error')

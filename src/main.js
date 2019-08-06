@@ -11,6 +11,9 @@ import 'video.js/dist/video-js.css'
 import 'font-awesome/css/font-awesome.css'
 import tools from './plugins/tools.js'
 import VueI18n from 'vue-i18n'
+import rightMenu from 'rightMenu'
+
+Vue.use(rightMenu)
 Vue.use(VueI18n)
 
 Vue.use(ElementUI)

@@ -49,11 +49,13 @@ export default {
       }
       let func = ()=>{
         this.SchedulingList.forEach((el)=>{
-          let code = el.swOpen({
+          let code;
+          this.$store.state.ErrorCode = code = el.swOpen({
             // interval:5000,
             // repeat:-1,
             callback: (options, response) => {
-              
+              if(response.emms.code!=0)return
+              this.$store.state.ErrorCode = response.emms.code
               let lat = response.gps.lat / 10000000;
               let long = response.gps.long / 10000000;
               // this.ChannelContent = true;
@@ -64,14 +66,15 @@ export default {
                   let marker
                   if(!el.marker){
                     marker = new AMap.Marker({
-                      position: resLnglat
-                      // icon: require('@/assets/images/video2.png')
+                      position: resLnglat,
+                      icon: require('@/assets/images/gps.png')
                     });
                     let markerContent = document.createElement("div");
                     let markerSpan = document.createElement("span");
                     let markerImg = document.createElement("img");
                     markerImg.className = "markerlnglat";
-                    markerImg.src = "//a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png";
+                    // markerImg.src = "//a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png";
+                    markerImg.src = require('@/assets/images/gps.png');
                     markerContent.appendChild(markerImg);
                     markerSpan.className = 'marker';
                     markerSpan.innerHTML = el._parent._name_pu||el._parent._id_pu;
@@ -128,8 +131,9 @@ export default {
         if (result.info === "ok") {
           var resLnglat = result.locations[0];
           let m2 = new AMap.Marker({
-            position: resLnglat
-            // icon: require('@/assets/images/video2.png')
+            position: resLnglat,
+            // offset: new AMap.Pixel(0, 0),
+            icon: require('@/assets/images/gps.png')
           });
 
           this.map.clearMap();
@@ -138,9 +142,22 @@ export default {
           // this.map.setZoom(15);
           this.loading = false;
 
+
+          //设备信息
+          let channel = this.position[2]
+          let puid = channel._parent._id_pu;
+          let puname = channel._parent._name_pu||channel._parent._id_pu;
           var info = `
-              <p style="display:flex;width:220px;line-height:20px;height:20px">
-                <span style='font-size:16px;font-weight:600'>${this.$t("Monitor.Position")} :</span> 
+              <p style="display:flex;width:220px;line-height:30px;height:30px">
+                <span style='font-size:15px;font-weight:600'>${this.$t("Monitor.Term")} </span> 
+                <span style="display:inline-block;padding-left:10px">${
+                  puname
+                }
+                  <span style="color:#ccc;padding-left:5px">(${puid.slice(3)})</span>
+                </span>
+              </p>
+              <p style="display:flex;width:220px;line-height:30px;height:30px">
+                <span style='font-size:15px;font-weight:600'>${this.$t("Monitor.Position")} </span> 
                 <span style="display:inline-block;flex:1;text-align:center">${
                   this.position[0]
                 }</span>   
@@ -150,9 +167,9 @@ export default {
               </p>
               <p style="margin-top:10px;text-align:center">
                 <button class="openVideo ivu-btn ivu-btn-success" onclick="MapOpenVideo()">${this.$t("Monitor.LiveVideo")}</button>
+                <button class="ivu-btn ivu-btn-success">${this.$t("Monitor.Intercom")}</button>
               </p>
                     `;
-                // <button class="ivu-btn ivu-btn-success">${this.$t("Monitor.LivePhoto")}</button>
 
           let infoWindow = new AMap.InfoWindow({
             anchor: "top-center",

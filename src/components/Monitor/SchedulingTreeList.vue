@@ -15,7 +15,7 @@
         :default-expanded-keys="['0']"
         @node-click="HandleChannelClick"
       >
-        <span class="custom-tree-node" slot-scope="{ node, data }">
+        <span class="custom-tree-node" slot-scope="{ node, data }" rightMenu>
           <span>
             <i v-if="node.label==''" class="el-icon-s-data" style="padding-right:5px;"></i>
             <img
@@ -36,15 +36,48 @@
             />
             <span
               class="unselectable"
-              @dblclick.stop.prevent="HandleTreeClick(data,node)"
-              :style="{color:data.isOnline==0?'#ccc':'inherit',paddingLeft:10}"
+              v-if="data.root"
             >{{ node.label }}</span>
+            <span
+              class="unselectable"
+              v-if="data.isMeeting"
+            >{{ node.label }}</span>
+
+            <el-dropdown trigger="click" v-if="data.isPerson" size="medium">
+              <span
+                class="unselectable"
+                @dblclick.stop.prevent="HandleTreeClick(data,node)"
+                :style="{color:data.isOnline==0?'#ccc':'inherit',paddingLeft:10}"
+              >{{ node.label }}</span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item icon="el-icon-plus">点名发言</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-plus">删除成员</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+
             <span class="pu_id" v-if="data.isPerson">
               <!-- {{node.label==node.pu_id?"":`(${node.pu_id})`}} -->
+
               {{ (data.id==undefined) ?"":(data.id.slice(3).length>0?`(${data.id.slice(3)})`:"") }}
             </span>
           </span>
+
           <span style="float:right;display:inline-block" v-if="data.isMeeting">
+            <el-dropdown trigger="click" size="medium">            
+              <img
+                :src="require('@/assets/images/PersonSet.png')"
+                width="15"
+                height="15"
+                style="display:block;float: left;margin:3px 5px 0 0 ;"
+                alt
+                @click.stop="a = 1"
+              />
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item icon="el-icon-zoom-in">邀请加入</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-close">删除会议</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+
             <img
               :src="liaotian"
               width="15"
@@ -53,6 +86,23 @@
               alt
               @click.stop="LiaotianClick(data)"
             />
+            
+          </span>
+          <span style="float:right;display:inline-block" v-if="data.root">
+            <el-dropdown trigger="click" size="medium">
+              <img
+                :src="require('@/assets/images/MeetSet.png')"
+                width="15"
+                height="15"
+                style="display:block;float: left;margin:3px 5px 0 0 ;outline: none"
+                @click.stop="MeetSetShow = true"
+                alt
+              />
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item icon="el-icon-plus">创建会议</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+            
           </span>
           <!-- <span class="pu_id" v-if="data.isMeeting">
             {{ (data.id==undefined) ?"":`(${data.id.slice(5)})` }} 
@@ -107,10 +157,11 @@ export default {
       TermListData: [
         {
           label: this.$t("Monitor.Meeting"),
+          root: true,
           key: 0,
           children: [
             {
-              label: "会议"
+              label: "会议",
             }
           ]
         }
@@ -124,7 +175,8 @@ export default {
         PIC: 5,
         AUDIO: 6,
         VOICE: 8
-      }
+      },
+      MeetSetShow:false
     };
   },
   methods: {
@@ -223,10 +275,10 @@ export default {
       let gpsterm = new Set();
       data.forEach((ele, i) => {
         let children = [];
-
+        if(!ele)return
         if (ele._conf_particulars.length > 0) {
           ele._conf_particulars.forEach((el, i) => {
-            if (el.id.indexOf("PU") != -1) {
+            if (el.id.indexOf("PU") != -1 && el.isonline) {
               gpsterm.add(el.id);
             }
             children.push({
@@ -257,6 +309,7 @@ export default {
 
       //获取设备GPS并显示
       gpsterm.forEach(el => {
+        console.log(el);
         let gps = this.session.swGetPuChanel(el, 65536);
         if (gps == null) {
           return;
@@ -494,7 +547,7 @@ export default {
   },
   computed: {
     ...mapState({
-      session: "session"
+      session: "session",
     })
   },
 
@@ -503,7 +556,7 @@ export default {
     console.log(this.Personexit);
 
     let SwConfManager = this.session.swGetConfManager();
-    SwConfManager.swInit({
+    this.$store.state.ErrorCode = SwConfManager.swInit({
       callback: code => {
         console.log("会议初始化:", code);
         let list = SwConfManager.swGetConfList();
@@ -565,6 +618,10 @@ export default {
         });
       }
     });
+    
+  },
+  destroyed() {
+    $(".layui-layim-min").remove()
   }
 };
 </script>

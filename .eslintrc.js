@@ -3,6 +3,9 @@ module.exports = {
   env: {
     node: true
   },
+  globals: {
+    'jSW': true
+  },
   'extends': [
     'plugin:vue/recommended',
     '@vue/standard'

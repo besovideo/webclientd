@@ -32,6 +32,7 @@
     "jquery": "3.4.1",
     "less": "^3.0.4",
     "less-loader": "^5.0.0",
+    "rightmenu": "^1.1.0",
     "vue-cli-plugin-iview": "^1.0.6",
     "vue-template-compiler": "^2.5.21"
   }
