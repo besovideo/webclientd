@@ -83,6 +83,9 @@ export default {
         this.$Message.error(this.$t("Monitor.plaseselectterm"));
         return;
       }
+      if(this.Loading && this.channel!=undefined){
+        return
+      }
       this.Close();
       this.channel = this.session.swGetPuChanel(this.puid, parseInt(this.tag));
       this.playLoading = false;
@@ -150,6 +153,7 @@ export default {
           this.$Message.error(this.$t("Monitor.channelopenerror") + val);
         }
         if(this.Loading){
+          this.Loading = false
           this.channel = undefined;
         }
       }

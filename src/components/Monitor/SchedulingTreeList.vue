@@ -43,15 +43,15 @@
               v-if="data.isMeeting"
             >{{ node.label }}</span>
 
-            <el-dropdown trigger="click" v-if="data.isPerson" size="medium">
+            <el-dropdown trigger="click" v-if="data.isPerson" size="medium" @command="MenuHandle">
               <span
                 class="unselectable"
-                @dblclick.stop.prevent="HandleTreeClick(data,node)"
                 :style="{color:data.isOnline==0?'#ccc':'inherit',paddingLeft:10}"
               >{{ node.label }}</span>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item icon="el-icon-plus">点名发言</el-dropdown-item>
-                <el-dropdown-item icon="el-icon-plus">删除成员</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-microphone" :disabled="data.isadmin" :command="{type:'InviteSpeak',val:[node,data]}">{{$t('Data.dianmingfayan')}}</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-turn-off-microphone" :disabled="data.isadmin" :command="{type:'StopSpeak',val:[node,data]}">{{$t('Data.zhongzhifayan')}}</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-close" :disabled="data.isadmin" :command="{type:'deletePerson',val:[node,data]}">{{$t('Data.shanchuchengyuan')}}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
 
@@ -63,7 +63,7 @@
           </span>
 
           <span style="float:right;display:inline-block" v-if="data.isMeeting">
-            <el-dropdown trigger="click" size="medium">            
+            <el-dropdown trigger="click" size="medium" @command="MenuHandle">            
               <img
                 :src="require('@/assets/images/PersonSet.png')"
                 width="15"
@@ -73,8 +73,8 @@
                 @click.stop="a = 1"
               />
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item icon="el-icon-zoom-in">邀请加入</el-dropdown-item>
-                <el-dropdown-item icon="el-icon-close">删除会议</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-zoom-in" :command="{type:'invaiteJoin',val:data}">{{$t('Data.yaoqingjiaru')}}</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-close" :command="{type:'deleteMeet',val:data}">{{$t('Data.shanchuhuiyi')}}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
 
@@ -89,7 +89,7 @@
             
           </span>
           <span style="float:right;display:inline-block" v-if="data.root">
-            <el-dropdown trigger="click" size="medium">
+            <el-dropdown trigger="click" size="medium" @command="MenuHandle">
               <img
                 :src="require('@/assets/images/MeetSet.png')"
                 width="15"
@@ -99,7 +99,7 @@
                 alt
               />
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item icon="el-icon-plus">创建会议</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-plus" :command="{type:'create'}">{{$t('Data.chuangjianhuiyi')}}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
             
@@ -112,18 +112,75 @@
     </div>
     <!-- 设备列表 -->
 
-    <!-- 分页 -->
-    <!-- <div class="Page">
-      <el-pagination
-        :current-page.sync="CurrentPage"
-        :page-size="100"
-        layout="prev, pager, next"
-        :total="Total"
-        :pager-count="5"
-        @current-change="ChangePage"
-      ></el-pagination>
-    </div>-->
-    <!-- 分页 -->
+  <!-- 创建会议 -->
+    <el-dialog
+      :title="$t('Data.chuangjianhuiyi')"
+      :visible.sync="CreateDialog"
+      :width="lang=='en'?'900px':'700px'"
+      
+      :before-close="HandleDialogClose"
+      center >
+      <el-form :model="CreateForm" :rules="CreateRules" ref="CreateForm" :label-width="lang=='en'?'140px':'90px'" size="medium">
+        <el-form-item :label="$t('Data.huiyimingcheng')" prop="name">
+          <el-input v-model="CreateForm.name"></el-input>
+        </el-form-item>
+        <el-form-item :label="$t('Data.qunzuleixing')" prop="type">
+          <el-radio-group v-model="CreateForm.type" size="medium">
+            <el-radio border label="0">{{$t('Data.zhuchirenmoshi')}}</el-radio>
+            <el-radio border label="1">{{$t('Data.taolunzumoshi')}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item :label="$t('Data.jiarufangshi')" prop="JoinMode">
+          <el-radio-group v-model="CreateForm.JoinMode" size="medium">
+            <el-radio border label="0">{{$t('Data.yaoqingjiaru')}}</el-radio>
+            <el-radio border label="8">{{$t('Data.shurumimajiaru')}}</el-radio>
+            <el-radio border label="16">{{$t('Data.wumimajiaru')}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item :label="$t('Data.mima')" v-if="CreateForm.JoinMode == '8' " prop="pass">
+          <el-input type="password" v-model="CreateForm.pass" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item :label="$t('Data.querenmima')" v-if="CreateForm.JoinMode == '8' " prop="checkPass">
+          <el-input type="password" v-model="CreateForm.checkPass" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item :label="$t('Data.fayanshenqing')" prop="ApplyFor">
+          <el-radio-group v-model="CreateForm.ApplyFor" size="medium">
+            <el-radio border label="128">{{$t('Data.zidongtongyi')}}</el-radio>
+            <el-radio border label="0">{{$t('Data.guanliyuanxuke')}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item :label="$t('Data.kaishimoshi')" prop="StartMode">
+          <el-radio-group v-model="CreateForm.StartMode" size="medium">
+            <el-radio border label="0">{{$t('Data.guanliyuankaiqi')}}</el-radio>
+            <el-radio border label="256">{{$t('Data.zidongkaiqi,buyunxuzanting')}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="CreateDialog = false">{{$t('Data.quxiao')}}</el-button>
+        <el-button type="primary" @click="DoCreateConfClick">{{$t('Data.queren')}}</el-button>
+      </span>
+    </el-dialog>
+  <!-- 创建会议 -->
+
+    <!-- 邀请加入会议 -->
+    <el-dialog
+      :title="$t('Data.yaoqingjiaru')"
+      :visible.sync="InvaiteDialog"
+      class="InvaiteDialog"
+      width="600px"
+      :before-close="HandleDialogClose"
+      center >
+      <el-divider content-position="left">{{$t('Data.zaixianyonghu')}}</el-divider>
+        <el-checkbox-group v-model="CheckBoxOnlineJoin.data" size="mini" >
+          <el-checkbox :label="item" border v-for="item in OnlineUserList" :key="item.id">{{ item.name || item.id }}</el-checkbox>
+        </el-checkbox-group>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="InvaiteDialog = false">{{$t('Data.quxiao')}}</el-button>
+        <el-button type="primary" @click="DoInvaiteJoinClick">{{$t('Data.queren')}}</el-button>
+      </span>
+    </el-dialog>
+    <!-- 邀请加入会议 -->
   </div>
 </template>
 
@@ -135,6 +192,25 @@ export default {
   props: ["noShowChannel"],
   components: { IM },
   data() {
+    var validatePass = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入密码'));
+      } else {
+        if (this.CreateForm.checkPass !== '') {
+          this.$refs.CreateForm.validateField('checkPass');
+        }
+        callback();
+      }
+    };
+    var validatePass2 = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请再次输入密码'));
+      } else if (value !== this.CreateForm.pass) {
+        callback(new Error('两次输入密码不一致!'));
+      } else {
+        callback();
+      }
+    };
     return {
       MeetingState: require("@/assets/images/meeting.png"),
       Person0: require("@/assets/images/person0.png"),
@@ -176,36 +252,299 @@ export default {
         AUDIO: 6,
         VOICE: 8
       },
-      MeetSetShow:false
+      MeetSetShow:false,
+      CreateDialog:false,
+      CreateForm:{
+        name: '',
+        type: '0',
+        JoinMode: '0',
+        ApplyFor: '128',
+        StartMode: '0',
+        pass: '',
+        checkPass:''
+      },
+      CreateRules:{
+        name:[
+          { required: true, message: '请输入会议名称', trigger: 'blur' }
+        ],
+        type:[
+          { required: true, message: '请选择', trigger: 'blur' }
+        ],
+        JoinMode:[
+          { required: true, message: '请选择', trigger: 'blur' }
+        ],
+        ApplyFor:[
+          { required: true, message: '请选择', trigger: 'blur' }
+        ],
+        StartMode:[
+          { required: true, message: '请选择', trigger: 'blur' }
+        ],
+        pass: [
+          { validator: validatePass, trigger: 'blur' },
+          { required: true, message: '请输入密码', trigger: 'blur' },
+        ],
+        checkPass: [
+          { validator: validatePass2, trigger: 'blur' },
+          { required: true, message: '请再次输入密码', trigger: 'blur' },
+        ],
+      },
+      InvaiteDialog:false,
+      CheckBoxOnlineJoin:{data:[],id:undefined},
+      OnlineUserList: []
     };
   },
   methods: {
-    ConfSendWords(list, group_id) {
-      let datas = [];
-      list.forEach(el => {
-        var data = {
-          iType: el.type,
-          data: el.msg,
-          nruid: "NRU_"
-        };
-        datas.push(data);
-      });
-      this.confSendMsg(datas, group_id);
+    HandleDialogClose(done){
+      this.$confirm(this.$t('Data.querenguanbi')+"?",{
+        confirmButtonText: this.$t('Data.queren'),
+        cancelButtonText: this.$t('Data.quxiao'),
+      })
+        .then(_ => {
+          done();
+        })
+        .catch(_ => {})
     },
-    confSendMsg(datas, group_id) {
-      var confManager = this.session.swGetConfManager();
-      var conf = confManager.swGetConfByConfId(group_id);
-      if (conf) {
-        var rc = conf.swConfIMSend({
-          msgitems: datas,
-          callback: (options, response) => {
-            console.log("发送信息回调", options, response);
-          },
-          pcallback: () => {},
-          tag: null
+    _DOCreateConf(cb) {
+      this.$store.state.ErrorCode = this.session.swGetConfManager().swCreateConf({
+            confbaseinfo: {
+                name: this.CreateForm.name,
+                speakmode: parseInt(this.CreateForm.type),
+                joinmode: parseInt(this.CreateForm.JoinMode),
+                applyformode: parseInt(this.CreateForm.ApplyFor),
+                startmode: parseInt(this.CreateForm.StartMode),
+                password: this.CreateForm.checkPass
+            },
+            callback:  (sender, event, json) => {
+                this.$store.state.ErrorCode = event.emms.code
+                if(event.emms.code!=0){
+                  this.$Message.error(this.$tools.findErrorCode(event.emms.code))
+                  return
+                }
+                // this.SetMeetingData(this.session.swGetConfManager().swGetConfList());
+                this.CreateDialog = false
+                this.$Message.success(this.$t('Data.chuangjianhuiyichenggong'))
+            }
         });
+    },
+    DoCreateConfClick(){
+      this.$refs['CreateForm'].validate((valid) => {
+          if (valid) {
+            this._DOCreateConf()
+          } else {
+            
+            return false;
+          }
+        });
+    },
+    DoDeleteMeet(data){
+      this.$confirm(`${this.$t('Data.cicaozuojiangshanchu')} ${data.label} (${data.id.slice(5)}) ${this.$t('Data.huiyi')}`, this.$t('Data.jinggao'), {
+          confirmButtonText: this.$t('Data.queren'),
+          cancelButtonText: this.$t('Data.quxiao'),
+          type: 'warning',
+          center: true
+        }).then(() => {
+          this.session.swGetConfManager().swDeleteConf({
+            confid: data.id,
+            callback: (sender, event, json) => {
+              this.$store.state.ErrorCode = event.emms.code
+              if(event.emms.code!=0){
+                this.$Message.error(this.$tools.findErrorCode(event.emms.code))
+                return
+              }
+              // this.SetMeetingData(this.session.swGetConfManager().swGetConfList());
+              this.$Message.success(this.$t('Data.shanchuchenggong'))
+            }
+        });
+        }).catch(() => {
+          
+        });
+    },
+    DoDeletePerson(data){
+      this.$confirm(`${this.$t('Data.cicaozuojiangshanchu')} ${data[1].label} (${data[1].id.slice(3)}) ${this.$t('Data.chengyuan')}`, this.$t('Data.jinggao'), {
+          confirmButtonText: this.$t('Data.queren'),
+          cancelButtonText: this.$t('Data.quxiao'),
+          type: 'warning',
+          center: true
+        }).then(() => {
+          let confManager = this.session.swGetConfManager();
+          let conf = confManager.swGetConfByConfId(data[0].parent.data.id);
+          if (conf == null) {
+              this.$Message.error(this.$t('Data.huiyibucunzai'))
+              return;
+          }
+
+          conf.swGetParticularList({
+              callback: (options, response, particularList) => {
+                  if (particularList.length > 0) {
+                      conf.swParticipatorRemove({
+                          users: particularList.filter(el => el.name == data[1].name),
+                          callback:  (sender, event, json) => {
+                            this.$store.state.ErrorCode = event.emms.code
+                            if(event.emms.code!=0){
+                              this.$Message.error(this.$tools.findErrorCode(event.emms.code))
+                              return
+                            }
+                            // this.SetMeetingData(this.session.swGetConfManager().swGetConfList());
+                            this.$Message.success(this.$t('Data.shanchuchenggong'))
+                          }
+                      });
+                  }
+              },
+              tag: null
+          });
+        }).catch(() => {
+          
+        });
+    },
+    DoInviteSpeak(data){
+      
+      let confManager = this.session.swGetConfManager();
+      let conf = confManager.swGetConfByConfId(data[0].parent.data.id);
+      if (conf == null) {
+          this.$Message.error(this.$t('Data.huiyibucunzai'))
+          return;
+      }
+      conf.swGetParticularList({
+          callback: (options, response, particularList) => {
+              if (particularList.length > 0) {
+                  conf.swInviteSpeak({
+                      user: particularList.filter(el => el.name == data[1].name)[0],
+                      callback:  (sender, event) => {
+                        this.$store.state.ErrorCode = event.emms.code
+                        if(event.emms.code!=0){
+                          this.$Message.error(this.$tools.findErrorCode(event.emms.code))
+                          return
+                        }
+                        this.$Message.success(this.$t('Data.dianmingfayan')+this.$t('Data.chenggong'))
+                      }
+                  });
+              }
+          },
+          tag: null
+      });
+        
+    },
+    DoStopSpeak(data){
+      
+      let confManager = this.session.swGetConfManager();
+      let conf = confManager.swGetConfByConfId(data[0].parent.data.id);
+      if (conf == null) {
+          this.$Message.error(this.$t('Data.huiyibucunzai'))
+          return;
+      }
+      conf.swGetParticularList({
+          callback: (options, response, particularList) => {
+              if (particularList.length > 0) {
+                  conf.swTerminalSpeak({
+                      user: particularList.filter(el => el.name == data[1].name)[0],
+                      callback:  (sender, event) => {
+                        this.$store.state.ErrorCode = event.emms.code
+                        if(event.emms.code!=0){
+                          this.$Message.error(this.$tools.findErrorCode(event.emms.code))
+                          return
+                        }
+                        this.$Message.success(this.$t('Data.zhongzhifayan')+this.$t('Data.chenggong'))
+                      }
+                  });
+              }
+          },
+          tag: null
+      });
+        
+    },
+    DoInvaiteJoinClick(){
+      if(this.CheckBoxOnlineJoin.data.length==0){
+        this.$Message.error(this.$t('Data.qingxuanzeyigeyonghu'))
+        return
+      }
+      let confManager = this.session.swGetConfManager();
+      let conf = confManager.swGetConfByConfId(this.CheckBoxOnlineJoin.id);
+      if (conf == null) {
+          this.$Message.error(this.$t("Data.huiyibucunzai"))
+          return;
+      }
+
+      conf.swGetParticularList({
+          callback: (options, response, particularList) => {
+              if (particularList.length > 0) {
+                  conf.swParticipatorAdd({
+                      users: this.CheckBoxOnlineJoin.data,
+                      callback:  (sender, event, json) => {
+                        this.$store.state.ErrorCode = event.emms.code
+                        if(event.emms.code!=0){
+                          this.$Message.error(this.$tools.findErrorCode(event.emms.code))
+                          return
+                        }
+                        // this.SetMeetingData(this.session.swGetConfManager().swGetConfList());
+                        this.InvaiteDialog = false
+                        this.$Message.success(this.$t('Data.yaoqingchenggong'))
+                      }
+                  });
+              }
+          },
+          tag: null
+      });
+    },
+    MenuHandle(data) {
+      console.log(data)
+      let type = data.type
+      switch (type) {
+        case 'create':
+          this.CreateForm = {
+              name: '',
+              type: '0',
+              JoinMode: '0',
+              ApplyFor: '128',
+              StartMode: '0',
+              pass: '',
+              checkPass: ''
+            }
+          this.CreateDialog = true
+        break
+        case 'deleteMeet':
+          this.DoDeleteMeet(data.val)
+        break
+        case 'deletePerson':
+          this.DoDeletePerson(data.val)
+        break
+        case 'invaiteJoin':
+          this.session.swGetConfManager().swGetConfByConfId(data.val.id).swGetOnlineUsers({
+            callback:(options,response,users)=>{
+              this.$store.state.ErrorCode = response.emms.code
+              if(response.emms.code!=0){
+                this.$Message.error(this.$tools.findErrorCode(event.emms.code))
+                return
+              }
+              this.OnlineUserList = users
+              this.CheckBoxOnlineJoin.data = []
+              this.CheckBoxOnlineJoin.id = data.val.id              
+              this.InvaiteDialog = true
+            }
+          })
+          // this.session.swSearchPuList({
+          //   iPosition: 0,
+          //   iCount: 200,
+          //   stFilter: {
+          //     iOnlineStatus: 1
+          //   },
+          //   callback: (event,response,data) =>{
+          //     this.$store.state.ErrorCode = response.emms.code
+          //     if(response.emms.code!=0){
+          //       this.$Message.error(this.$tools.findErrorCode(event.emms.code))
+          //       return
+          //     }
+          //   }
+          // })
+        break
+        case 'InviteSpeak':
+          this.DoInviteSpeak(data.val)
+        break
+        case 'StopSpeak':
+          this.DoStopSpeak(data.val)
+        break
       }
     },
+      
     LiaotianClick(data) {
       // let _IM = Vue.extend(IM)
       // let im = new _IM({
@@ -283,6 +622,7 @@ export default {
             }
             children.push({
               label: el.aliasname || el.name,
+              name: el.name,
               id: el.id,
               isPerson: true,
               addr: el.addr,
@@ -324,14 +664,55 @@ export default {
       console.log(sender, event, data);
       switch (event) {
         case "notifybaseinfo":
-          this.SetConfInfo(data.conf, data.data);
+            this.SetConfInfo(data.conf, data.data);
           break;
         case "notifyimmsg":
-          this.GetMessage(data.conf, data.data);
+            console.log(sender, event, data)
+            this.GetMessage(data.conf, data.data);
           break;
+        case "notifyapplyforstartspeak":
+        case "notifyapplyforendspeak":
+        case "notifyparticipartorleave":
+        case "notifyparticipartorreturn":
+        case "notifyparticipatormodify":
+        case "notifyinvitespeak":
+        case "notifyterminatespeak":
+            this.SetTermStatus(data.conf, data.data);
+          break
+        case "notifyconfcreate":
+        case "notifyconfdelete":
+        case "notifyparticipartoradd":
+        case "notifyparticipartorremove":
+          this.SetMeetingData(this.session.swGetConfManager().swGetConfList());
         default:
-          this.SetTermStatus(data.conf, data.data);
+          // this.SetMeetingData(this.session.swGetConfManager().swGetConfList());
           break;
+      }
+    },
+    ConfSendWords(list, group_id) {
+      let datas = [];
+      list.forEach(el => {
+        var data = {
+          iType: el.type,
+          data: el.msg,
+          nruid: "NRU_"
+        };
+        datas.push(data);
+      });
+      this.confSendMsg(datas, group_id);
+    },
+    confSendMsg(datas, group_id) {
+      var confManager = this.session.swGetConfManager();
+      var conf = confManager.swGetConfByConfId(group_id);
+      if (conf) {
+        var rc = conf.swConfIMSend({
+          msgitems: datas,
+          callback: (options, response) => {
+            console.log("发送信息回调", options, response);
+          },
+          pcallback: () => {},
+          tag: null
+        });
       }
     },
     GetMessage(conf, data) {
@@ -367,9 +748,15 @@ export default {
           }
           _data = datainnerhtml;
           break;
+        case this.imsgtypes.PIC:
+          _data += "img[" + receivedata[0].stFile.szFile + "]"
+          break
+        case this.imsgtypes.FILE:
+          _data += "file(" + receivedata[0].stFile.szFile + ")["+receivedata[0].stFile.szSrcFile.split('/').splice(-1)[0]+"]"
+          break
       }
       this.layim.getMessage({
-        username: "未知", //消息来源用户名
+        username: this.$t('Data.weizhi'), //消息来源用户名
         avatar: "http://tp1.sinaimg.cn/1571889140/180/40030060651/1", //消息来源用户头像
         id: data.confid, //消息的来源ID（如果是私聊，则是用户id，如果是群聊，则是群组id）
         type: "group", //聊天窗口来源类型，从发送消息传递的to里面获取
@@ -405,6 +792,7 @@ export default {
       if (Term.length == 0) return;
       let temp = {
         label: data.aliasname || data.name,
+        name: data.name,
         id: data.id,
         isPerson: true,
         addr: data.addr,
@@ -469,27 +857,28 @@ export default {
       });
       return tempList;
     },
-    UploadImage(file, id) {
+    UploadImage(file, id,type,cb) {
       if (file.files.length == 0) {
         console.error("");
         return;
       }
-      file.id = "images";
+      file.id = type+"_";
       var confManager = this.session.swGetConfManager();
       var conf = confManager.swGetConfByConfId(id);
       var myUsefulData = {
         target: file,
-        id: "images"
+        id: type+"_"
       }; //用户数据，在回调中也把这个对象通知过来
 
       var msgItem = {
-        iType: this.imsgtypes.PIC,
+        iType: type=='img'?this.imsgtypes.PIC:this.imsgtypes.FILE,
         data: file.files[0]
       };
 
       var rc = conf.swConfIMSend({
         msgitems: [msgItem],
         callback: (options,response) => {
+          cb(response.emms.code,type)
           if (response.emms.code == jSW.RcCode.RC_CODE_S_OK) {
             console.log(options.tag.id, "上传成功");
           } else {
@@ -548,6 +937,8 @@ export default {
   computed: {
     ...mapState({
       session: "session",
+      lang: "lang",
+      user: "user",
     })
   },
 
@@ -571,10 +962,11 @@ export default {
 
         let mList = this.GetLayImGroup(list);
         layui.use(["layim"], layim => {
-          this.layim = layim;
+          this.layim  = window.layim = layim;
+          
           layim.config({
             brief: false, //是否简约模式（如果true则不显示主面板）
-            title: "IM聊天",
+            title: "IM",
             init: {
               mine: {
                 username: this.session._user, //我的昵称
@@ -594,27 +986,41 @@ export default {
               url: "", //接口地址
               type: "post" //默认post
             },
-            isAudio: true
+            isAudio: false
           });
 
-          layim.on("sendMessage", res => {
-            var mine = res.mine; //包含我发送的消息及我的信息
-            var to = res.to; //对方的信息
-            console.log(res.mine);
-            if (to.type == "group") {
-              this.ConfSendWords(this.FilterEmoji(mine.content), to.id);
+          if(!window.layim_sendMessage){
+            window.layim_sendMessage = res => {
+              var mine = res.mine; //包含我发送的消息及我的信息
+              var to = res.to; //对方的信息
+              console.log(res.mine);
+              if (to.type == "group" && mine.content.indexOf('img[')==-1 && mine.content.indexOf('file(')==-1) {
+                this.ConfSendWords(this.FilterEmoji(mine.content), to.id);
+              }
+              console.log(mine, to);
+              return false;
             }
-            console.log(mine, to);
-            return false;
-          });
+            layim.on("sendMessage", window.layim_sendMessage);
+          }
 
-          layim.on("uploadImage", (data, info, callback) => {
-            console.log(info);
-            data.onchange = e => {
-              this.UploadImage(e.target, info.id);
-              callback();
-            };
-          });
+          if(!window.layim_uploadImage){
+            window.layim_uploadImage = (data, info,el, callback) => {
+              console.log(info);
+              data.onchange = e => {
+                let t = el.getAttribute('data-type')==null?'img':'file'
+                this.UploadImage(e.target, info.id,t,(code,type)=>{
+                  this.$store.state.ErrorCode = code
+                  if(code!=0){
+                    this.$Message.error(this.$t('Data.shangchuanshibai') + this.$tools.findErrorCode(code))
+                    return
+                  }
+                  callback(type);
+                  this.$Message.success(this.$t('Data.shangchuanchenggong'))
+                });
+              };
+            }
+            layim.on("uploadImage", window.layim_uploadImage);
+          }
         });
       }
     });
@@ -627,9 +1033,71 @@ export default {
 </script>
 
 <style lang="less">
+#TermList {
+  width: 100%;
+  height: 100%;
+
+  .el-loading-parent--relative {
+    height: 100%;
+  }
+  .search {
+    margin: 0px 0 6px 0;
+  }
+  .showonline {
+    .cb {
+      font-size: 15px;
+      margin-left: 10px;
+    }
+    height: 30px;
+    font-size: 18px;
+    background: rgb(242, 242, 242);
+  }
+
+  .TreeList {
+    width: 100%;
+    height: calc(100% - 98px);
+    padding-top: 5px;
+    border-right: 1px solid #dcdfe6;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12), 0 0 6px 0 rgba(0, 0, 0, 0.04);
+    overflow: auto;
+    .el-tree-node__content {
+      overflow: initial!important;
+      height: 30px !important;
+      font-size: 14px !important;
+    }
+    .pu_id{
+      color:#ccc
+    }
+  }
+  div.Page {
+    height: 30px;
+    width: 100%;
+    text-align: center;
+    .el-pagination {
+      display: inline-block;
+    }
+    // background-color: #ccc;
+  }
+}
 .SchedulingList {
   .TreeList {
     height: calc(100% - 38px) !important;
+  }
+  .InvaiteDialog{
+    .el-divider.el-divider--horizontal{
+      margin-top:0px
+    }
+    .el-checkbox-group {
+      display: grid;
+      grid-gap: 5px;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      .el-checkbox{
+        margin-right:0px;
+      }
+    }
+  }
+  .el-checkbox.is-bordered+.el-checkbox.is-bordered{
+    margin-left: 0px;
   }
 }
 .custom-tree-node {
@@ -658,4 +1126,3 @@ export default {
   background-color: rgb(3, 31, 11);
 }
 </style>
-

@@ -48,12 +48,14 @@ export default {
     ChangeLanguage(name){
       this.$i18n.locale = name
       localStorage.setItem('locale',name)
+      this.$store.state.lang = name
     },
     handleSubmit ({userName, password }) {
       let url = window.location.origin
       if(process.env.NODE_ENV=='development'){
         // url = 'http://115.28.79.237:8081'
         url = 'http://192.168.6.66:8081'
+        // url = 'https://localhost:9443'
       }
       this.spinShow = true
       // this.Server = Server
@@ -123,6 +125,7 @@ export default {
           // window.localStorage.setItem('Server',this.Server)
           // window.localStorage.setItem('Server_Port',this.Server_Port)
           window.localStorage.setItem('userName',this.userName)
+          this.$store.state.user = this.userName
           this.$router.push({path:'/Monitor'})
         } else {
           this.$store.state.ErrorCode = json.code

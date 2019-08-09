@@ -11,6 +11,9 @@ export default {
       element.msRequestFullscreen()
     }
   },
+  findErrorCode: (code) => {
+    return Object.keys(jSW.RcCode).find(k => jSW.RcCode[k] == code)
+  },
   checkFlash: () => {
     let hasFlash = false
     let flashVersion

@@ -43,6 +43,7 @@ export default {
   },
   methods: {
     SetSchedulingMap(){
+      this.map.clearMap();
       this.SchedulingList.forEach(el=>{el.marker=undefined})
       if(this.IntervalGetGpsID!=undefined){
         clearInterval(this.IntervalGetGpsID)

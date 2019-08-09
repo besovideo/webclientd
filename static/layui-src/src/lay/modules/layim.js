@@ -1711,10 +1711,15 @@ layui.define(['layer', 'laytpl', 'upload'], function (exports) {
         , file: 'uploadFile'
       }
         , thatChat = thisChat(), upload = cache.base[api[type]] || {};
-
+        // console.log(othis)
         layui.each(call.uploadImage, function (index, item) {
-          item && item(othis.find('input')[0],thatChat.data,()=>{
-            focusInsert(thatChat.textarea[0], 'img[' + (URL.createObjectURL(othis.find('input')[0].files[0]) || '') + ']');
+          item && item(othis.find('input')[0],thatChat.data,othis[0],(type)=>{
+            if(type=='file'){
+              console.log(othis.find('input')[0]);
+              focusInsert(thatChat.textarea[0], type+'(' + (URL.createObjectURL(othis.find('input')[0].files[0]) || '') + ')['+othis.find('input')[0].files[0].name+']');
+            }else{
+              focusInsert(thatChat.textarea[0], type+'[' + (URL.createObjectURL(othis.find('input')[0].files[0]) || '') + ']');
+            }
             sendMessage();
           });
         });

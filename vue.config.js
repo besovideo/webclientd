@@ -20,6 +20,12 @@ module.exports = {
       ])
     )
   },
+  chainWebpack: config => {
+    config.module.rule('vue')
+      .test(/\.vue$/)
+      .use('tran-loader')
+      .loader('tran-loader')
+  },
   lintOnSave: false,
   publicPath: '',
   outputDir: undefined,

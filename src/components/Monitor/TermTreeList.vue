@@ -176,7 +176,7 @@ export default {
         return;
       }
       if (data.isOnline == 0) {
-        this.$Message.error("设备已离线");
+        this.$Message.error(this.$t('Data.shebeiyilixian'));
         return;
       }
       if (!data.isTerm) {
