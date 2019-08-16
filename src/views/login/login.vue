@@ -52,10 +52,12 @@ export default {
     },
     handleSubmit ({userName, password }) {
       let url = window.location.origin
+      // let url = 'https://115.28.79.237:9443'
+
       if(process.env.NODE_ENV=='development'){
         // url = 'http://115.28.79.237:8081'
-        url = 'http://192.168.6.66:8081'
-        // url = 'https://localhost:9443'
+        // url = 'http://192.168.6.66:8081'
+        url = 'https://127.0.0.1:9443'
       }
       this.spinShow = true
       // this.Server = Server
@@ -85,6 +87,7 @@ export default {
               }
             })
             this.$store.state.session.swAddCallBack('login', this.sessionCallback);
+            this.$store.state.session.swAddCallBack('notify', this.notifyCallback);
           }else{
             this.$store.state.ErrorCode = code
             console.log(code)
@@ -119,6 +122,15 @@ export default {
 
      
     },
+    notifyCallback(sender, event, json){
+      switch(json.msg){
+        case 'notify_pu_onoffline':
+            console.log('notify_pu_onoffline');
+            this.$store.state.notify = json.content
+          break
+      }
+      // console.log('notify: ',sender, event, json);
+    },
     sessionCallback(sender, event, json){
         console.log("Login:",json);
         if (json.code == jSW.RcCode.RC_CODE_S_OK) {
@@ -152,7 +164,8 @@ export default {
           }
           this.spinShow = false
         }
-    }
+    },
+    
   },
   created(){
 

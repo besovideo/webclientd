@@ -38,7 +38,7 @@ export default new Router({
         {
           path: '/Monitor',
           name: 'Monitor',
-          redirect: '/Monitor/Scheduling',
+          redirect: '/Monitor/LivePreview',
           meta: {
             title: 'tab.monitor',
             keepAlive: true,
@@ -85,6 +85,29 @@ export default new Router({
             }
           ],
           component: () => import(/* webpackChunkName: "Monitor" */ './views/Monitor.vue')
+        },
+        {
+          path: '/Configuration',
+          name: 'Configuration',
+          redirect: '/Configuration/UserManage',
+          meta: {
+            title: 'Data.peizhizhongxin',
+            keepAlive: true,
+            Name: 'Configuration'
+          },
+          children: [
+            {
+              path: 'UserManage',
+              name: 'UserManage',
+              meta: {
+                title: 'Data.yonghuguanli',
+                keepAlive: true,
+                Name: 'Configuration'
+              },
+              component: () => import(/* webpackChunkName: "Monitor" */ './views/Configuration/UserManage.vue')
+            }
+          ],
+          component: () => import(/* webpackChunkName: "Monitor" */ './views/Configuration.vue')
         }
       ]
     }

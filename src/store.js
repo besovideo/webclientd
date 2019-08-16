@@ -9,7 +9,9 @@ export default new Vuex.Store({
     session: undefined,
     user: '',
     lang: '',
-    ErrorCode: -1
+    ErrorCode: -1,
+    notify: undefined,
+    notifyTip: {}
   },
   mutations: {
   },

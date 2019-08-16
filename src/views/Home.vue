@@ -13,7 +13,7 @@
             <MenuItem name="3" :style="{'background':this.Name=='123'?'rgb(30, 87, 163)':''}">
               {{$t('tab.inquiry')}}
             </MenuItem>
-            <MenuItem name="4" :style="{'background':this.Name=='334'?'rgb(30, 87, 163)':''}">
+            <MenuItem name="4" :to="{name:'Configuration'}"  :style="{'background':this.Name=='Configuration'?'rgb(30, 87, 163)':''}">
               {{$t('tab.Configuration')}}
             </MenuItem>
             <li style="float:left;font-size:16px;font-weight:700;color:#fff;margin-right:10px">|</li>
@@ -75,8 +75,9 @@ export default {
         case 'exit':
           let code = this.$store.state.session.swLogout()
           if(code==jSW.RcCode.RC_CODE_E_DISCONNECTED){
-            this.$store.state.session = undefined
-            this.$router.push({path:'/login'})
+            // this.$store.state.session = undefined
+            window.location.href = window.location.origin
+            // this.$router.push({path:'/login'})
           }
         break;
       }
@@ -101,8 +102,9 @@ export default {
       this.$store.state.session.swAddCallBack('logout', (sender, event, json)=>{
         if ('logout' == event) {
           if (json.code == jSW.RcCode.RC_CODE_S_OK) {
-              this.$store.state.session = undefined
-              this.$router.push({path:'/login'})
+              // this.$store.state.session = undefined
+              window.location.href = window.location.origin
+              // this.$router.push({path:'/login'})
           } else{
             this.$Message.error('Fail, error code: ' + json.code)
           }

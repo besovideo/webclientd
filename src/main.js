@@ -15,6 +15,8 @@ import rightMenu from 'rightMenu'
 import data from './plugins/data.json'
 import messages from './plugins/messages.js'
 
+import '@/components/Monitor/TreeList.less'
+
 Vue.use(rightMenu)
 Vue.use(VueI18n)
 

@@ -102,8 +102,11 @@ export default {
         callback: (options, response, dlg) => {
           this.$store.state.ErrorCode = this.OpenResult = response.emms.code;
           console.log(options, response, dlg);
+          console.log()
+          
           this.Loading = false;
           if (response.emms.code == 0) {
+            this.$store.state.notifyTip[this.puid] = false
             this.Loading = false;
             this.ShowTag = true;
             this.Type = options.prototype;
@@ -115,7 +118,8 @@ export default {
   },
   computed: {
     ...mapState({
-      session: "session"
+      session: "session",
+      notify: "notify"
     })
   },
   watch: {
@@ -126,6 +130,17 @@ export default {
         //   if (this.tagdata == 20) clearInterval(id);
         //   this.tagdata += 1;
         // }, 1000);
+      }
+    },
+    notify(val) {
+      if(val==undefined && this.ShowTag)
+        return
+      if(this.puid == val.content._id_pu){
+        if(!this.$store.state.notifyTip[this.puid]){
+          this.$Message.error(this.$t('Data.shebeiyilixian'))
+          this.$store.state.notifyTip[this.puid] = true
+        }
+        this.Close()
       }
     },
     // tag(val,oldVal){

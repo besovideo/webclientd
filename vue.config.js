@@ -21,10 +21,15 @@ module.exports = {
     )
   },
   chainWebpack: config => {
-    config.module.rule('vue')
-      .test(/\.vue$/)
-      .use('tran-loader')
-      .loader('tran-loader')
+    // config.module.rule('vue')
+    //   .test(/\.vue$/)
+    //   .use('tran-loader')
+    //   .loader('tran-loader')
+
+    config.plugin('define').tap(args => {
+      args[1] = { jSW: 'window.jSW' } 
+      return args
+    })
   },
   lintOnSave: false,
   publicPath: '',

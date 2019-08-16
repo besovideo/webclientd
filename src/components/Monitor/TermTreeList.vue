@@ -330,12 +330,12 @@ export default {
         },
         callback: (options, response, data) => {
           this.$store.state.ErrorCode = response.emms.code 
-          console.log(
-            "searchlist============================\n",
-            options,
-            response,
-            data
-          );
+          // console.log(
+          //   "searchlist============================\n",
+          //   options,
+          //   response,
+          //   data
+          // );
           this.Total = data.info.itotalcount;
           this.CurrentPage = page + 1;
           if (this.isFirst) {
@@ -406,51 +406,52 @@ export default {
 </script>
 
 <style lang="less">
-#TermList {
-  width: 100%;
-  height: 100%;
-  .el-loading-parent--relative {
-    height: 100%;
-  }
-  .search {
-    margin: 0px 0 6px 0;
-  }
-  .showonline {
-    .cb {
-      font-size: 15px;
-      margin-left: 10px;
-    }
-    height: 30px;
-    font-size: 18px;
-    background: rgb(242, 242, 242);
-  }
+@import "./TreeList.less"; 
+// #TermList {
+//   width: 100%;
+//   height: 100%;
+//   .el-loading-parent--relative {
+//     height: 100%;
+//   }
+//   .search {
+//     margin: 0px 0 6px 0;
+//   }
+//   .showonline {
+//     .cb {
+//       font-size: 15px;
+//       margin-left: 10px;
+//     }
+//     height: 30px;
+//     font-size: 18px;
+//     background: rgb(242, 242, 242);
+//   }
 
-  .TreeList {
-    width: 100%;
-    height: calc(100% - 98px);
-    padding-top: 5px;
-    border-right: 1px solid #dcdfe6;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12), 0 0 6px 0 rgba(0, 0, 0, 0.04);
-    overflow: auto;
-    .el-tree-node__content {
-      overflow: initial!important;
-      height: 30px !important;
-      font-size: 14px !important;
-    }
-    .pu_id{
-      color:#ccc
-    }
-  }
-  div.Page {
-    height: 30px;
-    width: 100%;
-    text-align: center;
-    .el-pagination {
-      display: inline-block;
-    }
-    // background-color: #ccc;
-  }
-}
+//   .TreeList {
+//     width: 100%;
+//     height: calc(100% - 98px);
+//     padding-top: 5px;
+//     border-right: 1px solid #dcdfe6;
+//     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12), 0 0 6px 0 rgba(0, 0, 0, 0.04);
+//     overflow: auto;
+//     .el-tree-node__content {
+//       overflow: initial!important;
+//       height: 30px !important;
+//       font-size: 14px !important;
+//     }
+//     .pu_id{
+//       color:#ccc
+//     }
+//   }
+//   div.Page {
+//     height: 30px;
+//     width: 100%;
+//     text-align: center;
+//     .el-pagination {
+//       display: inline-block;
+//     }
+//     // background-color: #ccc;
+//   }
+// }
 // .el-tree-node>.el-tree-node__children{
 //   overflow: initial!important;
 // }

@@ -1,0 +1,124 @@
+*.unselectable {
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+
+  /*
+     Introduced in IE 10.
+     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+   */
+  -ms-user-select: none;
+  user-select: none;
+}
+.ivu-tabs-bar{
+  padding-left: 20px;
+}
+.ivu-tabs.ivu-tabs-no-animation{
+  width: 100%;
+  .ivu-tabs-bar{
+    margin-bottom: 6px;
+  }
+  // flex:1;
+  // display: flex;
+  // flex-direction: column;
+  
+}
+.ivu-tabs-content{
+  height: 0;
+  .ivu-tabs-tabpane{
+    height: 100%;
+  }
+}
+#TermList {
+  width: 100%;
+  height: 100%;
+
+  .el-loading-parent--relative {
+    height: 100%;
+  }
+  .search {
+    margin: 0px 0 6px 0;
+  }
+  .showonline {
+    .cb {
+      font-size: 15px;
+      margin-left: 10px;
+    }
+    height: 30px;
+    font-size: 18px;
+    background: rgb(242, 242, 242);
+  }
+
+  .TreeList {
+    width: 100%;
+    height: calc(100% - 98px);
+    padding-top: 5px;
+    border-right: 1px solid #dcdfe6;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12), 0 0 6px 0 rgba(0, 0, 0, 0.04);
+    overflow: auto;
+    .el-tree-node__content {
+      overflow: initial!important;
+      height: 30px !important;
+      font-size: 14px !important;
+    }
+    .pu_id{
+      color:#ccc
+    }
+  }
+  div.Page {
+    height: 30px;
+    width: 100%;
+    text-align: center;
+    .el-pagination {
+      display: inline-block;
+    }
+    // background-color: #ccc;
+  }
+}
+.SchedulingList {
+  .TreeList {
+    // height: calc(100% - 38px) !important;
+    height: 100% !important;
+  }
+  .InvaiteDialog{
+    .el-divider.el-divider--horizontal{
+      margin-top:0px
+    }
+    .el-checkbox-group {
+      display: grid;
+      grid-gap: 5px;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      .el-checkbox{
+        margin-right:0px;
+      }
+    }
+  }
+  .el-checkbox.is-bordered+.el-checkbox.is-bordered{
+    margin-left: 0px;
+  }
+}
+.custom-tree-node {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
+}
+.layim-send-voice {
+  cursor: pointer;
+  color: #fff;
+  position: absolute;
+  width: 100px;
+  top: 3px;
+  height: 32px;
+  transform: translateX(-50%);
+  left: 50%;
+  background-color: #5fb878;
+  border-radius: 3px;
+  text-align: center;
+  line-height: 32px;
+}
+.layim-send-voice:active {
+  background-color: rgb(3, 31, 11);
+}

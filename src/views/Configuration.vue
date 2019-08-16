@@ -1,11 +1,7 @@
 <template>
   <Content>
     <Tabs   name='tabs' :animated="false" :value='tabs' @on-click="ChangeTabs">
-      <TabPane :label="$t('home.Locate')" name="Locate" tab='tabs'>
-      </TabPane>
-      <TabPane :label="$t('home.LivePreview')" name="LivePreview" tab='tabs'>
-      </TabPane>
-      <TabPane :label="$t('home.Scheduling')" name="Scheduling" tab='tabs'>
+      <TabPane :label="$t('Data.yonghuguanli')" name="UserManage" tab='tabs'>
       </TabPane>
     </Tabs>
 
@@ -15,7 +11,9 @@
       <el-tab-pane :label="$t('home.Scheduling')" name="Scheduling"></el-tab-pane>
     </el-tabs> -->
   <!-- <keep-alive> -->
+  <div class="content">
     <router-view></router-view>
+  </div>
   <!-- </keep-alive> -->
 
   </Content>
@@ -42,42 +40,15 @@ export default {
     }
   },
   created(){
-    console.log(this)
     this.tabs = this.$route.name;
   },
 };
 </script>
-<style lang="less">
-*.unselectable {
-  -moz-user-select: -moz-none;
-  -khtml-user-select: none;
-  -webkit-user-select: none;
 
-  /*
-     Introduced in IE 10.
-     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
-   */
-  -ms-user-select: none;
-  user-select: none;
-}
-.ivu-tabs-bar{
-  padding-left: 20px;
-}
-.ivu-tabs.ivu-tabs-no-animation{
+<style lang="less" scoped>
+.content {
   width: 100%;
-  .ivu-tabs-bar{
-    margin-bottom: 6px;
-  }
-  // flex:1;
-  // display: flex;
-  // flex-direction: column;
-  
-}
-.ivu-tabs-content{
-  height: 0;
-  .ivu-tabs-tabpane{
-    height: 100%;
-  }
+  height: calc(100% - 42px);
+  display: flex;
 }
 </style>
-

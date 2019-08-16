@@ -1,6 +1,6 @@
 <template>
   <div id="TermList" class="SchedulingList">
-    <Input class="search" @on-search="TermSearch" v-model="Search" search clearable placeholder />
+    <!-- <Input class="search" @on-search="TermSearch" v-model="Search" search clearable placeholder /> -->
     <!-- <div class="showonline">
       <Checkbox class="cb" v-model="Cb_isOnline">{{$t('Monitor.Showonlyonlinedevices')}}</Checkbox>
     </div>-->
@@ -13,17 +13,17 @@
         node-key="key"
         :indent="8"
         :default-expanded-keys="['0']"
-        @node-click="HandleChannelClick"
       >
         <span class="custom-tree-node" slot-scope="{ node, data }" rightMenu>
           <span>
-            <i v-if="node.label==''" class="el-icon-s-data" style="padding-right:5px;"></i>
+            <i v-if="data.isMeeting" :class="data.bIsStarted ? 'el-icon-success':'el-icon-error'" style="padding-right:5px;"></i>
             <img
               v-if="data.isMeeting"
               :src="MeetingState"
               width="15"
               height="15"
               style="display:block;float: left;margin:3px 5px 0 0 ;"
+              @click.stop="HandleChannelClick(data)"
               alt
             />
             <img
@@ -41,6 +41,7 @@
             <span
               class="unselectable"
               v-if="data.isMeeting"
+              @click.stop="HandleChannelClick(data)"
             >{{ node.label }}</span>
 
             <el-dropdown trigger="click" v-if="data.isPerson" size="medium" @command="MenuHandle">
@@ -74,9 +75,28 @@
               />
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item icon="el-icon-zoom-in" :command="{type:'invaiteJoin',val:data}">{{$t('Data.yaoqingjiaru')}}</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-success" :command="{type:'startMeet',val:data}">{{$t('Data.kaishihuiyi')}}</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-error" :command="{type:'stopMeet',val:data}">{{$t('Data.jieshuhuiyi')}}</el-dropdown-item>
                 <el-dropdown-item icon="el-icon-close" :command="{type:'deleteMeet',val:data}">{{$t('Data.shanchuhuiyi')}}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
+
+            <img
+              :src="require('@/assets/images/stopfayan.png')"
+              width="15"
+              height="15"
+              style="display:block;float: left;margin:3px 5px 0 0 ;"
+              alt
+              @click.stop="stopSpeak(data)"
+            />
+            <img
+              :src="require('@/assets/images/fayan.png')"
+              width="15"
+              height="15"
+              style="display:block;float: left;margin:3px 5px 0 0 ;"
+              alt
+              @click.stop="startSpeak(data)"
+            />
 
             <img
               :src="liaotian"
@@ -126,15 +146,15 @@
         </el-form-item>
         <el-form-item :label="$t('Data.qunzuleixing')" prop="type">
           <el-radio-group v-model="CreateForm.type" size="medium">
-            <el-radio border label="0">{{$t('Data.zhuchirenmoshi')}}</el-radio>
-            <el-radio border label="1">{{$t('Data.taolunzumoshi')}}</el-radio>
+            <el-radio border :label="jSW.SwConfManager.MODE_SPEAK.CHAIRMAN">{{$t('Data.zhuchirenmoshi')}}</el-radio>
+            <el-radio border :label="jSW.SwConfManager.MODE_SPEAK.DISCUSSIONGROUP">{{$t('Data.taolunzumoshi')}}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item :label="$t('Data.jiarufangshi')" prop="JoinMode">
           <el-radio-group v-model="CreateForm.JoinMode" size="medium">
-            <el-radio border label="0">{{$t('Data.yaoqingjiaru')}}</el-radio>
-            <el-radio border label="8">{{$t('Data.shurumimajiaru')}}</el-radio>
-            <el-radio border label="16">{{$t('Data.wumimajiaru')}}</el-radio>
+            <el-radio border :label="jSW.SwConfManager.MODE_JOIN.INVITE">{{$t('Data.yaoqingjiaru')}}</el-radio>
+            <el-radio border :label="jSW.SwConfManager.MODE_JOIN.PASSWORD">{{$t('Data.shurumimajiaru')}}</el-radio>
+            <el-radio border :label="jSW.SwConfManager.MODE_JOIN.FREE">{{$t('Data.wumimajiaru')}}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item :label="$t('Data.mima')" v-if="CreateForm.JoinMode == '8' " prop="pass">
@@ -145,14 +165,14 @@
         </el-form-item>
         <el-form-item :label="$t('Data.fayanshenqing')" prop="ApplyFor">
           <el-radio-group v-model="CreateForm.ApplyFor" size="medium">
-            <el-radio border label="128">{{$t('Data.zidongtongyi')}}</el-radio>
-            <el-radio border label="0">{{$t('Data.guanliyuanxuke')}}</el-radio>
+            <el-radio border :label="jSW.SwConfManager.MODE_APPLY.AUTOAGREE">{{$t('Data.zidongtongyi')}}</el-radio>
+            <el-radio border :label="jSW.SwConfManager.MODE_APPLY.NEEDAGREE">{{$t('Data.guanliyuanxuke')}}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item :label="$t('Data.kaishimoshi')" prop="StartMode">
           <el-radio-group v-model="CreateForm.StartMode" size="medium">
-            <el-radio border label="0">{{$t('Data.guanliyuankaiqi')}}</el-radio>
-            <el-radio border label="256">{{$t('Data.zidongkaiqi,buyunxuzanting')}}</el-radio>
+            <el-radio border :label="jSW.SwConfManager.MODE_START.STOPADMIN">{{$t('Data.guanliyuankaiqi')}}</el-radio>
+            <el-radio border :label="jSW.SwConfManager.MODE_START.FOREVER">{{$t('Data.zidongkaiqi,buyunxuzanting')}}</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -181,6 +201,10 @@
       </span>
     </el-dialog>
     <!-- 邀请加入会议 -->
+
+    <!-- 发起语音 -->
+
+    <!-- 发起语音 -->
   </div>
 </template>
 
@@ -220,6 +244,7 @@ export default {
       Personexit: require("@/assets/images/Personexit.png"),
       liaotian: require("@/assets/images/liaotian.png"),
       TermGpsList: [],
+      jSW: undefined,
       Cb_isOnline: true,
       TreeLoading: true,
       isFirst: true,
@@ -256,10 +281,10 @@ export default {
       CreateDialog:false,
       CreateForm:{
         name: '',
-        type: '0',
-        JoinMode: '0',
-        ApplyFor: '128',
-        StartMode: '0',
+        type: jSW.SwConfManager.MODE_SPEAK.CHAIRMAN,
+        JoinMode: jSW.SwConfManager.MODE_JOIN.INVITE,
+        ApplyFor: jSW.SwConfManager.MODE_APPLY.AUTOAGREE,
+        StartMode: jSW.SwConfManager.MODE_START.STOPADMIN,
         pass: '',
         checkPass:''
       },
@@ -290,10 +315,39 @@ export default {
       },
       InvaiteDialog:false,
       CheckBoxOnlineJoin:{data:[],id:undefined},
-      OnlineUserList: []
+      OnlineUserList: [],
+      SpeakNotify: []
     };
   },
   methods: {
+    startSpeak(data){
+      var confManager = this.session.swGetConfManager();
+        var conf = confManager.swGetConfByConfId(data.id);
+        if (conf == null) {
+            console.warn("会议不存在");
+            return;
+        }
+
+
+        conf.swApplyForSpeak({
+            callback: function (sender, event, json) {
+
+            }
+        });
+    },
+    stopSpeak(data){
+      var confManager = this.session.swGetConfManager();
+        var conf = confManager.swGetConfByConfId(data.id);
+        if (conf == null) {
+            console.warn("会议不存在");
+            return;
+        }
+        conf.swApplyForEndSpeak({
+            callback: function (sender, event, json) {
+
+            }
+        });
+    },
     HandleDialogClose(done){
       this.$confirm(this.$t('Data.querenguanbi')+"?",{
         confirmButtonText: this.$t('Data.queren'),
@@ -491,18 +545,52 @@ export default {
       switch (type) {
         case 'create':
           this.CreateForm = {
-              name: '',
-              type: '0',
-              JoinMode: '0',
-              ApplyFor: '128',
-              StartMode: '0',
-              pass: '',
-              checkPass: ''
-            }
+            name: '',
+            type: jSW.SwConfManager.MODE_SPEAK.CHAIRMAN,
+            JoinMode: jSW.SwConfManager.MODE_JOIN.INVITE,
+            ApplyFor: jSW.SwConfManager.MODE_APPLY.AUTOAGREE,
+            StartMode: jSW.SwConfManager.MODE_START.STOPADMIN,
+            pass: '',
+            checkPass:''
+          }
           this.CreateDialog = true
         break
         case 'deleteMeet':
           this.DoDeleteMeet(data.val)
+        break
+        case 'startMeet':
+          var confManager = this.session.swGetConfManager();
+          var conf = confManager.swGetConfByConfId(data.val.id);
+          if (conf == null) {
+              console.warn("会议不存在");
+              return;
+          }
+
+          conf.swConfStart({
+              callback:  (sender, event, json) => {
+                if(event.emms.code!=0){
+                    return
+                }
+                data.val.bIsStarted = true
+              }
+          });
+        break
+        case 'stopMeet':
+          var confManager = this.session.swGetConfManager();
+          var conf = confManager.swGetConfByConfId(data.val.id);
+          if (conf == null) {
+              console.warn("会议不存在");
+              return;
+          }
+
+          conf.swConfStop({
+              callback:  (sender, event, json) => {
+                  if(event.emms.code!=0){
+                    return
+                  }
+
+              }
+          });
         break
         case 'deletePerson':
           this.DoDeletePerson(data.val)
@@ -573,39 +661,19 @@ export default {
     },
     TermSearch(val, page) {},
     HandleChannelClick(data, node) {
-      if (data.isTerm) {
-        let channel = this.session.swGetPuChanel(data.pu_id, 65536);
-        console.log(channel);
-        this.$emit("on-term-click", channel);
-        return;
-      }
-
-      if (data.$treeNodeId == 1) {
-        return;
-      }
-      if (!data.isChannel) {
-        return;
-      }
-      // this.ReloadContent = true;
-      // this.ChannelContent = true
-      let channel = this.session.swGetPuChanel(data.pu_id, data.index);
-      this.$emit("on-click", channel, data.index);
-
-      // if (data.index < channel._parent._arr_gps.length) {
-      //   channel = channel._parent._arr_gps[data.index];
-      // } else {
-      //   channel = channel._parent._arr_gps[0];
-      // }
-      // console.log(channel);
-      // channel.swOpen({
-      //   callback: (options, response) => {
-      //     let lat = response.gps.lat / 10000000;
-      //     let long = response.gps.long / 10000000;
-      //     this.ReloadContent = true;
-      //     this.ChannelContent = true;
-      //     this.position = [long, lat];
+      if(!data.isMeeting)return
+      let confManager = this.session.swGetConfManager();
+      let conf = confManager.swGetConfByConfId(data.id)
+      // conf.swParticipatorLeave({
+      //   callback : (sender, response, json)=>{
+          
       //   }
-      // });
+      // })
+      conf.swParticipatorReturn({
+        callback: function (sender, response, json) {
+        }
+      });
+      console.log(data,node)
     },
     HandleTreeClick(data, node, ele) {},
     ChangePage(page) {},
@@ -631,13 +699,14 @@ export default {
               isadmin: el.isadmin,
               isinseat: el.isinseat,
               isleave: el.isleave,
-              isSpeak: el.isSpeak
+              isSpeak: el.isSpeak,
             });
           });
         }
         temp.push({
           label: ele._conf_base_info.name,
           id: ele._conf_base_info.id,
+          bIsStarted: ele._conf_base_info.bIsStarted,
           isMeeting: true,
           children
         });
@@ -671,7 +740,22 @@ export default {
             this.GetMessage(data.conf, data.data);
           break;
         case "notifyapplyforstartspeak":
+            this.SpeakNotify = this.$notify({
+                title: '正在发言',
+                dangerouslyUseHTMLString: true,
+                position: 'bottom-left',
+                type: 'success',
+                duration: 0,
+                message: `
+                  <p >发言:<span style='margin-left:5px'>${data.data.aliasname||data.data.name||data.data.id}</span></p>
+                `
+              })
+              
         case "notifyapplyforendspeak":
+          if(this.SpeakNotify!=undefined){
+            this.SpeakNotify.close()
+            this.SpeakNotify = undefined
+          }
         case "notifyparticipartorleave":
         case "notifyparticipartorreturn":
         case "notifyparticipatormodify":
@@ -683,6 +767,8 @@ export default {
         case "notifyconfdelete":
         case "notifyparticipartoradd":
         case "notifyparticipartorremove":
+        case "notifyconfstart":
+        case "notifyconfstop":
           this.SetMeetingData(this.session.swGetConfManager().swGetConfList());
         default:
           // this.SetMeetingData(this.session.swGetConfManager().swGetConfList());
@@ -788,7 +874,7 @@ export default {
         });
         return;
       }
-      let Term = Conf[0].children.filter(el => el.id == data.id);
+      let Term = Conf[0].children.filter(el => el.id == data.id && el.name == data.name);
       if (Term.length == 0) return;
       let temp = {
         label: data.aliasname || data.name,
@@ -801,8 +887,9 @@ export default {
         isadmin: data.isadmin,
         isinseat: data.isinseat,
         isleave: data.isleave,
-        isSpeak: data.isSpeak
+        isSpeak: data.isSpeak,
       };
+      Conf[0].bIsStarted = conf._conf_base_info.bIsStarted
 
       for (let obj in temp) {
         Term[0][obj] = temp[obj];
@@ -943,6 +1030,7 @@ export default {
   },
 
   created() {
+    this.jSW = window.jSW
     console.log("SchedulingTreeList,created");
     console.log(this.Personexit);
 
@@ -1028,101 +1116,104 @@ export default {
   },
   destroyed() {
     $(".layui-layim-min").remove()
+    $(".layui-layim").remove()
+    $(".layui-layim-chat").remove()
   }
 };
 </script>
 
 <style lang="less">
-#TermList {
-  width: 100%;
-  height: 100%;
+  @import "./TreeList.less";
+// #TermList {
+//   width: 100%;
+//   height: 100%;
 
-  .el-loading-parent--relative {
-    height: 100%;
-  }
-  .search {
-    margin: 0px 0 6px 0;
-  }
-  .showonline {
-    .cb {
-      font-size: 15px;
-      margin-left: 10px;
-    }
-    height: 30px;
-    font-size: 18px;
-    background: rgb(242, 242, 242);
-  }
+//   .el-loading-parent--relative {
+//     height: 100%;
+//   }
+//   .search {
+//     margin: 0px 0 6px 0;
+//   }
+//   .showonline {
+//     .cb {
+//       font-size: 15px;
+//       margin-left: 10px;
+//     }
+//     height: 30px;
+//     font-size: 18px;
+//     background: rgb(242, 242, 242);
+//   }
 
-  .TreeList {
-    width: 100%;
-    height: calc(100% - 98px);
-    padding-top: 5px;
-    border-right: 1px solid #dcdfe6;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12), 0 0 6px 0 rgba(0, 0, 0, 0.04);
-    overflow: auto;
-    .el-tree-node__content {
-      overflow: initial!important;
-      height: 30px !important;
-      font-size: 14px !important;
-    }
-    .pu_id{
-      color:#ccc
-    }
-  }
-  div.Page {
-    height: 30px;
-    width: 100%;
-    text-align: center;
-    .el-pagination {
-      display: inline-block;
-    }
-    // background-color: #ccc;
-  }
-}
-.SchedulingList {
-  .TreeList {
-    height: calc(100% - 38px) !important;
-  }
-  .InvaiteDialog{
-    .el-divider.el-divider--horizontal{
-      margin-top:0px
-    }
-    .el-checkbox-group {
-      display: grid;
-      grid-gap: 5px;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      .el-checkbox{
-        margin-right:0px;
-      }
-    }
-  }
-  .el-checkbox.is-bordered+.el-checkbox.is-bordered{
-    margin-left: 0px;
-  }
-}
-.custom-tree-node {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 14px;
-  padding-right: 8px;
-}
-.layim-send-voice {
-  cursor: pointer;
-  color: #fff;
-  position: absolute;
-  width: 100px;
-  top: 3px;
-  height: 32px;
-  transform: translateX(-50%);
-  left: 50%;
-  background-color: #5fb878;
-  border-radius: 3px;
-  text-align: center;
-  line-height: 32px;
-}
-.layim-send-voice:active {
-  background-color: rgb(3, 31, 11);
-}
+//   .TreeList {
+//     width: 100%;
+//     height: calc(100% - 98px);
+//     padding-top: 5px;
+//     border-right: 1px solid #dcdfe6;
+//     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12), 0 0 6px 0 rgba(0, 0, 0, 0.04);
+//     overflow: auto;
+//     .el-tree-node__content {
+//       overflow: initial!important;
+//       height: 30px !important;
+//       font-size: 14px !important;
+//     }
+//     .pu_id{
+//       color:#ccc
+//     }
+//   }
+//   div.Page {
+//     height: 30px;
+//     width: 100%;
+//     text-align: center;
+//     .el-pagination {
+//       display: inline-block;
+//     }
+//     // background-color: #ccc;
+//   }
+// }
+// .SchedulingList {
+//   .TreeList {
+//     height: calc(100% - 38px) !important;
+//   }
+//   .InvaiteDialog{
+//     .el-divider.el-divider--horizontal{
+//       margin-top:0px
+//     }
+//     .el-checkbox-group {
+//       display: grid;
+//       grid-gap: 5px;
+//       grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+//       .el-checkbox{
+//         margin-right:0px;
+//       }
+//     }
+//   }
+//   .el-checkbox.is-bordered+.el-checkbox.is-bordered{
+//     margin-left: 0px;
+//   }
+// }
+// .custom-tree-node {
+//   flex: 1;
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+//   font-size: 14px;
+//   padding-right: 8px;
+// }
+// .layim-send-voice {
+//   cursor: pointer;
+//   color: #fff;
+//   position: absolute;
+//   width: 100px;
+//   top: 3px;
+//   height: 32px;
+//   transform: translateX(-50%);
+//   left: 50%;
+//   background-color: #5fb878;
+//   border-radius: 3px;
+//   text-align: center;
+//   line-height: 32px;
+// }
+// .layim-send-voice:active {
+//   background-color: rgb(3, 31, 11);
+// }
 </style>
