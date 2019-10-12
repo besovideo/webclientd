@@ -1,10 +1,20 @@
 <template>
   <div class="content">
     <div class="left">
-      <term-tree-list key="LocateTree" :noShowChannel="true" @on-term-click='ChanelClick'/>
+      <term-tree-list 
+        ref="LocateTree" 
+        key="LocateTree" 
+        :disabled="disabled" 
+        :ChanneTooltip="''" 
+        :TermTooltip="$t('Data.shuangjidakaishebeidingwei')" 
+        @on-tooltip-disabled="DontShowTooltip" 
+        @on-online-term="GetOnlineTerm" 
+        @on-check-term="OnCheckTerm" 
+        :noShowChannel="true" 
+        @on-term-click='ChanelClick'/>
     </div>
     <div class="body">
-      <Map :position="position"  key="LocateMap" />
+      <Map :position="position" key="LocateMap" ref='LocateMap' />
     </div>
   </div>
 </template>
@@ -18,11 +28,49 @@ export default {
   data() {
     return {
       position: [],
-      openChannel:undefined
+      openChannel:undefined,
+      GpsList:undefined,
+      tooltip: false,
+      disabled: false,
     };
   },
   methods: {
+    OnCheckTerm(pu_id,tag,isChecked){
+      console.log('pu_id:',pu_id)
+      console.log('tag:',tag)
+      console.log('isChecked:',isChecked)
+      this.$refs['LocateMap'].SetPu2LocateTerms(pu_id,tag,isChecked?'add':'remove')
+    },
+    DontShowTooltip(){
+      this.disabled = true
+      localStorage.setItem('localeDisabled',true)
+    },
+    GetOnlineTerm(termList){
+      console.log('OnlineList',termList)
+      // let temp = []
+      // termList.forEach(el => {
+      //   console.log(el);
+      //   let gps = this.session.swGetPuChanel(el.pu_id, 65536);
+      //   if (gps == null) {
+      //     return;
+      //   }
+      //   temp.push(gps);
+      // });
+      // this.GpsList = temp
+      // this.$nextTick(()=>{
+      //   this.$refs['LocateMap'].SetLocateAllTerm()
+      // })
+      let temp = []
+      termList.forEach(el=>{
+        temp.push({
+          'pu_id':el.pu_id
+        })
+      })
+      this.$refs['LocateMap'].SetLocateAllTerm(temp)
+    },
     ChanelClick(channel){
+      this.$refs['LocateMap'].ShowOneMarker(channel._parent._id_pu)
+      return
       if(null == channel){
         this.$Message.error(this.$t("Monitor.noGPSChannel"))        
         return
@@ -77,6 +125,7 @@ export default {
     //   }, 2000);
     // });
     // this.GetTermList(); 
+    this.disabled = localStorage.getItem('localeDisabled') == null ? false:true 
   }
 };
 </script>

@@ -5,7 +5,7 @@
       <Checkbox class="cb" v-model="Cb_isOnline">{{$t('Monitor.Showonlyonlinedevices')}}</Checkbox>
     </div>
     <!-- 设备列表 -->
-    <div class="TreeList" ref="treeTerm" @contextmenu="BoxRightClick($event)">
+    <div class="TreeList">
       <el-tree
         v-loading="TreeLoading"
         :data="TermListData"
@@ -14,50 +14,36 @@
         :indent="8"
         :default-expanded-keys="['0']"
         :expand-on-click-node='false'
-        @check="CheckTermBox"
       >
         <span class="custom-tree-node" slot-scope="{ node, data }" >
 
-          <el-tooltip  placement="right" :disabled="disabled" :transfer="true" effect="light" v-if="data.pu_id!=='0'">
-            <template slot="content" >
-              <div style="font-size:16px;margin-bottom:10px;" v-if="data.isChannel">{{ChanneTooltip}}</div>
-              <div style="font-size:16px;margin-bottom:10px;" v-if="data.isTerm">{{TermTooltip}}</div>
-              <div style="text-align:center">
-                <el-link type="success" @click="$emit('on-tooltip-disabled')">{{$t('Data.buzaixianshi')}}</el-link>
-              </div>
-            </template>
-            <span @dblclick="HandleChannelClick(data,node)" >
-              <i v-if="node.label==''" class="el-icon-s-data" style="padding-right:5px;"></i>
-              <img
-                v-if="data.isTerm"
-                :src="data.isOnline==0?VideoErrorState:VideoState"
-                width="15"
-                height="15"
-                style="display:block;float: left;margin:3px 5px 0 0 ;"
-                alt
-              />
-              <img
-                v-if="data.isChannel"
-                :src="ChannelUrl"
-                width="15"
-                height="15"
-                style="display:block;float: left;margin:3px 5px 0 0 ;"
-                alt
-              />
-                <!-- @dblclick.stop.prevent="HandleTreeClick(data,node)" -->
-              <span
-                class="unselectable TermTree"
-                :puid="data.pu_id"
-                :style="{color:data.isOnline==0?'#ccc':'inherit',paddingLeft:10}"
-              >{{ node.label }}</span>
-              <span class="pu_id" v-if="data.isTerm" :title="data.pu_id.slice(3)">
-                <!-- {{node.label==node.pu_id?"":`(${node.pu_id})`}} -->
-                ({{data.pu_id.slice(3)}})
-              </span>
+          <span @dblclick="HandleChannelClick(data,node)">
+            <i v-if="node.label==''" class="el-icon-s-data" style="padding-right:5px;"></i>
+            <img
+              v-if="data.isTerm"
+              :src="data.isOnline==0?VideoErrorState:VideoState"
+              width="15"
+              height="15"
+              style="display:block;float: left;margin:3px 5px 0 0 ;"
+              alt
+            />
+            <img
+              v-if="data.isChannel"
+              :src="ChannelUrl"
+              width="15"
+              height="15"
+              style="display:block;float: left;margin:3px 5px 0 0 ;"
+              alt
+            />
+              <!-- @dblclick.stop.prevent="HandleTreeClick(data,node)" -->
+            <span
+              class="unselectable"
+              :style="{color:data.isOnline==0?'#ccc':'inherit',paddingLeft:10}"
+            >{{ node.label }}</span>
+            <span class="pu_id" v-if="data.isTerm" :title="data.pu_id.slice(3)">
+              <!-- {{node.label==node.pu_id?"":`(${node.pu_id})`}} -->
+              ({{data.pu_id.slice(3)}})
             </span>
-          </el-tooltip >
-          <span v-if="data.key=='0'">
-            {{data.label}}
           </span>
         </span>
       </el-tree>
@@ -76,33 +62,13 @@
       ></el-pagination>
     </div>
     <!-- 分页 -->
-    
-    <div v-if="contextMenuVisible" @click="contextMenuVisible=false"  @contextmenu.stop.prevent="contextMenuVisible=false" style="background:rgba(0,0,0,0);position: fixed;width:100%;height:100%;top:0;left:0;z-index: 998">
-    </div>
-
-      <context-menu class="right-menu" 
-        :target="$refs.treeTerm" 
-        :show="contextMenuVisible"
-        >
-        <!-- @update:show="(show) => contextMenuVisible = show"> -->
-        <ul class="rightMenu-ul" v-for="item in this.$store.state.locateCheckData[rigthClickPuID]"> 
-          <li>
-            <i v-if="item.isChecked" class="el-icon-check"/>
-            <a href="javascript:;" 
-              @click="SetRightMenuVal(item)">{{item.label}}</a></li>
-        </ul>
-      </context-menu>
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
-import { component as VueContextMenu } from '@xunlei/vue-context-menu'
 export default {
-  props: ["noShowChannel","TermTooltip","ChanneTooltip",'disabled'],
-  components:{
-    'context-menu': VueContextMenu
-  },
+  props: ["noShowChannel"],
   data() {
     return {
       VideoState: require("@/assets/images/video2.png"),
@@ -110,7 +76,6 @@ export default {
       ChannelUrl: require("@/assets/images/channel.png"),
       Cb_isOnline: true,
       TreeLoading: true,
-      contextMenuVisible:false,
       isFirst: true,
       NameSearch: "",
       NameSelect: "1",
@@ -119,15 +84,10 @@ export default {
       Total: undefined,
       Search: "",
       SearchStatus: undefined,
-      allCheckedTerm:[],
-      rigthClickPuID:undefined,
-      locateCheckData:{
-      },
       TermListData: [
         {
           label: this.$t("Monitor.Server"),
-          pu_id: '0',
-          key: '0',
+          key: 0,
           children: [
             {
               label: ""
@@ -138,63 +98,10 @@ export default {
     };
   },
   methods: {
-    SetRightMenuVal(item){
-      console.log('item.key :',item.key,item.isChecked);
-      this.contextMenuVisible = false
-      this.$set(item,'isChecked',!item.isChecked)
-      if(item.key == 'guiji' && item.isChecked) {
-        let Weizhi = this.$store.state.locateCheckData[this.rigthClickPuID][0]
-        if(!Weizhi.isChecked){
-          Weizhi.isChecked = true
-          this.$emit('on-check-term',this.rigthClickPuID,'weizhi',item.isChecked)
-        }
-      } 
-      this.$emit('on-check-term',this.rigthClickPuID,item.key,item.isChecked)
-    },
-    BoxRightClick(e){
-      // let div = document.querySelector('.TermTree')
-      if(e.target.classList.contains('TermTree') && this.noShowChannel){
-        this.rigthClickPuID = e.target.getAttribute('puid')
-        if(!this.$store.state.locateCheckData[this.rigthClickPuID]){
-          this.$set(this.$store.state.locateCheckData,this.rigthClickPuID,[
-            {
-              label: this.$t('Data.xianshishishiweizhi'),
-              isChecked: false,
-              key: 'weizhi'
-            },
-            {
-              label: this.$t('Data.xianshiguiji'),
-              isChecked: false,
-              key: 'guiji'
-            }
-          ])
-        }
-        this.contextMenuVisible = true
-      }else{
-        this.contextMenuVisible = false
-      }
-    },
-    CheckTermBox(self,allCheckedNodes){
-      let check = allCheckedNodes.checkedKeys
-      this.allCheckedTerm = check
-
-      console.log(self,allCheckedNodes)
-      if(self.pu_id=='0'){
-        
-        return
-      }
-      
-      // if(check.findIndex(el=>el==self.pu_id)==-1){
-      //   this.$emit('on-check-term','remove',[self.pu_id])
-      // }else{
-      //   this.$emit('on-check-term','add',[self.pu_id])
-      // }
-      
-
-    },
     TermSearch(val,page) {
       console.log(val);
       let isOnline = this.Cb_isOnline
+
       let code = this.session.swSearchPuList({
         iPosition: page==undefined?0:page,
         iCount: 100,
@@ -219,22 +126,11 @@ export default {
         }
       });
     },
-    HandleCentContentShow(target) {
-      for (const key in this.CentCenterShowList) {
-        if (this.CentCenterShowList.hasOwnProperty(key)) {
-          this.CentCenterShowList[key] = false;
-          console.log(key);
-        }
-      }
-      this.$nextTick(() => {
-        this.CentCenterShowList[target] = true;
-      });
-    },
     HandleChannelClick(data, node) {
       if (data.isTerm) {
-        let channel = this.session.swGetPuChanel(data.pu_id, 65536);
-        console.log(channel);
-        this.$emit("on-term-click", channel);
+        // let channel = this.session.swGetPuChanel(data.pu_id, 65536);
+        // console.log(channel);
+        this.$emit("on-term-click", data.pu_id,data.isOnline);
         return;
       }
 
@@ -244,42 +140,7 @@ export default {
       if (!data.isChannel) {
         return;
       }
-      // this.ReloadContent = true;
-      // this.ChannelContent = true
-      let channel = this.session.swGetPuChanel(data.pu_id, data.index);
-      this.$emit("on-click", channel, data.index);
-
-      // if (data.index < channel._parent._arr_gps.length) {
-      //   channel = channel._parent._arr_gps[data.index];
-      // } else {
-      //   channel = channel._parent._arr_gps[0];
-      // }
-      // console.log(channel);
-      // channel.swOpen({
-      //   callback: (options, response) => {
-      //     let lat = response.gps.lat / 10000000;
-      //     let long = response.gps.long / 10000000;
-      //     this.ReloadContent = true;
-      //     this.ChannelContent = true;
-      //     this.position = [long, lat];
-      //   }
-      // });
-    },
-    HandleTreeClick(data, node, ele) {
-      if (data.$treeNodeId == 1) {
-        return;
-      }
-      if (data.isOnline == 0) {
-        this.$Message.error(this.$t('Data.shebeiyilixian'));
-        return;
-      }
-      if (!data.isTerm) {
-        return;
-      }
-      this.ChannelContent = false;
-      this.ReloadContent = true;
-      // this.ReloadContent = false((this.pu_id = data.pu_id));
-      this.CurrentPuInfo = data;
+      
     },
     ChangePage(page) {
       if(this.SearchStatus){
@@ -318,15 +179,6 @@ export default {
     },
     SetTreeData(name) {
       if (this.SearchStatus) return;
-      // let list = [];
-      // this.session._arr_pu.forEach(item => {
-      //   list.push({
-      //     label: item._name_pu || item._id_pu,
-      //     pu_id: item._id_pu,
-      //     isOnline: item._info_pu.onlinestatus
-      //   });
-      // });
-      // this.$set(this.TermListData[0], "children", list);
       this.TreeLoading = true;
       let CurrentPage = this.CurrentPage;
       if(this.CurrentPage > Math.ceil(this.session[name].length / 100)){
@@ -393,37 +245,20 @@ export default {
         return;
       }
 
-      
-      let giveLocateOnlineTerm = []
       let SortTemp = [];
       temp.forEach(el => {
         if (el.isOnline) {
           SortTemp.unshift(el);
-          giveLocateOnlineTerm.push(el)
         } else {
           SortTemp.push(el);
         }
       });
-      
-
-
       this.$set(this.TermListData[0], "children", []);
       this.$set(this.TermListData[0], "children", SortTemp);
       if (document.querySelector(".TreeList"))
         document.querySelector(".TreeList").scrollTop = 0;
       this.TreeLoading = false;
-      if (this.isFirst) {
-        this.$emit('on-online-term',giveLocateOnlineTerm)
-        this.isFirst = false;
-      }
-
-      // this.$nextTick(()=>{
-      //   if(this.allCheckedTerm[0]=='0'){
-      //     this.$refs.tree.setCheckedKeys(this.allCheckedTerm.slice(1))
-      //     return
-      //   }
-      //   this.$refs.tree.setCheckedKeys(this.allCheckedTerm)
-      // })
+      if (this.isFirst) this.isFirst = false;
     },
     GetTermList(page, pagesize, isOnline) {
       // if(this.session._arr_pu_online.length>0){
@@ -478,11 +313,18 @@ export default {
     //     this.GetTermList(this.CurrentPage-1,100,false)
     //   }
     // },
-    
     notify(val) {
-      // console.log('allCheck',this.$refs.tree.getCheckedKeys())
       // if(this.TreeLoading)return
-      console.log("ONline");
+      console.log("notify:",val);
+      // console.log("TermListData:",this.TermListData[0].children);
+      
+      // let filterData = this.TermListData[0].children.filter(el=>{return el.pu_id==val.content._id_pu})
+      // if(filterData.length>0){
+      //   filterData
+      // }else{
+
+      // }
+      // return
       if (this.Cb_isOnline && !this.isFirst) {
         this.GetTermList(this.CurrentPage - 1, 100, true);
       }
@@ -511,15 +353,16 @@ export default {
   created() {
     console.log("created");
     console.log(this.session);
-    
     this.GetTermList(0, 100, true);
-
+    // this.session.swAddCallBack('pulist',(sender, cmd, data)=>{
+    //   console.log("pulist============================\n",sender, cmd, data);
+    // })
   }
 };
 </script>
 
 <style lang="less">
-@import "./TreeList.less"; 
+@import "../../Monitor/TreeList.less"; 
 // #TermList {
 //   width: 100%;
 //   height: 100%;
@@ -568,78 +411,5 @@ export default {
 // .el-tree-node>.el-tree-node__children{
 //   overflow: initial!important;
 // }
-.right-menu {
-    position: fixed;
-    background: #fff;
-    border: 1px solid rgba(0,0,0,.5);
-    border-radius: 3px;
-    z-index: 999;
-    display: none;
-    > .rightMenu-ul {
-
-      li {
-        padding-left: 24px;
-        position: relative;
-        height: 28px;
-        background-color: rgba(110, 107, 107, 0.2);
-        >i{
-          display: inline-block;
-          width: 20px;
-          height: 20px;
-          font-weight: 700;
-          font-size: 16px;
-          
-          color: #000;
-          border: 1px solid skyblue;
-          background-color: #fff;
-          line-height: 20px;
-          position: absolute;
-          left: 2px;
-          top: 4px;
-          text-align: center;
-        }
-      }
-    }
-}
-
-.right-menu a {
-    // width: 100px;
-    height: 28px;
-    background: #fff;
-    line-height: 20px;
-    text-align: left;
-    display: block;
-    color: #1a1a1a
-}
-
-.right-menu a:hover {
-    background: #eee;
-    color: #fff
-}
-
-body,html {
-    height: 100%
-}
-
-.right-menu {
-    border: 1px solid #eee;
-    box-shadow: 0 .5em 1em 0 rgba(0,0,0,.1);
-    border-radius: 1px
-}
-
-.rightMenu-ul
-
-a {
-    text-decoration: none
-}
-
-.right-menu a {
-    padding: 5px
-}
-
-.right-menu a:hover {
-    background: #42b983
-}
-
 </style>
 

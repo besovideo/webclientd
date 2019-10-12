@@ -28,8 +28,9 @@
             <Dropdown style="float:left;"  @on-click="ChangePersonal">             
               <Icon type="md-person" size='20' style="color:#fff"></Icon><Icon type="ios-arrow-down" size='16' style="color:#fff"></Icon>
               <DropdownMenu slot="list">
-                  <DropdownItem>{{$t('tab.Personal.Basic_Info')}}</DropdownItem>
-                  <DropdownItem>{{$t('tab.Personal.change_Password')}}</DropdownItem>
+                  <DropdownItem :disabled='true'>{{$store.state.user}}</DropdownItem>
+                  <!-- <DropdownItem name='info'>{{$t('tab.Personal.Basic_Info')}}</DropdownItem> -->
+                  <!-- <DropdownItem>{{$t('tab.Personal.change_Password')}}</DropdownItem> -->
                   <DropdownItem name='exit'>{{$t('tab.Personal.exit')}}</DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -44,15 +45,15 @@
           </div>
         </Menu>
       </Header>
-  <keep-alive>
     <router-view></router-view>
-  </keep-alive>
       <!-- <Footer class="layout-footer-center">2011-2016 &copy; TalkingData</Footer> -->
     </Layout>
+    <!-- <login-user-info-vue v-model="ShowInfoModal"/> -->
   </div>
 </template>
   
 <script>
+import LoginUserInfoVue from '../components/main/LoginUserInfo.vue';
 // @ is an alias to /src
 
 export default {
@@ -60,9 +61,13 @@ export default {
   // components: {
   //   HelloWorld
   // }
+  components:{
+    LoginUserInfoVue
+  },
   data(){
     return {
-      Name: ''
+      Name: '',
+      ShowInfoModal:false
     }
   },
   methods:{
@@ -76,9 +81,13 @@ export default {
           let code = this.$store.state.session.swLogout()
           if(code==jSW.RcCode.RC_CODE_E_DISCONNECTED){
             // this.$store.state.session = undefined
-            window.location.href = window.location.origin
+            // window.location.href = window.location.origin
+            location.reload()
             // this.$router.push({path:'/login'})
           }
+        break
+        case 'info':
+          this.ShowInfoModal = true
         break;
       }
     }

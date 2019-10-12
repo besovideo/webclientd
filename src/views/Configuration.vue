@@ -3,6 +3,8 @@
     <Tabs   name='tabs' :animated="false" :value='tabs' @on-click="ChangeTabs">
       <TabPane :label="$t('Data.yonghuguanli')" name="UserManage" tab='tabs'>
       </TabPane>
+      <TabPane :label="$t('Data.shebeiguanli')" name="TermManage" tab='tabs'>
+      </TabPane>
     </Tabs>
 
     <!-- <el-tabs v-model="tabs" type="border-card" @tab-click="ChangeTabs">
@@ -10,11 +12,11 @@
       <el-tab-pane :label="$t('home.LivePreview')" name="LivePreview"></el-tab-pane>
       <el-tab-pane :label="$t('home.Scheduling')" name="Scheduling"></el-tab-pane>
     </el-tabs> -->
-  <!-- <keep-alive> -->
   <div class="content">
-    <router-view></router-view>
+    <!-- <keep-alive> -->
+      <router-view></router-view>
+    <!-- </keep-alive> -->
   </div>
-  <!-- </keep-alive> -->
 
   </Content>
 </template>

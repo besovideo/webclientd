@@ -55,9 +55,9 @@ export default {
       // let url = 'https://115.28.79.237:9443'
 
       if(process.env.NODE_ENV=='development'){
-        // url = 'http://115.28.79.237:8081'
-        // url = 'http://192.168.6.66:8081'
-        url = 'https://127.0.0.1:9443'
+        // url = 'https://115.28.79.237:8081'
+        // url = 'http://192.168.0.67:9443'
+        url = 'https://127.0.0.1:8081'
       }
       this.spinShow = true
       // this.Server = Server
@@ -86,6 +86,7 @@ export default {
                 })
               }
             })
+            window._session = this.$store.state.session
             this.$store.state.session.swAddCallBack('login', this.sessionCallback);
             this.$store.state.session.swAddCallBack('notify', this.notifyCallback);
           }else{
@@ -123,10 +124,13 @@ export default {
      
     },
     notifyCallback(sender, event, json){
+      console.log('notify: ',json.msg);
+      
       switch(json.msg){
         case 'notify_pu_onoffline':
             console.log('notify_pu_onoffline');
             this.$store.state.notify = json.content
+            this.$store.state.notify_term = json.content
           break
       }
       // console.log('notify: ',sender, event, json);
@@ -168,7 +172,12 @@ export default {
     
   },
   created(){
-
+    localStorage.getItem('VideoType')? '': localStorage.setItem('VideoType','auto')
+    this.$store.state.VideoType = localStorage.getItem('VideoType')
+    this.$store.state.lang = localStorage.getItem('locale')
+    if(process.env.NODE_ENV=='development'){
+      this.handleSubmit({userName:'admin',password:'123456'})
+    }
   }
 }
 </script>

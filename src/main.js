@@ -14,8 +14,15 @@ import VueI18n from 'vue-i18n'
 import rightMenu from 'rightMenu'
 import data from './plugins/data.json'
 import messages from './plugins/messages.js'
-
 import '@/components/Monitor/TreeList.less'
+import lodash from 'lodash'
+
+Vue.prototype.$lodash = lodash
+
+// require('../static/layui-src/src/layui.js')
+// require('../static/layui-src/src/css/layui.css')
+
+
 
 Vue.use(rightMenu)
 Vue.use(VueI18n)

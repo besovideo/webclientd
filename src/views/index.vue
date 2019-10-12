@@ -2,53 +2,83 @@
   <Content :style="{margin: '0 auto',height: '100%',width: '1250px'}">
     <div style="height: 100%;width: 100%;padding-top:20px;background:#f5f7f9">
       <Row>
-        <Col span='18' style="background:#fff;height:250px;padding-top:20px">
-          <Col span="6" style="height:100px;line-height:100px">
-            <div class="item_box"  @click="$router.push({name:'LivePreview'})">
-              <div class="img"><img style="margin-top:-10px" src="../assets/images/icon1.png" alt=""></div>
-              <div class="content">
-                <p class="title">{{$t('home.LivePreview')}}</p>
-                <p class="body">{{$t('home.LivePreview_tip')}}</p>
-              </div>
+        <Col span='18' >
+          <div style="background:#fff;height:250px;padding-top:20px" class="box_content">
+            <div class="box_content_tip">
+              <p>{{$t('Data.jiankongzhongxin')}}</p>
             </div>
-          </Col>
-          <Col span="6" style="height:100px;line-height:100px">
-            <div class="item_box" @click="$router.push({name:'VideoPlayback'})">
-              <div class="img"><img  style="margin-top:-10px"  src="../assets/images/icon2.png" alt=""></div>
-              <div class="content">
-                  <p class="title">{{$t('home.Video_playback')}}</p>
-                  <p class="body">{{$t('home.Video_playback_tip')}}</p>
-              </div>
-            </div>
-          </Col>
-          <Col span="6" style="height:100px;line-height:100px" >
-            <div class="item_box" @click="$router.push({name:'Locate'})">
-                <div class="img"><img style="margin-top:-10px"  src="../assets/images/icon3.png" alt=""></div>
+            <Col span="6" style="height:100px;line-height:100px">
+              <div class="item_box"  @click="$router.push({name:'LivePreview'})">
+                <div class="img"><img style="margin-top:-10px" src="../assets/images/icon1.png" alt=""></div>
                 <div class="content">
-                    <p class="title">{{$t('home.location')}}</p>
-                    <p class="body">{{$t('home.location_tip')}}</p>
+                  <p class="title">{{$t('home.LivePreview')}}</p>
+                  <p class="body">{{$t('home.LivePreview_tip')}}</p>
                 </div>
               </div>
-          </Col>
-          <Col span="6" style="height:100px;line-height:100px">
-          <div class="item_box" >
-                <div class="img"><img src="../assets/images/icon4.png" alt=""></div>
-                <div class="content">
-                    <p class="title">{{$t('home.Track_playback')}}</p>
-                    <p class="body">{{$t('home.Track_playback_tip')}}</p>
-                </div>
-              </div>
-          </Col>
-          <Divider dashed style="margin-bottom:10px"/>
-          <Col span="6" style="height:100px;line-height:100px">
+            </Col>
+            <Col span="6" style="height:100px;line-height:100px">
+              <!-- <div class="item_box" @click="$router.push({name:'VideoPlayback'})"> -->
               <div class="item_box" >
-                <div class="img"><img src="../assets/images/icon5.png" alt=""></div>
+                <div class="img"><img  style="margin-top:-10px"  src="../assets/images/icon2.png" alt=""></div>
                 <div class="content">
-                    <p class="title">{{$t('home.Picture_monitor')}}</p>
-                    <p class="body">{{$t('home.Picture_monitor_tip')}}</p>
+                    <p class="title">{{$t('home.Video_playback')}}</p>
+                    <p class="body">{{$t('home.Video_playback_tip')}}</p>
                 </div>
               </div>
-          </Col>
+            </Col>
+            <Col span="6" style="height:100px;line-height:100px" >
+              <div class="item_box" @click="$router.push({name:'Locate'})">
+                  <div class="img"><img style="margin-top:-10px"  src="../assets/images/icon3.png" alt=""></div>
+                  <div class="content">
+                      <p class="title">{{$t('home.location')}}</p>
+                      <p class="body">{{$t('home.location_tip')}}</p>
+                  </div>
+                </div>
+            </Col>
+            <Col span="6" style="height:100px;line-height:100px">
+            <div class="item_box" >
+                  <div class="img"><img src="../assets/images/icon4.png" alt=""></div>
+                  <div class="content">
+                      <p class="title">{{$t('home.Track_playback')}}</p>
+                      <p class="body">{{$t('home.Track_playback_tip')}}</p>
+                  </div>
+                </div>
+            </Col>
+            <Divider dashed style="margin-bottom:10px"/>
+            <Col span="6" style="height:100px;line-height:100px">
+                <div class="item_box" @click="$router.push({name:'Scheduling'})">
+                  <div class="img"><img src="../assets/images/diaodu.png" alt=""></div>
+                  <div class="content">
+                      <p class="title">{{$t('Data.jiquntiaodu')}}</p>
+                      <p class="body">{{$t('Data.jiquntiaodu')}}</p>
+                  </div>
+                </div>
+            </Col>
+          </div>
+
+          <div style="background:#fff;height:130px;margin-top:20px;padding-top:20px" class="box_content">
+            <div class="box_content_tip">
+              <p>{{$t('Data.peizhizhongxin')}}</p>
+            </div>
+            <Col span="6" style="height:100px;line-height:100px">
+              <div class="item_box"  @click="$router.push({name:'UserManage'})">
+                <div class="img"><img style="margin-top:-10px" src="../assets/images/qun.png" alt=""></div>
+                <div class="content">
+                  <p class="title">{{$t('Data.yonghuguanli')}}</p>
+                  <p class="body">{{$t('Data.yonghuguanli')}}</p>
+                </div>
+              </div>
+            </Col>
+            <Col span="6" style="height:100px;line-height:100px">
+              <div class="item_box"  @click="$router.push({name:'TermManage'})">
+                <div class="img"><img style="margin-top:-10px" src="../assets/images/shebeiguanli.png" alt=""></div>
+                <div class="content">
+                  <p class="title">{{$t('Data.shebeiguanli')}}</p>
+                  <p class="body">{{$t('Data.shebeiguanli')}}</p>
+                </div>
+              </div>
+            </Col>
+          </div>
           <!-- <Col span="6" style="height:100px;line-height:100px">
             <div class="item_box" >
                 <div class="img"><img  style="margin-top:-10px"  src="../assets/images/icon6.png" alt=""></div>
@@ -83,6 +113,8 @@
           </div>
         </Col>
       </Row>
+
+      
     </div>
   </Content>
 </template>
@@ -93,6 +125,25 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.box_content{
+  position: relative;
+  &>.box_content_tip{
+    display: block;
+    position: absolute;
+    width:100px;
+    height: 25px;
+    top:0;
+    background-color: rgb(39, 114, 211);
+    &>p{
+      line-height: 25px;
+      cursor: pointer;
+      font-size: 14px;
+      text-align: center;
+      color: white;
+    }
+  }
+
+}
   .item_box{
     &:hover{
       background: rgb(236, 244, 254)

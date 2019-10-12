@@ -1,7 +1,7 @@
 <template>
   <div class="lp_content">
     <div class="lp_left">
-      <term-tree-list  @on-click='ChanelClick'/>
+      <term-tree-list  @on-click='ChanelClick' :disabled="disabled" :ChanneTooltip="$t('Data.shuangjichanneldakaishipinyulan')" :TermTooltip="$t('Data.shuangjichanneldakaishipinyulan')" @on-tooltip-disabled="DontShowTooltip" />
     </div>
     <div class="lp_body">
       <div id="right_VideoContent">
@@ -29,18 +29,34 @@
             </DropdownMenu>
           </Dropdown> -->
           <el-dropdown trigger="click" @command="DropdownClick">
+            <span class="el-dropdown-link" style="margin-right:10px">
+              <a href="javascript:void(0)">
+                <img :src="require('@/assets/images/videoSet.png')" width="20" style="line-height: 30px">
+              </a>
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" :disabled="$store.state.VideoType == 'auto'" :command="{'type':'videotype',val:'auto'}">AUTO</el-dropdown-item>
+              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" :disabled="$store.state.VideoType == 'rtmp'" :command="{'type':'videotype',val:'rtmp'}">RTMP</el-dropdown-item>
+              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" :disabled="$store.state.VideoType == 'hls'" :command="{'type':'videotype',val:'hls'}">HLS</el-dropdown-item>
+              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" :disabled="$store.state.VideoType == 'httpflv'" :command="{'type':'videotype',val:'httpflv'}">HttpFlv</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+
+          <el-dropdown trigger="click" @command="DropdownClick">
             <span class="el-dropdown-link">
               <a href="javascript:void(0)">
                 <Icon type="ios-apps" size="24" style="line-height:30px"/>
               </a>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" command="1">1X1</el-dropdown-item>
-              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" command="4">2X2</el-dropdown-item>
-              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" command="9">3X3</el-dropdown-item>
-              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" command="16">4X4</el-dropdown-item>
+              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" :command="{'type':'window',val:1}">1X1</el-dropdown-item>
+              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" :command="{'type':'window',val:4}">2X2</el-dropdown-item>
+              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" :command="{'type':'window',val:9}">3X3</el-dropdown-item>
+              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" :command="{'type':'window',val:16}">4X4</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
+
+          
         </div>
       </div>
     </div>
@@ -71,10 +87,15 @@ export default {
       videoboxclass:{width:"50%",height:"50%",float:'left',border:"1px solid rgb(72, 123, 194)"},
       videoTarget: 0,
       tag: undefined,
-      puid: undefined
+      puid: undefined,
+      disabled: undefined
     };
   },
   methods: {
+    DontShowTooltip(){
+      this.disabled = true
+      localStorage.setItem('LivePreviewDisabled',true)
+    },
     ChanelClick(channel,index) {
       let temp = this.videoinfo.filter((el,i)=>{
         return i<this.videosize && !el.isopen
@@ -104,8 +125,13 @@ export default {
     openState(i,status){
       this.videoinfo[i].isopen = status
     },
-    DropdownClick(command){
-      this.videosize = parseInt(command)
+    DropdownClick(data){
+      if(data.type=='window'){
+        this.videosize = data.val
+      }else if(data.type=='videotype'){
+        localStorage.setItem('VideoType',data.val)
+        this.$store.state.VideoType = data.val
+      }
     }
   },
   watch: {
@@ -149,6 +175,7 @@ export default {
     for(var i=0;i<16;i++){
       this.videoinfo.push({index:i,puid:undefined,puname:undefined,tag:undefined,isopen:undefined})
     }
+    this.disabled = localStorage.getItem('LivePreviewDisabled') == null ? false:true 
     
   },
   updated() {

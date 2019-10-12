@@ -5,7 +5,7 @@
     </div>
     <div class="body">
       <!-- 默认显示所有用户组列表 -->
-      <header v-if="group_info==undefined">
+      <header v-if="group_info==undefined && !User_info">
         <div class="h_left">
           <img :src="require('@/assets/images/qun.png')" alt="">
           <p>{{$t('Data.yonghuzuguanli')}}</p>
@@ -29,10 +29,24 @@
       </header>
       <!-- 默认某个用户组中用户 和用户组 列表 -->
 
-      <el-divider style="margin: 10px 0;"><i class="el-icon-mobile-phone"></i></el-divider>
-      <div class="_content">
-        <user-group-table-vue v-if="group_info==undefined" ref='userallgroup'/>
+      <!-- 默认用户信息列表 -->
+      <header v-if="!group_info && User_info" class="user_header">
+        <div class="h_left">
+          <img :src="require('@/assets/images/userinfo.png')" alt="">
+          <p>{{User_info.name}}    <span style="color: #ccc">{{User_info.id}}</span></p>
+        </div>
+        <div class="h_right">
+          <el-button type="primary" icon="el-icon-circle-plus" @click="HandleAddGroup">{{this.$t('Data.tianjiayonghuzu')}}</el-button>
+          <el-button type="primary" icon="el-icon-circle-plus" @click="HandleAddUser">{{this.$t('Data.tianjiayonghu')}}</el-button>
+        </div>
+      </header>
+      <!-- 默认用户信息列表 -->
+
+      <el-divider style="margin: 10px 0;" v-if="!User_info"><i class="el-icon-mobile-phone"></i></el-divider>
+      <div :class="{_content:true,user_content:User_info!=undefined}">
+        <user-group-table-vue v-if="group_info==undefined && !User_info" ref='userallgroup'/>
         <user-group-users-table v-if="group_info && group_info.id" ref="groupusers"/>
+        <user-info-table-vue  v-if="group_info==undefined && User_info" ref="userinfo"/>
       </div>
     </div>
     <!-- 添加用户组 操作框 -->
@@ -60,24 +74,37 @@
         </span>
       </el-dialog>
     <!-- 添加用户组 操作框 -->
-    <!-- 添加用户组 操作框 -->
+    <!-- 添加用户 操作框 -->
       <el-dialog
         :title="$t('Data.tianjiayonghu')"
         :visible.sync="AddUserDialog"
         class="AddUserDialog"
         :close-on-click-modal="false"
-        width="600px"
+        width="800px"
         center >
         <el-form :label-width="lang=='en'?'170px':'90px'" size="medium">
-          <el-form-item :label="$t('Data.yonghuID')" >
+          <el-form-item :label="$t('Data.zhanghao')" >
             <el-input v-model="AddUser.id"></el-input>
           </el-form-item>
           <el-form-item :label="$t('Data.yonghumingcheng')" >
             <el-input v-model="AddUser.name"></el-input>
           </el-form-item>
+          <el-form-item :label="$t('Data.dianhua')" >
+            <el-input type="phone" v-model="AddUser.phone"></el-input>
+          </el-form-item>
+          <el-form-item :label="$t('Data.youxiang')" >
+            <el-input type="email" v-model="AddUser.email"></el-input>
+          </el-form-item>
           <el-form-item :label="$t('Data.yonghumima')" >
             <el-input type="password" v-model="AddUser.passwd"></el-input>
           </el-form-item>
+          <el-form-item :label="$t('Data.quanxian')" >
+              <el-checkbox v-model="AddUser.sysadmin.isGroup" :label="$t('Data.zuguanli')" border></el-checkbox>
+              <el-checkbox v-model="AddUser.sysadmin.isUser" :label="$t('Data.yonghuguanli')" border></el-checkbox>
+              <el-checkbox v-model="AddUser.sysadmin.isDev" :label="$t('Data.shebeiguanli')" border></el-checkbox>
+              <el-checkbox v-model="AddUser.sysadmin.isDevAss" :label="$t('Data.shebeifenpei')" border></el-checkbox>
+          </el-form-item>
+
           <el-form-item :label="$t('Data.miaoshu')" >
             <el-input type="textarea" v-model="AddUser.desc"></el-input>
           </el-form-item>
@@ -96,11 +123,14 @@ import UserManageTreeList from '@/components/Configuration/UserManageTreeList.vu
 import UserGroupTableVue from '../../components/Configuration/UserAllGroupTable.vue';
 import {mapState} from 'vuex'
 import UserGroupUsersTable from '../../components/Configuration/UserGroupUsersTable.vue';
+import UserInfoTableVue from '../../components/Configuration/UserInfoTable.vue';
+
 export default {
   components:{
     UserManageTreeList,
     UserGroupTableVue,
-    UserGroupUsersTable
+    UserGroupUsersTable,
+    UserInfoTableVue
   },
   data(){
     return {
@@ -110,10 +140,24 @@ export default {
 
       },
       AddUserDialog:false,
-      AddUser:{},
+      AddUser:{
+        id: '',
+        name: '',
+        passwd: '',
+        email: '',
+        phone: '',
+        sysadmin: {
+          isGroup:false,
+          isUser:false,
+          isDev:false,
+          isDevAss:false
+        },
+        desc: ''
+      },
       userManager:undefined,
       group_parentid: '',
       group_info: undefined,
+      User_info: undefined,
       groupEvent:undefined
     }
   },
@@ -141,6 +185,7 @@ export default {
     handleAllClick(data,node){
       this.group_info = undefined
       this.groupEvent = undefined
+      this.User_info = undefined
       this.GetGroupData(this.GroupData)
       console.log('根',data,node);
     },
@@ -157,9 +202,13 @@ export default {
     },
     //点击用户后逻辑
     handleUserClick(data,node,event){
-      this.groupEvent = event
-      this.group_info = data._group
-      console.log('用户',data,node);      
+      this.group_info = undefined
+      this.User_info = data._user      
+      console.log('用户',data,node);
+      this.$nextTick(()=>{
+        let userinfo = this.$refs['userinfo']
+        userinfo.SetData(this.User_info)
+      })      
     },
     //添加用户组按钮 逻辑
     HandleAddGroup(target){
@@ -190,9 +239,16 @@ export default {
         })
         return
       }
+      this.userManager || (this.userManager = this.session.swGetUserManager())
+      this.userManager.swGetGroupById('Admin').swGetGroupInfo({
+        callback:(sender, event, data)=>{
+          let res;
+          console.log(data)
+        }
+      })
       this.AddGroup = {
         id: this.$tools.randomString().toLowerCase(),
-        name: 'testGroup_'+this.$tools.randomString(5).toLowerCase(),
+        name: 'Group_'+this.$tools.randomString(5).toLowerCase(),
         desc: ''
       }
       this.AddGroupDialog = true
@@ -220,13 +276,16 @@ export default {
             description: this.AddUser.desc,
             groupid: this.group_info.id,
             allocateId: this.userManager.swGetCurrentUserId(),
-            sysadmin: {
-              isGroup: false,
-              isUser: true,
-              isDev: false,
-              isDevAss: false
-            },
+            // sysadmin: {
+            //   isGroup: this.AddUser.sysadmin.isGroup,
+            //   isUser: this.AddUser.sysadmin.isUser,
+            //   isDev: this.AddUser.sysadmin.isDev,
+            //   isDevAss: this.AddUser.sysadmin.isDevAss
+            // },
+            sysadmin: this.AddUser.sysadmin,
             passwd: this.AddUser.passwd,
+            email: this.AddUser.email,
+            phone: this.AddUser.phone,
             resources: []
           },
           callback: (sender, option, data) =>{
@@ -247,6 +306,14 @@ export default {
         id: '',
         name: '',
         passwd: '',
+        email: '',
+        phone: '',
+        sysadmin: {
+          isGroup:false,
+          isUser:false,
+          isDev:false,
+          isDevAss:false
+        },
         desc: ''
       }
       this.AddUserDialog = true
@@ -257,7 +324,7 @@ export default {
   }  
 }
 </script>
-<style lang="less" scoped>
+<style lang="less">
 #ConfigureList{
   display: flex;
   height: 100%;
@@ -273,6 +340,9 @@ export default {
     header{
       height: 60px;
       overflow: hidden;
+      &.user_header{
+        display: none;
+      }
       .h_left{
         img{
           width: 40px;
@@ -300,9 +370,14 @@ export default {
         }
       }
     }
+    
+    
     ._content{
       height: calc(100% - 81px);
       overflow: auto;
+      &.user_content{
+        height: 100% !important;
+      }
     }
     .el-divider{
       &.el-divider--horizontal{
@@ -310,6 +385,9 @@ export default {
       }
     }
   }
+}
+.el-checkbox.el-checkbox--medium.is-bordered{
+  margin-left: 0!important
 }
 
 </style>

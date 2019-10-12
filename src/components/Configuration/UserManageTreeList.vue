@@ -1,6 +1,6 @@
 <template>
   <div id="TermList">
-    <Input class="search"  search clearable placeholder />
+    <Input class="search"  v-model="filterText"  search clearable placeholder  />
     <div class="TreeList _TreeList">
       <el-tree
         v-loading="TreeLoading"
@@ -8,10 +8,14 @@
         :highlight-current="true"
         node-key="key"
         :indent="8"
-        :default-expanded-keys="['0']"
-        @node-click="HandleTreeClick"
+        :default-expanded-keys="ExpandedKey"
+        :expand-on-click-node='false'
+        @node-expand='expandOpen'
+        @node-collapse='expandClose'
+        :filter-node-method="filterNode"
+        ref="tree"
       >
-        <span class="custom-tree-node" slot-scope="{ node, data }" rightMenu>
+        <span class="custom-tree-node" slot-scope="{ node, data }" rightMenu @dblclick="HandleTreeClick(data,node,$event)">
           <span>
             <img
               v-if="data.target=='group'"
@@ -19,7 +23,6 @@
               width="15"
               height="15"
               style="display:block;float: left;margin:3px 5px 0 0 ;"
-              @click.stop="HandleTreeClick(data,node,$event)"
               alt
             />
             <img
@@ -32,7 +35,6 @@
             />
             <span
               class="unselectable"
-              @click.stop="HandleTreeClick(data,node,$event)"
             >{{ node.label }}</span>
               <!-- <span
                 class="unselectable"
@@ -60,6 +62,7 @@ export default {
       yonghu: require("@/assets/images/yonghu.png"),
       TreeLoading: true,
       userManager:undefined,
+      ExpandedKey:[0],
       UserListData: [
         {
           label: this.$t('Data.yonghuguanli'),
@@ -72,9 +75,25 @@ export default {
           ]
         }
       ],
+      filterText:''
     }
   },
   methods:{
+    //搜索过滤
+    filterNode(value, data) {
+      if (!value) return true;
+      return data.label.indexOf(value) !== -1;
+    },
+    //树节点张开关闭事件
+    expandOpen(data,node,el){
+      this.ExpandedKey.find(el=>el==data.key)==undefined && this.ExpandedKey.push(data.key)
+    },
+    //树节点张开关闭事件
+    expandClose(data,node,el){
+      // this.ExpandedKey.push()
+      let index;
+      (index = this.ExpandedKey.find(el=>el==data.key))!=undefined && this.ExpandedKey.splice(index,1)
+    },
     // 树节点 点击 逻辑
     HandleTreeClick(data,node,e){
       if(data.root){
@@ -97,16 +116,16 @@ export default {
         group._userlist.forEach(user => {
           children.push({
             target: 'user',
-            label: user._user.name,
+            label: user._user.name||user._user.id,
             _user: user._user,
             _group: user._group
           })
         })
-
         temp.push({
           target: 'group',
-          label: group._group.name,
+          label: group._group.name||group._group.id,
           _group: group._group,
+          key: group._group.id,
           children
         })
       })
@@ -176,7 +195,19 @@ export default {
     },
     //获取用户组信息
     GetGroupInit(){
-      if(this.userManager==undefined){
+      window.UserManageChange = (sender, response, data) => {
+        console.log('Change: ',sender, response, data);
+        switch(data.cmd){
+          case 'addgroup':
+          case 'delgroup':
+          case 'adduser':
+          case 'deluser':
+            this.GetGroupList()
+            break
+        }
+      }
+      if(!this.UserManageInit){
+        this.$store.state.UserManageInit = true
         this.userManager = this.session.swGetUserManager();
         let code;
         this.$store.state.ErrorCode = code = this.userManager.swInit({
@@ -185,6 +216,7 @@ export default {
             if(response.emms.code!=0){
               this.$Message.error(this.$tools.findErrorCode(response.emms.code))
             }
+            this.$store.state.UserManageInit = true
             //初始化返回值判断
             if(code!=0){
               this.TreeLoading = false
@@ -192,32 +224,27 @@ export default {
             }
             this.GetGroupList()
           },
-          ondatachanged: (sender, response, data) => {
-            console.log('Change: ',sender, response, data);
-            switch(data.cmd){
-              case 'addgroup':
-              case 'delgroup':
-              case 'adduser':
-              case 'deluser':
-                this.GetGroupList()
-                break
-            }
-          },
+          ondatachanged: window.UserManageChange,
           tag: null
         })
       }else{
+        this.userManager = this.session.swGetUserManager();
         this.GetGroupList()
       }
 
     }
   },
   watch:{
-
+    filterText(val) {
+      console.log(this.ExpandedKey)
+      this.$refs.tree.filter(val);
+    }
   },
   computed:{
     ...mapState({
       session: 'session',
-      ErrorCode: 'ErrorCode'
+      ErrorCode: 'ErrorCode',
+      UserManageInit:'UserManageInit'
     })
   },
   created(){

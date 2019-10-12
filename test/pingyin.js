@@ -3,11 +3,12 @@ const request = require('request')
 var fs = require('fs')
 var path = require('path')
 var process = require('process')
+const { exec } = require('child_process')
 
 let FilePath = path.resolve('src/plugins/data.json')
 let data 
 eval('data = ' + fs.readFileSync(FilePath).toString())
-console.log(data)
+// console.log(data)
 
 if (!data.zh.Data && !data.en.Data) {
   data.zh.Data = {} 
@@ -25,7 +26,7 @@ function saveData () {
 }
 
 
-function Fangyi (str) {
+function Fangyi (str, target) {
   let code = pinyin(str, { style: pinyin.STYLE_NORMAL }).join('')
   console.log('code: ', code)
   GetGoogle(str).then(body => {
@@ -35,8 +36,37 @@ function Fangyi (str) {
       if (!en) {
         return
       } 
+      switch (target) {
+        case '1':
+          exec('clip').stdin.end(`{{$t('Data.${code}')}}`)
+          break
+        case '2':
+          exec('clip').stdin.end(`$t('Data.${code}')`)
+          break
+        case '3':
+          exec('clip').stdin.end(`this.$t('Data.${code}')`)
+          break
+        default:
+          exec('clip').stdin.end(`$t('Data.${code}')`)
+          break
+      }
       if (data.zh.Data[code] != undefined) {
         console.log('已有数据：', code)
+
+        switch (target) {
+          case '1':
+            exec('clip').stdin.end(`{{$t('Data.${code}')}}`)
+            break
+          case '2':
+            exec('clip').stdin.end(`$t('Data.${code}')`)
+            break
+          case '3':
+            exec('clip').stdin.end(`this.$t('Data.${code}')`)
+            break
+          default:
+            exec('clip').stdin.end(`$t('Data.${code}')`)
+            break
+        }
         console.log(`{{$t('Data.${code}')}}`)
         console.log(`$t('Data.${code}')`)
         console.log(`this.$t('Data.${code}')`)
@@ -79,7 +109,13 @@ function GetGoogle (str) {
 
 
 
-Fangyi(process.argv[2])
+
+// if (process.argv[2] === '-r') {
+//   console.log('fanyi')
+//   return
+// }
+
+Fangyi(process.argv[2], process.argv[3])
 
 
 

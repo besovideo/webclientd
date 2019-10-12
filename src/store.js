@@ -9,9 +9,13 @@ export default new Vuex.Store({
     session: undefined,
     user: '',
     lang: '',
+    VideoType: '',
     ErrorCode: -1,
     notify: undefined,
-    notifyTip: {}
+    notify_term: undefined,
+    notifyTip: {},
+    UserManageInit: false,
+    locateCheckData: {}
   },
   mutations: {
   },

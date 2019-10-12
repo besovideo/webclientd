@@ -38,7 +38,7 @@ export default new Router({
         {
           path: '/Monitor',
           name: 'Monitor',
-          redirect: '/Monitor/LivePreview',
+          redirect: '/Monitor/Locate',
           meta: {
             title: 'tab.monitor',
             keepAlive: true,
@@ -104,10 +104,20 @@ export default new Router({
                 keepAlive: true,
                 Name: 'Configuration'
               },
-              component: () => import(/* webpackChunkName: "Monitor" */ './views/Configuration/UserManage.vue')
+              component: () => import(/* webpackChunkName: "Configuration" */ './views/Configuration/UserManage.vue')
+            },
+            {
+              path: 'TermManage',
+              name: 'TermManage',
+              meta: {
+                title: 'Data.shebeiguanli',
+                keepAlive: true,
+                Name: 'Configuration'
+              },
+              component: () => import(/* webpackChunkName: "Configuration" */ './views/Configuration/TermManage.vue')
             }
           ],
-          component: () => import(/* webpackChunkName: "Monitor" */ './views/Configuration.vue')
+          component: () => import(/* webpackChunkName: "Configuration" */ './views/Configuration.vue')
         }
       ]
     }

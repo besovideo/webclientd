@@ -283,7 +283,7 @@ layui.define(['layer', 'laytpl', 'upload'], function (exports) {
     , '</div>'
     , '<div class="layim-chat-textarea"><textarea></textarea></div>'
     , '<div class="layim-chat-bottom">'
-    , '<span class="layim-send-voice unselectable" layim-event="SendVoice">长按发言</span>'
+    // , '<span class="layim-send-voice unselectable" layim-event="SendVoice">长按发言</span>'
     , '<div class="layim-chat-send">'
     , '{{# if(!d.base.brief){ }}'
     // , '<span class="layim-send-close" layim-event="closeThisChat">关闭</span>'

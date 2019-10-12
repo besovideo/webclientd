@@ -13,7 +13,7 @@ module.exports = {
     config.plugins.push(
       new CopyWebpackPlugin([
         {
-          from: './static', // 新增可以被index.html访问的静态文件目录,支持多个
+          from: './static/layui-src/src', // 新增可以被index.html访问的静态文件目录,支持多个
           to: this.outputDir,
           ignore: ['.*']
         }
@@ -25,7 +25,6 @@ module.exports = {
     //   .test(/\.vue$/)
     //   .use('tran-loader')
     //   .loader('tran-loader')
-
     config.plugin('define').tap(args => {
       args[1] = { jSW: 'window.jSW' } 
       return args

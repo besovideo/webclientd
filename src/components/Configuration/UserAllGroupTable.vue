@@ -8,14 +8,14 @@
         :label="$t('Data.yonghuzuID')"
         width="270">
         <template slot-scope="scope">
-          <span >{{ scope.row.id }}</span>
+          <span >{{ scope.row.data.id }}</span>
         </template>
       </el-table-column>
       <el-table-column
         :label="$t('Data.yonghuzumingcheng')"
         width="180">
         <template slot-scope="scope">
-          <el-tag size="medium">{{ scope.row.name }}</el-tag>
+          <el-tag size="medium">{{ scope.row.data.name }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column
@@ -23,7 +23,7 @@
         :show-overflow-tooltip="true"
         >
         <template slot-scope="scope">
-          <span >{{ scope.row.desc }}</span> 
+          <span >{{ scope.row.data.description }}</span> 
         </template>
       </el-table-column>
       <el-table-column :label="$t('Data.caozuo')" fixed="right" width="200">
@@ -55,6 +55,18 @@
           <el-form-item :label="$t('Data.yonghuzumiaoshu')" >
             <el-input type="textarea" v-model="Editer.desc"></el-input>
           </el-form-item>
+          <!-- <el-form-item :label="$t('Data.ziyuan')" >
+            <el-select v-model="Editer.resources" multiple filterable style="width:100%">
+              <el-option
+                v-for="item in Editer.data.allresources"
+                :key="item.puid"
+                :label="item.puname"
+                :value="JSON.stringify(item)">
+                <span style="float: left">{{ item.puname }}</span>
+                <span style="float: right; margin-right:15px; color: #8492a6; font-size: 13px">{{ item.puid.slice(3) }}</span>
+              </el-option>
+            </el-select>
+          </el-form-item> -->
         </el-form>
         <span slot="footer" class="dialog-footer">
           <el-button @click="EditerDialog = false">{{$t('Data.quxiao')}}</el-button>
@@ -77,7 +89,9 @@ export default {
       EditerDialog: false,
       Editer:{
         name: '',
-        desc: ''
+        desc: '',
+        resources:[],
+        data:{}
       }
     }
   },
@@ -85,19 +99,21 @@ export default {
     ...mapState({
       session:'session',
       lang:'lang'
-    })
+    }),
+    allresources(){
+      // return this.Editer.data.allresources.filter(el=>{
+      //   this.Editer.resources
+      // })
+    }
   },
   methods:{
     // 被父组件调用，设置表格信息 
     SetGroupData(data){
       let temp = []
       data.forEach(group => {
-        this.getInfo(group._group.id,(desc)=>{
+        this.getInfo(group._group.id,(_data)=>{
           temp.push({
-            desc,
-            id: group._group.id,
-            name: group.label,
-            _group: group._group
+            data:_data
           })
         })
       })
@@ -109,7 +125,11 @@ export default {
       let group = this.userManager.swGetGroupById(id)
       group.swGetGroupInfo({
         callback: (sender, event, data) => {
-          cb(data.description)
+          if(data.id=='Admin'){
+            console.log('Admin');
+            console.log(data)
+          }
+          cb(data)
         },
         tag: null
       });
@@ -121,13 +141,20 @@ export default {
           this.$Message.error(this.$t('Data.mingchengbunengweikong'))
           return
         }
+        this.userManager || (this.userManager = this.session.swGetUserManager())
+
         let group = this.userManager.swGetGroupById(this.Editer.data.id)
+
+        // let resources = []
+        // this.Editer.resources.forEach(el=>{
+        //   resources.push(JSON.parse(el))
+        // })
         this.$store.state.ErrorCode = group.swModGroup({
           info: {
             name: this.Editer.name ,
             description: this.Editer.desc ,
-            parentid: this.Editer.data._group.parentid,
-            resources: []
+            parentid: this.Editer.data.parentid,
+            resources: this.Editer.data.resources
           },
           callback: (sender,option,data) => {
             this.$store.state.ErrorCode = option.emms.code
@@ -138,17 +165,20 @@ export default {
             }
             this.$Message.success(this.$t('Data.xiugaichenggong'))
             this.Editer.data.name = this.Editer.name
-            this.Editer.data.desc = this.Editer.desc
+            this.Editer.data.description = this.Editer.desc
             this.EditerDialog = false
           }
         })
         return
       }
+        console.log('data:',data.data)
+
       this.EditerDialog = true
       this.Editer = {
-        name: data.name,
-        desc: data.desc,
-        data
+        name: data.data.name,
+        desc: data.data.description,
+        resources:data.data.resources,
+        data: data.data
       }
     },  
     // 删除 按钮逻辑处理
@@ -159,7 +189,7 @@ export default {
           type: 'warning',
           center: true
         }).then(() => {
-          let group = this.userManager.swGetGroupById(data.id)
+          let group = this.userManager.swGetGroupById(data.data.id)
           this.$store.state.ErrorCode = group.swDelGroup({
             callback: (sender, option, data) => {
               this.$store.state.ErrorCode = option.emms.code

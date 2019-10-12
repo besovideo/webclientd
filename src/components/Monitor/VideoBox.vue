@@ -25,12 +25,26 @@
           <img :src="closePng" class="close item unselectable" @click="Close()" />
         </div>
         <div class="right">
+          <el-dropdown trigger="click" @command="DropdownClick" v-if="VideoTypeSetting">
+            <span class="el-dropdown-link" style="margin-right:10px">
+              <a href="javascript:void(0)">
+                <img :src="require('@/assets/images/videoSet.png')" width="20" style="line-height: 30px">
+              </a>
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" :disabled="$store.state.VideoType == 'auto'" :command="{'type':'videotype',val:'auto'}">AUTO</el-dropdown-item>
+              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" :disabled="$store.state.VideoType == 'rtmp'" :command="{'type':'videotype',val:'rtmp'}">RTMP</el-dropdown-item>
+              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" :disabled="$store.state.VideoType == 'hls'" :command="{'type':'videotype',val:'hls'}">HLS</el-dropdown-item>
+              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" :disabled="$store.state.VideoType == 'httpflv'" :command="{'type':'videotype',val:'httpflv'}">HttpFlv</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
           <Icon
             type="md-expand item unselectable"
             size="20"
             style="line-height:25px"
             @click="FullScreen()"
           />
+          
         </div>
       </div>
     </div>
@@ -40,7 +54,7 @@
 <script>
 import { mapState } from "vuex";
 export default {
-  props: ["tag", "puid", "tagEl", "noPlay", "isopen", "puname"],
+  props: ["tag", "puid", "tagEl", "noPlay", "isopen", "puname",'VideoTypeSetting'],
   data() {
     return {
       tagdata: undefined,
@@ -56,6 +70,18 @@ export default {
     };
   },
   methods: {
+    DropdownClick(data){
+      if(data.type=='window'){
+        this.videosize = data.val
+      }else if(data.type=='videotype'){
+        localStorage.setItem('VideoType',data.val)
+
+        if(this.$store.state.VideoType!=data.val){
+          this.$store.state.VideoType = data.val
+          this.Play()
+        }
+      }
+    },
     //全屏
     FullScreen() {
       if (this.channel != undefined)
@@ -97,7 +123,7 @@ export default {
         ismuti: false,
         div: videoEl,
         // bstretch: true,
-        prototype: "rtmp",
+        prototype: this.$store.state.VideoType,
         bstretch: true,
         callback: (options, response, dlg) => {
           this.$store.state.ErrorCode = this.OpenResult = response.emms.code;
@@ -109,7 +135,7 @@ export default {
             this.$store.state.notifyTip[this.puid] = false
             this.Loading = false;
             this.ShowTag = true;
-            this.Type = options.prototype;
+            this.Type = this.$store.state.VideoType;
             this.$emit("on-open", this.tagEl, true);
           }
         }
@@ -196,6 +222,7 @@ export default {
     font-weight: 700;
     padding-left: 10px;
     background-color: rgba(0, 0, 0, 0.3);
+    color: white
   }
   div.videoEl {
     // margin-top:25px;

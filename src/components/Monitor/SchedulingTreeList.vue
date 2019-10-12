@@ -10,12 +10,16 @@
         v-loading="TreeLoading"
         :data="TermListData"
         :highlight-current="true"
+        :expand-on-click-node="false"
         node-key="key"
+        ref="SchedulingTree"
+        @node-expand="HandleChannelClick"
         :indent="8"
-        :default-expanded-keys="['0']"
+        accordion
+        :default-expanded-keys="TreeExpanded"
       >
         <span class="custom-tree-node" slot-scope="{ node, data }" rightMenu>
-          <span>
+          <span :title="data.bIsStarted==true?'':(data.isMeeting && $t('Data.huiyiweikaishi'))">
             <i v-if="data.isMeeting" :class="data.bIsStarted ? 'el-icon-success':'el-icon-error'" style="padding-right:5px;"></i>
             <img
               v-if="data.isMeeting"
@@ -23,7 +27,6 @@
               width="15"
               height="15"
               style="display:block;float: left;margin:3px 5px 0 0 ;"
-              @click.stop="HandleChannelClick(data)"
               alt
             />
             <img
@@ -41,7 +44,6 @@
             <span
               class="unselectable"
               v-if="data.isMeeting"
-              @click.stop="HandleChannelClick(data)"
             >{{ node.label }}</span>
 
             <el-dropdown trigger="click" v-if="data.isPerson" size="medium" @command="MenuHandle">
@@ -49,22 +51,21 @@
                 class="unselectable"
                 :style="{color:data.isOnline==0?'#ccc':'inherit',paddingLeft:10}"
               >{{ node.label }}</span>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item icon="el-icon-microphone" :disabled="data.isadmin" :command="{type:'InviteSpeak',val:[node,data]}">{{$t('Data.dianmingfayan')}}</el-dropdown-item>
-                <el-dropdown-item icon="el-icon-turn-off-microphone" :disabled="data.isadmin" :command="{type:'StopSpeak',val:[node,data]}">{{$t('Data.zhongzhifayan')}}</el-dropdown-item>
+              <el-dropdown-menu slot="dropdown" v-if="node.parent.data.UserIsAdmin">
+                <el-dropdown-item icon="el-icon-microphone" :disabled="!data.isOnline" :command="{type:'InviteSpeak',val:[node,data]}">{{$t('Data.dianmingfayan')}}</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-turn-off-microphone" :disabled="!data.isOnline" :command="{type:'StopSpeak',val:[node,data]}">{{$t('Data.zhongzhifayan')}}</el-dropdown-item>
                 <el-dropdown-item icon="el-icon-close" :disabled="data.isadmin" :command="{type:'deletePerson',val:[node,data]}">{{$t('Data.shanchuchengyuan')}}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
 
             <span class="pu_id" v-if="data.isPerson">
               <!-- {{node.label==node.pu_id?"":`(${node.pu_id})`}} -->
-
-              {{ (data.id==undefined) ?"":(data.id.slice(3).length>0?`(${data.id.slice(3)})`:"") }}
+              {{ (data.id==undefined) ?"":(data.id.slice(3).length>0?`(${data.id.slice(3)})`:"") }} {{data.isadmin?$t('Data.guanliyuan'):''}}
             </span>
           </span>
 
           <span style="float:right;display:inline-block" v-if="data.isMeeting">
-            <el-dropdown trigger="click" size="medium" @command="MenuHandle">            
+            <el-dropdown trigger="click" size="medium" @command="MenuHandle">    
               <img
                 :src="require('@/assets/images/PersonSet.png')"
                 width="15"
@@ -81,21 +82,22 @@
               </el-dropdown-menu>
             </el-dropdown>
 
-            <img
+            <!-- <img
               :src="require('@/assets/images/stopfayan.png')"
               width="15"
               height="15"
               style="display:block;float: left;margin:3px 5px 0 0 ;"
               alt
               @click.stop="stopSpeak(data)"
-            />
+            /> -->
             <img
               :src="require('@/assets/images/fayan.png')"
               width="15"
               height="15"
               style="display:block;float: left;margin:3px 5px 0 0 ;"
               alt
-              @click.stop="startSpeak(data)"
+              @mousedown="startSpeak(data)"
+              @mouseup="stopSpeak(data)"
             />
 
             <img
@@ -193,7 +195,7 @@
       center >
       <el-divider content-position="left">{{$t('Data.zaixianyonghu')}}</el-divider>
         <el-checkbox-group v-model="CheckBoxOnlineJoin.data" size="mini" >
-          <el-checkbox :label="item" border v-for="item in OnlineUserList" :key="item.id">{{ item.name || item.id }}</el-checkbox>
+          <el-checkbox :label="item" border v-for="item in OnlineUserList" :title="'id: '+item.id" :key="item.applierid||item.id">{{ item.name || item.id }}</el-checkbox>
         </el-checkbox-group>
       <span slot="footer" class="dialog-footer">
         <el-button @click="InvaiteDialog = false">{{$t('Data.quxiao')}}</el-button>
@@ -203,7 +205,11 @@
     <!-- 邀请加入会议 -->
 
     <!-- 发起语音 -->
-
+    <div class="speak_fixed">
+      <p style="height: 50%;line-height:25px;font-size:14px;padding-left:10px">{{$t('Data.dangqianhuiyi')}} <span>{{this.NowSpeakConf}}</span></p> 
+      <!-- <p style="height: 50%;line-height:25px;font-size:14px;padding-left:10px">{{$t('Data.zhengzaifayan')}} <span>{{this.NowSpeaker == this.user ? $t('Data.dangqianyonghu'): this.NowSpeaker}}</span></p>  -->
+      <p style="height: 50%;line-height:25px;font-size:14px;padding-left:10px">{{$t('Data.zhengzaifayan')}} <span>{{this.NowSpeaker}}</span></p> 
+    </div>
     <!-- 发起语音 -->
   </div>
 </template>
@@ -218,7 +224,7 @@ export default {
   data() {
     var validatePass = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('请输入密码'));
+        callback(new Error(this.$t('Data.qingshurumima')));
       } else {
         if (this.CreateForm.checkPass !== '') {
           this.$refs.CreateForm.validateField('checkPass');
@@ -228,9 +234,9 @@ export default {
     };
     var validatePass2 = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('请再次输入密码'));
+        callback(new Error(this.$t('Data.qingzaicishurumima')));
       } else if (value !== this.CreateForm.pass) {
-        callback(new Error('两次输入密码不一致!'));
+        callback(new Error(this.$t('Data.liangcishurumimabuyizhi')));
       } else {
         callback();
       }
@@ -243,6 +249,9 @@ export default {
       Listening: require("@/assets/images/listening.png"),
       Personexit: require("@/assets/images/Personexit.png"),
       liaotian: require("@/assets/images/liaotian.png"),
+      NowSpeaker:'',
+      NowSpeakConf:'',
+      TreeExpanded: [0],
       TermGpsList: [],
       jSW: undefined,
       Cb_isOnline: true,
@@ -290,27 +299,27 @@ export default {
       },
       CreateRules:{
         name:[
-          { required: true, message: '请输入会议名称', trigger: 'blur' }
+          { required: true, message: this.$t('Data.qingshuruhuiyimingcheng'), trigger: 'blur' }
         ],
         type:[
-          { required: true, message: '请选择', trigger: 'blur' }
+          { required: true, message: this.$t('Data.qingxuanze'), trigger: 'blur' }
         ],
         JoinMode:[
-          { required: true, message: '请选择', trigger: 'blur' }
+          { required: true, message: this.$t('Data.qingxuanze'), trigger: 'blur' }
         ],
         ApplyFor:[
-          { required: true, message: '请选择', trigger: 'blur' }
+          { required: true, message: this.$t('Data.qingxuanze'), trigger: 'blur' }
         ],
         StartMode:[
-          { required: true, message: '请选择', trigger: 'blur' }
+          { required: true, message: this.$t('Data.qingxuanze'), trigger: 'blur' }
         ],
         pass: [
           { validator: validatePass, trigger: 'blur' },
-          { required: true, message: '请输入密码', trigger: 'blur' },
+          { required: true, message: this.$t('Data.qingshurumima'), trigger: 'blur' },
         ],
         checkPass: [
           { validator: validatePass2, trigger: 'blur' },
-          { required: true, message: '请再次输入密码', trigger: 'blur' },
+          { required: true, message: this.$t('Data.qingzaicishurumima'), trigger: 'blur' },
         ],
       },
       InvaiteDialog:false,
@@ -321,6 +330,10 @@ export default {
   },
   methods: {
     startSpeak(data){
+      if(!data.bIsStarted){
+        this.$Message.error(this.$t('Data.huiyiweikaishi'))
+        return
+      }
       var confManager = this.session.swGetConfManager();
         var conf = confManager.swGetConfByConfId(data.id);
         if (conf == null) {
@@ -329,11 +342,15 @@ export default {
         }
 
 
-        conf.swApplyForSpeak({
-            callback: function (sender, event, json) {
-
+        let rc = conf.swApplyForSpeak({
+            callback:  (sender, event, json) => {
+              if(event.emms.code!=0){
+                this.$Message.error(this.$tools.findErrorCode(event.emms.code))
+                return
+              }
             }
         });
+        console.log(rc)
     },
     stopSpeak(data){
       var confManager = this.session.swGetConfManager();
@@ -558,8 +575,9 @@ export default {
         case 'deleteMeet':
           this.DoDeleteMeet(data.val)
         break
-        case 'startMeet':
+        case 'startMeet': 
           var confManager = this.session.swGetConfManager();
+
           var conf = confManager.swGetConfByConfId(data.val.id);
           if (conf == null) {
               console.warn("会议不存在");
@@ -571,6 +589,14 @@ export default {
                 if(event.emms.code!=0){
                     return
                 }
+                conf.swParticipatorReturn({
+                  callback:  (sender, response, json) => {
+                    if(event.emms.code!=0){
+                      return
+                    }
+                    this.$refs.SchedulingTree.store.nodesMap[data.val.id].expanded = true
+                  }
+                });
                 data.val.bIsStarted = true
               }
           });
@@ -582,13 +608,12 @@ export default {
               console.warn("会议不存在");
               return;
           }
-
           conf.swConfStop({
               callback:  (sender, event, json) => {
                   if(event.emms.code!=0){
                     return
                   }
-
+                this.$refs.SchedulingTree.store.nodesMap[data.val.id].expanded = false
               }
           });
         break
@@ -660,8 +685,10 @@ export default {
       });
     },
     TermSearch(val, page) {},
-    HandleChannelClick(data, node) {
-      if(!data.isMeeting)return
+    HandleChannelClick(data, node,el) {
+      console.log(data,node,el)
+      this.TreeExpanded = [0,node.key]
+      if(!data.isMeeting || !data.bIsStarted)return
       let confManager = this.session.swGetConfManager();
       let conf = confManager.swGetConfByConfId(data.id)
       // conf.swParticipatorLeave({
@@ -678,16 +705,23 @@ export default {
     HandleTreeClick(data, node, ele) {},
     ChangePage(page) {},
     SetMeetingData(data) {
+      console.log(data)
       let temp = [];
       let gpsterm = new Set();
       data.forEach((ele, i) => {
         let children = [];
+        let target = false
         if(!ele)return
         if (ele._conf_particulars.length > 0) {
           ele._conf_particulars.forEach((el, i) => {
             if (el.id.indexOf("PU") != -1 && el.isonline) {
               gpsterm.add(el.id);
             }
+
+            if(el.isadmin && el.name!='' && el.name==this.user){
+              target = true
+            }
+
             children.push({
               label: el.aliasname || el.name,
               name: el.name,
@@ -703,11 +737,14 @@ export default {
             });
           });
         }
+
         temp.push({
           label: ele._conf_base_info.name,
           id: ele._conf_base_info.id,
           bIsStarted: ele._conf_base_info.bIsStarted,
           isMeeting: true,
+          UserIsAdmin: target,
+          key: ele._conf_base_info.id,
           children
         });
       });
@@ -740,30 +777,41 @@ export default {
             this.GetMessage(data.conf, data.data);
           break;
         case "notifyapplyforstartspeak":
-            this.SpeakNotify = this.$notify({
-                title: '正在发言',
-                dangerouslyUseHTMLString: true,
-                position: 'bottom-left',
-                type: 'success',
-                duration: 0,
-                message: `
-                  <p >发言:<span style='margin-left:5px'>${data.data.aliasname||data.data.name||data.data.id}</span></p>
-                `
-              })
-              
+            // this.SpeakNotify = this.$notify({
+            //     title: '正在发言',
+            //     dangerouslyUseHTMLString: true,
+            //     position: 'bottom-left',
+            //     type: 'success',
+            //     duration: 0,
+            //     message: `
+            //       <p >发言:<span style='margin-left:5px'>${data.data.aliasname||data.data.name||data.data.id}</span></p>
+            //     `
+            //   })
+            this.NowSpeakConf = data.conf._conf_base_info.name
+            this.NowSpeaker = data.data.aliasname||data.data.name
+            this.SetTermStatus(data.conf, data.data);
+          break
+        case "notifyterminatespeak":
         case "notifyapplyforendspeak":
-          if(this.SpeakNotify!=undefined){
-            this.SpeakNotify.close()
-            this.SpeakNotify = undefined
-          }
+            this.NowSpeakConf = ''
+            this.NowSpeaker = ''
+            this.SetTermStatus(data.conf, data.data);
+          break
         case "notifyparticipartorleave":
         case "notifyparticipartorreturn":
+          if(data.data.id.startsWith('PU')){
+            this.SetMeetingData(this.session.swGetConfManager().swGetConfList());
+          }
         case "notifyparticipatormodify":
         case "notifyinvitespeak":
         case "notifyterminatespeak":
             this.SetTermStatus(data.conf, data.data);
           break
         case "notifyconfcreate":
+          let __data = this.session.swGetConfManager().swGetConfList()
+          console.log('created Data: ',__data);
+          this.SetMeetingData(__data);
+          break
         case "notifyconfdelete":
         case "notifyparticipartoradd":
         case "notifyparticipartorremove":
@@ -842,8 +890,10 @@ export default {
           break
       }
       this.layim.getMessage({
-        username: this.$t('Data.weizhi'), //消息来源用户名
-        avatar: "http://tp1.sinaimg.cn/1571889140/180/40030060651/1", //消息来源用户头像
+        // username: this.$t('Data.weizhi'), //消息来源用户名
+        username: data.sender.aliasname || data.sender.name , //消息来源用户名
+        // avatar: "http://tp1.sinaimg.cn/1571889140/180/40030060651/1", //消息来源用户头像
+        avatar: require('@/assets/images/yonghu.png'), //消息来源用户头像
         id: data.confid, //消息的来源ID（如果是私聊，则是用户id，如果是群聊，则是群组id）
         type: "group", //聊天窗口来源类型，从发送消息传递的to里面获取
         content: _data, //消息内容
@@ -890,6 +940,7 @@ export default {
         isSpeak: data.isSpeak,
       };
       Conf[0].bIsStarted = conf._conf_base_info.bIsStarted
+      
 
       for (let obj in temp) {
         Term[0][obj] = temp[obj];
@@ -981,6 +1032,9 @@ export default {
       } else {
         console.log("上传失败");
       }
+    },
+    _log(code){
+      console.log('log',code)
     }
   },
   filters: {
@@ -1030,6 +1084,7 @@ export default {
   },
 
   created() {
+    
     this.jSW = window.jSW
     console.log("SchedulingTreeList,created");
     console.log(this.Personexit);
@@ -1124,6 +1179,22 @@ export default {
 
 <style lang="less">
   @import "./TreeList.less";
+
+  .speak_fixed {
+    width: 280px;
+    height: 50px;
+    background-color: #ccc;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    p{
+      font-weight: 600;
+      span {
+        margin-left: 10px;
+        color: green
+      }
+    }
+  }
 // #TermList {
 //   width: 100%;
 //   height: 100%;

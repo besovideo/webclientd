@@ -41,6 +41,7 @@ export default {
       switch(code){
         case jSW.RcCode.RC_CODE_E_DISCONNECTED:
           this.$Message.error("WebSocket TimeOut");
+          location.reload()
           // this.$router.push('/login')
         break
         default:
@@ -57,6 +58,8 @@ export default {
     })
   },
   created() {
+    console.log(window.btoa('2019-9-23 09:30:09'))
+    
     if(!this.$tools.checkFlash().f){
       let target = navigator.userAgent.match(/Chrome\/(\d{2})/)
       if(target==null) {
