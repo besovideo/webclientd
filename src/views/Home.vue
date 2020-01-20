@@ -3,6 +3,9 @@
     <Layout>
       <Header>
         <Menu mode="horizontal" theme="dark" active-name="1">
+          <div class="layout-nav-left">
+            可视指挥调度平台SmartEye
+          </div>
           <div class="layout-nav">
             <MenuItem name="Home" to="/Home"  :style="{'background':this.Name=='Home'?'rgb(30, 87, 163)':''}" >
               {{$t('tab.Home')}}
@@ -140,6 +143,13 @@ export default {
 .ivu-layout-header{
   background: rgb(43, 100, 176);
   padding: 0 0 0 50px;
+  min-width: 1050px;
+}
+
+.layout-nav-left {
+  float: left;
+  font-size: 24px;
+  color: #fff;
 }
 .ivu-layout-content{
   // display: flex;

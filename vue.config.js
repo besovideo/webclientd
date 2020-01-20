@@ -2,6 +2,9 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')// npm install --save-de
 
 
 module.exports = {
+  devServer: {
+    https: true
+  },
   css: {
     loaderOptions: {
       less: {

@@ -7,6 +7,7 @@
     <!-- 设备列表 -->
     <div class="TreeList" ref="treeTerm" @contextmenu="BoxRightClick($event)">
       <el-tree
+        ref="tree"
         v-loading="TreeLoading"
         :data="TermListData"
         :highlight-current="true"
@@ -18,14 +19,14 @@
       >
         <span class="custom-tree-node" slot-scope="{ node, data }" >
 
-          <el-tooltip  placement="right" :disabled="disabled" :transfer="true" effect="light" v-if="data.pu_id!=='0'">
+          <!-- <el-tooltip  placement="right" :disabled="disabled" :transfer="true" effect="light" v-if="data.pu_id!=='0'">
             <template slot="content" >
               <div style="font-size:16px;margin-bottom:10px;" v-if="data.isChannel">{{ChanneTooltip}}</div>
               <div style="font-size:16px;margin-bottom:10px;" v-if="data.isTerm">{{TermTooltip}}</div>
               <div style="text-align:center">
                 <el-link type="success" @click="$emit('on-tooltip-disabled')">{{$t('Data.buzaixianshi')}}</el-link>
               </div>
-            </template>
+            </template> -->
             <span @dblclick="HandleChannelClick(data,node)" >
               <i v-if="node.label==''" class="el-icon-s-data" style="padding-right:5px;"></i>
               <img
@@ -45,20 +46,23 @@
                 alt
               />
                 <!-- @dblclick.stop.prevent="HandleTreeClick(data,node)" -->
-              <span
-                class="unselectable TermTree"
-                :puid="data.pu_id"
-                :style="{color:data.isOnline==0?'#ccc':'inherit',paddingLeft:10}"
-              >{{ node.label }}</span>
+              
+                <span
+                  slot="reference" 
+                  class="unselectable TermTree"
+                  
+                  :puid="data.pu_id"
+                  :style="{color:data.isOnline==0?'#ccc':'inherit',paddingLeft:10}"
+                >{{ node.label }}</span>
               <span class="pu_id" v-if="data.isTerm" :title="data.pu_id.slice(3)">
                 <!-- {{node.label==node.pu_id?"":`(${node.pu_id})`}} -->
                 ({{data.pu_id.slice(3)}})
               </span>
             </span>
-          </el-tooltip >
-          <span v-if="data.key=='0'">
+          <!-- </el-tooltip > -->
+          <!-- <span v-if="data.key=='0'">
             {{data.label}}
-          </span>
+          </span> -->
         </span>
       </el-tree>
     </div>
@@ -99,7 +103,7 @@
 import { mapState } from "vuex";
 import { component as VueContextMenu } from '@xunlei/vue-context-menu'
 export default {
-  props: ["noShowChannel","TermTooltip","ChanneTooltip",'disabled'],
+  props: ["noShowChannel","TermTooltip","ChanneTooltip"], // 'disabled'
   components:{
     'context-menu': VueContextMenu
   },
@@ -141,20 +145,28 @@ export default {
     SetRightMenuVal(item){
       console.log('item.key :',item.key,item.isChecked);
       this.contextMenuVisible = false
+      let clickID = this.rigthClickPuID + '';
       this.$set(item,'isChecked',!item.isChecked)
       if(item.key == 'guiji' && item.isChecked) {
         let Weizhi = this.$store.state.locateCheckData[this.rigthClickPuID][0]
         if(!Weizhi.isChecked){
           Weizhi.isChecked = true
-          this.$emit('on-check-term',this.rigthClickPuID,'weizhi',item.isChecked)
+
+          this.$emit('on-check-term',clickID,'weizhi',item.isChecked)
         }
       } 
-      this.$emit('on-check-term',this.rigthClickPuID,item.key,item.isChecked)
+      this.$emit('on-check-term',clickID,item.key,item.isChecked)
     },
     BoxRightClick(e){
+      
       // let div = document.querySelector('.TermTree')
-      if(e.target.classList.contains('TermTree') && this.noShowChannel){
+      if(e.target.classList.contains('TermTree') && this.noShowChannel ){
         this.rigthClickPuID = e.target.getAttribute('puid')
+        let PuIdData = this.TermListData[0].children.find(el=>el.pu_id == this.rigthClickPuID)
+        if(!PuIdData.isOnline){
+          return
+        }
+         
         if(!this.$store.state.locateCheckData[this.rigthClickPuID]){
           this.$set(this.$store.state.locateCheckData,this.rigthClickPuID,[
             {
@@ -381,6 +393,7 @@ export default {
             label: ele._name_pu || ele._id_pu,
             pu_id: ele._id_pu,
             isTerm: true,
+            pu_info: ele._info_pu,
             isOnline: ele._info_pu.onlinestatus,
             children
           });
@@ -413,6 +426,9 @@ export default {
         document.querySelector(".TreeList").scrollTop = 0;
       this.TreeLoading = false;
       if (this.isFirst) {
+        // giveLocateOnlineTerm.forEach(item=>{
+          
+        // })
         this.$emit('on-online-term',giveLocateOnlineTerm)
         this.isFirst = false;
       }
@@ -440,6 +456,7 @@ export default {
           iTimeEnd: 0
         },
         callback: (options, response, data) => {
+          // debugger
           this.$store.state.ErrorCode = response.emms.code 
           // console.log(
           //   "searchlist============================\n",
@@ -449,18 +466,27 @@ export default {
           // );
           this.Total = data.info.itotalcount;
           this.CurrentPage = page + 1;
-          if (this.isFirst) {
-            if (data.puList.length == 0 && isOnline) {
-              this.GetTermList(0, 100, false);
-              return;
-            }
-            this.Cb_isOnline = isOnline;
-            this.SetTreeData(isOnline ? "_arr_pu_online" : "_arr_pu");
-          } else {
-            this.SetTreeData(isOnline ? "_arr_pu_online" : "_arr_pu");
-          }
+          // if (this.isFirst) {
+          //   // if (data.puList.length == 0 && isOnline) {
+          //   //   this.GetTermList(0, 100, false);
+          //   //   return;
+          //   // }
+          //   // this.Cb_isOnline = isOnline;
+          //   this.SetTreeData(isOnline ? "_arr_pu_online" : "_arr_pu");
+          // } else {
+          //   this.SetTreeData(isOnline ? "_arr_pu_online" : "_arr_pu");
+          // }
+          this.SetTreeData(isOnline ? "_arr_pu_online" : "_arr_pu");
+          this.Cb_isOnline = isOnline;
         }
       });
+    },
+    initLocateCheckData(data){
+      for(let key in data){
+        data[key].forEach(el=>{
+          this.$emit('on-check-term',key,el.key,el.isChecked)
+        })
+      }
     }
   },
   watch: {
@@ -492,13 +518,18 @@ export default {
       }
     },
     Cb_isOnline(val) {
-      if (!this.isFirst) {
+      if(val == true) {
+        localStorage.setItem('cb_online',val)
+      }else {
+        localStorage.removeItem('cb_online')
+      }
+      // if (!this.isFirst) {
         if(this.SearchStatus){
           this.TermSearch(this.Search,0)
         }else{
           this.GetTermList(0, 100, val);
         }
-      }
+      // } 
     }
   },
   computed: {
@@ -507,12 +538,24 @@ export default {
       notify: "notify"
     })
   },
-
+  mounted(){
+    this.initLocateCheckData(this.$store.state.locateCheckData)
+  },
   created() {
     console.log("created");
     console.log(this.session);
+    console.log('this.$store.state.locateCheckData ',this.$store.state.locateCheckData);
     
-    this.GetTermList(0, 100, true);
+    if(localStorage.getItem('cb_online',undefined)) {
+      this.Cb_isOnline = true
+      this.GetTermList(0, 100, true);
+      return 
+    }
+
+    this.Cb_isOnline = false
+
+    this.GetTermList(0, 100, false);
+    
 
   }
 };
@@ -571,12 +614,15 @@ export default {
 .right-menu {
     position: fixed;
     background: #fff;
-    border: 1px solid rgba(0,0,0,.5);
-    border-radius: 3px;
+    border: 2px solid #ccc;
+    box-shadow: 0 .5em 1em 0 rgba(0,0,0,.1);
+    border-radius: 1px;
     z-index: 999;
     display: none;
     > .rightMenu-ul {
-
+      &:nth-child( n+2 ){
+        border-top: 1px solid #ccc;
+      }
       li {
         padding-left: 24px;
         position: relative;
@@ -621,11 +667,7 @@ body,html {
     height: 100%
 }
 
-.right-menu {
-    border: 1px solid #eee;
-    box-shadow: 0 .5em 1em 0 rgba(0,0,0,.1);
-    border-radius: 1px
-}
+
 
 .rightMenu-ul
 

@@ -41,13 +41,33 @@ export default {
   },
   randomString: (len) => {
     len = len || 31
-    var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678'   
+    var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678'
     var maxPos = $chars.length
     var pwd = ''
     for (let i = 0; i < len; i++) {
       pwd += $chars.charAt(Math.floor(Math.random() * maxPos))
     }
     return pwd
+  },
+  getRandomColor: () => {
+    let fn = (color) => {
+      return (color += '0123456789abcdef'[Math.floor(Math.random() * 16)])
+        && (color.length == 6) ? color : fn(color)
+    }
+    return '#' + fn('')
+  },
+  LatLongValid (lat, long) {
+    if (lat === 0 || long === 0) {
+      return false
+    }
+    if (long < 0.0 || long > 180.0) {
+      return false
+    }
+    if (lat < 0.0 || lat > 90.0) {
+      return false
+    }
+
+    return true
   },
   ErrorHandle: (code, cb) => {
     if (code == jSW.RcCode.RC_CODE_E_DISCONNECTED) {
@@ -69,9 +89,9 @@ export default {
       timestamp = parseInt(new_datetime)
     }
 
-    
 
-    function formatFunc (str) {    
+
+    function formatFunc(str) {
       return str > 9 ? str : '0' + str
     }
     // 时间戳转为时间

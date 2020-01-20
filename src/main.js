@@ -45,7 +45,7 @@ Vue.use(VueVideoPlayer)
 router.beforeEach((to, from, next) => {
   /* 路由发生变化修改页面title */
   if (to.meta.title) {
-    document.title = i18n.t(to.meta.title)
+    // document.title = i18n.t(to.meta.title)
   }
   if (!store.state.session) {
     if (to.name !== 'login') {
@@ -62,7 +62,14 @@ router.beforeEach((to, from, next) => {
 router.afterEach(route => {
 })
 
+// Vue.directive('right-menu', {
+//   bind: (el) => {
 
+//   },
+//   inserted: (el) => {
+
+//   }
+// })
 new Vue({
   router,
   store,

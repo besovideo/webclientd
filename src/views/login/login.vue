@@ -4,7 +4,9 @@
 
 <template>
   <div class="login">
+
     <div class="login-con">
+      <h1 class="login_titile" style="">可视化指挥调度平台SmartEye</h1>
       <Card icon="log-in" :bordered="false">
         <p slot="title">
             {{$t('login.login_tip')}}
@@ -56,8 +58,11 @@ export default {
 
       if(process.env.NODE_ENV=='development'){
         // url = 'https://115.28.79.237:8081'
-        // url = 'http://192.168.0.67:9443'
-        url = 'https://127.0.0.1:8081'
+        // url = 'https://112.30.114.240:9443';
+        url = 'https://192.168.8.7:9443'
+        // url = 'http://127.0.0.1:8081'
+        // url = 'https://127.0.0.1:9443'
+        // url = 'http://192.168.6.59:8081'
       }
       this.spinShow = true
       // this.Server = Server
@@ -88,6 +93,11 @@ export default {
             })
             window._session = this.$store.state.session
             this.$store.state.session.swAddCallBack('login', this.sessionCallback);
+            this.$store.state.session.swAddCallBack('logout', ()=>{
+              if (this.$store.state.session) {
+                this.$store.state.session.swLogout();
+              }
+            });
             this.$store.state.session.swAddCallBack('notify', this.notifyCallback);
           }else{
             this.$store.state.ErrorCode = code
@@ -175,8 +185,10 @@ export default {
     localStorage.getItem('VideoType')? '': localStorage.setItem('VideoType','auto')
     this.$store.state.VideoType = localStorage.getItem('VideoType')
     this.$store.state.lang = localStorage.getItem('locale')
-    if(process.env.NODE_ENV=='development'){
-      this.handleSubmit({userName:'admin',password:'123456'})
+    if(process.env.NODE_ENV=='development' && window.localStorage.getItem('login')=='true'){
+      // this.handleSubmit({userName:'admin',password:'123456'})
+      this.handleSubmit({userName:'test',password:'123'})
+      // this.handleSubmit({userName:'root',password:'besovideo88'})
     }
   }
 }

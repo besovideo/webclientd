@@ -20,7 +20,10 @@ export default {
         a.href = 'http://www.macromedia.com/go/getflashplayer'
         a.click()
       } else {
-        this.$confirm(`${this.$t('Data.ciwangzhanxuyaokaiqiFlashgongneng')} <br> ${this.$t('Data.qingzaixinchuangkoudakaicilianjie,bingkaiqiFlashdequanxian')}<br>${"chrome://settings/content/siteDetails?site="+window.location.origin}`, this.$t('Data.kaiqiFlash'), {
+        this.$confirm(`${this.$t('Data.ciwangzhanxuyaokaiqiFlashgongneng')} <br> ${this.$t('Data.qingzaixinchuangkoudakaicilianjie,bingkaiqiFlashdequanxian')}<br>${"chrome://settings/content/siteDetails?site="+window.location.origin}
+          <br>
+          
+        `, this.$t('Data.kaiqiFlash'), {
           confirmButtonText: this.$t('Data.queren'),
           cancelButtonText: this.$t('Data.quxiao'),
           dangerouslyUseHTMLString: true,

@@ -62,7 +62,9 @@ export default {
       IntervalGetGpsID: undefined,
       SpeakModal: false,
       StartMode: false,
-      LocateTerms: undefined
+      LocateTerms: [],
+      complete_job: [],
+      zindex:1,
     };
   },
   watch: {
@@ -101,22 +103,20 @@ export default {
       }else{
         let temp = {}
         temp['pu_id'] = val.content._id_pu
+        temp['pu_info'] = val.content._info_pu
         let PuCheckInfo = this.$store.state.locateCheckData[val.content._id_pu]
         
         if(PuCheckInfo){
           setTimeout(() => {
-            this.SetPu2LocateTerms(val.content._id_pu,PuCheckInfo[0]['key'],"add",PuCheckInfo[0].isChecked?'add':'remove')      
-            this.SetPu2LocateTerms(val.content._id_pu,PuCheckInfo[1]['key'],PuCheckInfo[1].isChecked?'add':'remove')        
-          }, 5000);
+            this.SetPu2LocateTerms(val.content._id_pu,PuCheckInfo[0]['key'],PuCheckInfo[0].isChecked?'add':'remove')
+            setTimeout(() => {
+              this.SetPu2LocateTerms(val.content._id_pu,PuCheckInfo[1]['key'],PuCheckInfo[1].isChecked?'add':'remove')        
+            }, 2000);      
+          }, 1000);
           
         }
         this.SetPuInfoLatLon2Marker(temp)
-        
-        // let gps = this.session.swGetPuChanel(temp['pu_id'], 65536);
-        // if (gps == null) return
-        // this.SetMarkerToMap(gps,temp)
-        // temp['timer'] = setInterval(()=>{this.SetMarkerToMap(gps,temp)},5000)
-        // this.LocateTerms.push(temp)
+
       }
 
       if(val==undefined && !this.StartMode)
@@ -128,7 +128,7 @@ export default {
           this.SpeakModal = false
           this.$store.state.notifyTip[this.puid] = true
         }
-        // this.Close()
+        
       }
 
     }
@@ -140,48 +140,123 @@ export default {
     })
   },
   methods: {
-    SetPu2LocateTerms(pu_id,tag,isChecked){
+    Marker2Top(e) {
+      
+      document.querySelectorAll(".amap-marker").forEach((item)=>{
+        item.classList.remove('marker_top')
+      })
+      const target = e.target.getContentDom();
+      if(e.target.getContentDom()) {
+
+        target.parentElement.classList.add('marker_top')
+      }
+    },
+    async SetPu2LocateTerms(pu_id,tag,isChecked){
+      console.log(pu_id)
+      if(!this.map){
+        this.complete_job.push(()=>{
+          if(isChecked=='add'){
+            this.SetPu2LocateTerms(pu_id,tag,isChecked)
+          }
+        })
+        return
+      }
       let index = this.LocateTerms.findIndex(el=>el.pu_id == pu_id)
       if(tag == 'weizhi'){
-
         if(isChecked=='add'){
           let temp = {pu_id};
           if(index!=-1){
-            if(this.LocateTerms[index].timer!=undefined){
-              return
-            }
+            // if(this.LocateTerms[index].timer!=undefined){
+            //   return
+            // }
             temp = this.LocateTerms[index]
+            if(temp.marker){
+              temp.marker.setMap(null)
+              temp.marker.infoWindow && temp.marker.infoWindow.close()
+              temp.marker = undefined
+            }   
           }
+          // this.session.swGetPuChanel(temp.pu_id, 65536).swClose()
           let gps = this.session.swGetPuChanel(temp.pu_id, 65536);
-          if (gps == null) return
-          this.SetMarkerToMap(gps,temp)
-          temp['timer'] = setInterval(()=>{this.SetMarkerToMap(gps,temp)},5000)
+          if (gps == null) {
+            this.$store.state.locateCheckData[pu_id].forEach(setting => {
+              setting.isChecked = false
+            })
+            return
+          }
+
+          // if(!await this.GetGPSValid(gps)){
+          //   this.$Message.error(this.session.swGetPu(pu_id)['_name_pu'] +' '+ this.$t('Data.weizhihuoqushibai'))
+          //   console.log(this.$store.state.locateCheckData[pu_id])
+          //   this.$store.state.locateCheckData[pu_id].forEach(setting => {
+          //     setting.isChecked = false
+          //   })
+          //   return
+          // }
+
+          const result = await this.SetMarkerToMap(gps,temp)
+            debugger
+          if(!result) {
+            this.$Message.error(this.session.swGetPu(pu_id)['_name_pu'] +' '+ this.$t('Data.weizhihuoqushibai'))
+            console.log(this.$store.state.locateCheckData[pu_id])
+            this.$store.state.locateCheckData[pu_id].forEach(setting => {
+              setting.isChecked = false
+            })
+            return
+          }
+
+          this.map.setFitView([temp.marker],false,undefined,this.map.getZoom())
+
+
+          temp['timer'] = setInterval(async ()=>{ await this.SetMarkerToMap(gps,temp)},5000)
+
           if(index==-1){
             this.LocateTerms.push(temp)
           }
 
         }else{
           
-          if(index==-1)return
+          if(index==-1) {
+            console.log(this.$store.state.locateCheckData[pu_id])
+            this.$store.state.locateCheckData[pu_id].forEach(setting => {
+              setting.isChecked = false
+            })
+            return
+          }
           if(this.LocateTerms[index].timer==undefined){
+            console.log(this.$store.state.locateCheckData[pu_id])
+            
             return
           }
           this.SetPuInfoLatLon2Marker({pu_id})
           clearInterval(this.LocateTerms[index].timer)
+          this.session.swGetPuChanel(pu_id, 65536).swClose()
           if(this.LocateTerms[index].marker){
             this.LocateTerms[index].marker.infoWindow.close()
             this.map.remove(this.LocateTerms[index].marker) 
+            this.LocateTerms[index].marker = undefined
           }
-          this.LocateTerms.splice(index,1)
+          // this.LocateTerms.splice(index,1)
         }
       }else if(tag == 'guiji') {
+        if(index==-1) {
+          console.log(this.$store.state.locateCheckData[pu_id])
+          this.$store.state.locateCheckData[pu_id].forEach(setting => {
+            setting.isChecked = false
+          })
+          return
+        }
+
         let temp = this.LocateTerms[index]
 
         if(isChecked=='add'){
           temp.ShowLocus = true
-          temp.LocusPath = temp.marker.resLnglat ? [temp.marker.resLnglat] : []
+          temp.marker && (temp.LocusPath = temp.marker.resLnglat ? [temp.marker.resLnglat] : [])
+
         }else{
           temp.ShowLocus = false
+          temp.Polyline && this.map.remove(temp.Polyline)
+          temp.Polyline = undefined
         }
 
       }
@@ -196,7 +271,7 @@ export default {
         term.Polyline = new AMap.Polyline({
           path: term.LocusPath,  
           borderWeight: 2, // 线条宽度，默认为 1
-          strokeColor: 'red', // 线条颜色
+          strokeColor: this.$tools.getRandomColor(), // 线条颜色
           lineJoin: 'round' // 折线拐点连接处样式
         })
         this.map.add(term.Polyline)
@@ -204,139 +279,196 @@ export default {
         term.Polyline.setPath(term.LocusPath)
       }
     },
-    SetMarkerToMap(gps,el) {
-      
-          let code;
-          this.$store.state.ErrorCode = code = gps.swOpen({
-            callback: (options, response) => {
-              if (response.emms.code != 0){
-                console.log('GPS获取失败',this.$tools.findErrorCode(response.emms.code));
-                return
-              } 
-              this.$store.state.ErrorCode = response.emms.code;
-              let lat = response.gps.lat / 10000000;
-              let long = response.gps.long / 10000000;
-              // this.ChannelContent = true;
-              // this.position = [long, lat,this.openChannel];
-              AMap.convertFrom([long, lat], "gps", (status, result) => {
-                if (result.info === "ok") {
-                  var resLnglat = result.locations[0];
-                  let marker;
-                  if(!el.marker){
-                    marker = new AMap.Marker({
-                      position: resLnglat,
-                      icon: require("@/assets/images/gps.png")
-                    });
-                    let markerContent = document.createElement("div");
-                    let markerSpan = document.createElement("span");
-                    let markerImg = document.createElement("img");
-                    markerImg.className = "markerlnglat";
-                    // markerImg.src = "//a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png";
-                    markerImg.src = require("@/assets/images/gps.png");
-                    markerContent.appendChild(markerImg);
-                    markerSpan.className = "marker";
-                    markerSpan.innerHTML =
-                      gps._parent._name_pu || gps._parent._id_pu;
-                    markerContent.appendChild(markerSpan);
-                    marker.setContent(markerContent);
+    GetInfoWindowContent(puname,puid,Lnglat){
+      return `
+        <p style="display:flex;line-height:30px;height:30px">
+          <span style='font-size:15px;font-weight:600'>${this.$t(
+            "Monitor.Term"
+          )} </span> 
+          <span style="display:inline-block;padding-left:10px">${puname}
+            <span style="color:#ccc;padding-left:5px">(${puid.slice(
+              3
+            )})</span>
+          </span>
+        </p>
+        <p style="display:flex;width:220px;line-height:30px;height:30px">
+          <span style='font-size:15px;font-weight:600'>${this.$t(
+            "Monitor.Position"
+          )} </span> 
+          <span style="display:inline-block;flex:1;text-align:center">${
+            Lnglat[0]
+          }</span>   
+          <span style="display:inline-block;flex:1;text-align:center">${
+            Lnglat[1]
+          }</span>
+        </p>
+        <p style="margin-top:10px;text-align:center">
+          <button class="openVideo ivu-btn ivu-btn-success" onclick="MapOpenVideo('${puid}')">${this.$t(
+            "Monitor.LiveVideo"
+          )}</button>
+          <button class="ivu-btn ivu-btn-success" onclick="MapOpenSpeak('${puid}')">${this.$t(
+            "Monitor.Intercom"
+          )}</button>
+        </p>
+      `
+    },
+    SetMarkerToMap(gps,el,success_cb,error_cb) {
+        return new Promise((resolve,reject)=>{
 
-                    //设备信息
-                    let puid = gps._parent._id_pu;
-                    let puname =
-                      gps._parent._name_pu || gps._parent._id_pu;
-                    this.position[2] = gps
-                    var info = `
-                      <p style="display:flex;width:220px;line-height:30px;height:30px">
-                        <span style='font-size:15px;font-weight:600'>${this.$t(
-                          "Monitor.Term"
-                        )} </span> 
-                        <span style="display:inline-block;padding-left:10px">${puname}
-                          <span style="color:#ccc;padding-left:5px">(${puid.slice(
-                            3
-                          )})</span>
-                        </span>
-                      </p>
-                      <p style="display:flex;width:220px;line-height:30px;height:30px">
-                        <span style='font-size:15px;font-weight:600'>${this.$t(
-                          "Monitor.Position"
-                        )} </span> 
-                        <span style="display:inline-block;flex:1;text-align:center">${
-                          long
-                        }</span>   
-                        <span style="display:inline-block;flex:1;text-align:center">${
-                          lat
-                        }</span>
-                      </p>
-                      <p style="margin-top:10px;text-align:center">
-                        <button class="openVideo ivu-btn ivu-btn-success" onclick="MapOpenVideo()">${this.$t(
-                          "Monitor.LiveVideo"
-                        )}</button>
-                        <button class="ivu-btn ivu-btn-success" onclick="MapOpenSpeak()">${this.$t(
-                          "Monitor.Intercom"
-                        )}</button>
-                      </p>
-                            `;
+             
+          let SetMarkerAndInfoWindow = (long,lat) => {
+            AMap.convertFrom([long,lat], "gps", (status, result) => {
+                  if (result.info === "ok") {
+                    var resLnglat = result.locations[0];
+                    let marker;
+                    if(!el.marker){
+                      marker = new AMap.Marker({
+                        position: resLnglat,
+                        icon: require("@/assets/images/gps.png")
+                      });
+                      let markerContent = document.createElement("div");
+                      let markerSpan = document.createElement("span");
+                      let markerImg = document.createElement("img");
+                      markerImg.className = "markerlnglat";
+                      // markerImg.src = "//a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png";
+                      markerImg.src = require("@/assets/images/gps.png");
+                      markerContent.appendChild(markerImg);
+                      markerSpan.className = "marker";
+                      markerSpan.innerHTML =
+                        gps._parent._name_pu || gps._parent._id_pu;
+                      markerContent.appendChild(markerSpan);
+                      marker.setContent(markerContent);
 
-                    let infoWindow = new AMap.InfoWindow({
-                      anchor: "top-center",
-                      content: info //使用默认信息窗体框样式，显示信息内容
-                    });
+                      //设备信息
+                      let puid = gps._parent._id_pu;
+                      let puname =
+                        gps._parent._name_pu || gps._parent._id_pu;
+                      this.position[2] = gps
+                      var info = this.GetInfoWindowContent(puname,puid,[long, lat]);
 
-                    marker.resLnglat = resLnglat
-                    let infoWindowClose = false;
-                    infoWindow.on("close", () => {
-                      infoWindowClose = false;
-                    });
-                    marker.on("click", () => {
-                      if (!infoWindowClose) {
-                        infoWindow.open(this.map, marker.resLnglat);
+                      let infoWindow = new AMap.InfoWindow({
+                        anchor: "top-center",
+                        content: info //使用默认信息窗体框样式，显示信息内容
+                      });
+
+                      marker.resLnglat = resLnglat
+                      let infoWindowClose = false;
+                      infoWindow.on("close", () => {
+                        infoWindowClose = false;
+                      });
+                      marker.on("click", (e) => {
+                        if (!infoWindowClose) {
+                          marker.setzIndex(++this.zindex);
+                          infoWindow.open(this.map,marker.resLnglat)
+                          infoWindowClose = true;
+                        }
+                      });
+
+                      if(el.openInfo){
+                        infoWindow.open(this.map, resLnglat);
                         infoWindowClose = true;
                       }
-                    });
-                    el.marker = marker;
-                    marker.infoWindow = infoWindow
-                    this.map.add(marker);
-                  }else{
-                    el.marker.resLnglat = resLnglat
-                    el.marker.setPosition(resLnglat)
+
+                      el.marker = marker;
+                      marker.infoWindow = infoWindow
+                      
+                      this.map.add(marker);
+
+                      // 为了双击设备后居中回调
+                      resolve(true)
+                    }else{
+                      el.marker.resLnglat = resLnglat
+                      el.marker.setPosition(resLnglat)
+                      let puid = gps._parent._id_pu;
+                      let puname =
+                      gps._parent._name_pu || gps._parent._id_pu;  
+                      el.marker.infoWindow.setContent(this.GetInfoWindowContent(puname,puid,[long, lat]))
+                      el.marker.infoWindow.setPosition(resLnglat)
+                      resolve(true)
+                    }
+                    if(el.ShowLocus){
+                      this.ShowLocus2Map(el)
+                    }
                   }
 
-                  if(el.ShowLocus){
-                    this.ShowLocus2Map(el)
-                  }
-
+                })
+          }
+          if (!el.lastGpsData) {
+            el.lastGpsData = {
+              state: [],
+              data: []
+            } 
+            el.lastGpsData.state[0] = this.$store.state.ErrorCode = gps.swOpen({
+              callback: (options, response) => {
+                el.lastGpsData.state[1] = response.emms.code
+                if (response.emms.code != 0){
+                  console.log('GPS获取失败',this.$tools.findErrorCode(response.emms.code));
+                  resolve(false);
+                  return
                 }
+                const lat = response.gps.lat / 10000000;
+                const long = response.gps.long / 10000000;
+                el.lastGpsData.data = [long,lat];
+                console.log( (gps._parent._name_pu || gps._parent._id_pu ) + ' 持续获取GPS信息中。。。',[long,lat]);
+                if(!el.marker)
+                  SetMarkerAndInfoWindow(long,lat)
+              }
+            })
 
-              })
+            if(el.lastGpsData.state[0]) {
+              resolve(false)
             }
-          }) 
-        
-    },
-    SetPuInfoLatLon2Marker(el){
-      this.session.swGetPuDeviceInfo({
-          puid: el.pu_id,
-          callback: (options,response,data) =>{
-            this.$store.state.ErrorCode = response.emms.code
-            if(response.emms.code!=0){
-               this.$Message.error(this.$tools.findErrorCode(response.emms.code))
-               return
+          } else {
+            if (!el.lastGpsData.state) {
+              resolve(false)
             }
-            console.log(el.pu_id+":",data);
-            if(data.iLatitude && data.iLongitude){
-              this.SetMarker({
-                position:[data.iLongitude/10000000, data.iLatitude/10000000],
-                pu_id: data.szID,
-                pu_name: data.szName
-              },el)
-              this.LocateTerms.push(el)
+            if (el.lastGpsData.state[0] == 0 && el.lastGpsData.state[1] == 0) {
+              let {long,lat} = el.lastGpsData.data
+              SetMarkerAndInfoWindow(long,lat)
             }
           }
+          
         })
+    },
+    SetPuInfoLatLon2Marker(el,resLnglat){
+      // this.session.swGetPuDeviceInfo({
+      //     puid: el.pu_id,
+      //     callback: (options,response,data) =>{
+      //       this.$store.state.ErrorCode = response.emms.code
+      //       if(response.emms.code!=0){
+      //          this.$Message.error(this.$tools.findErrorCode(response.emms.code))
+      //          return
+      //       }
+            let info = el.pu_info || this.session.swGetPu(el.pu_id)['_info_pu']
+            console.log(el.pu_id+":",info,info.lat ,info.long);
+            // if (0.0 > data.iLongitude/10000000 || 180.0 < data.iLongitude/10000000)
+            //   return 
+            //     //纬度最大是90° 最小是0°
+            // if (0.0 > data.iLatitude/10000000 || 90.0 < data.iLatitude/10000000)
+            //   return 
+            if(!this.$tools.LatLongValid(info.lat/10000000,info.long/10000000)){
+              // this.$Message.error(this.session.swGetPu(el.pu_id)['_name_pu'] +' '+ this.$t('Data.weizhihuoqushibai'))
+              return
+            }
+            this.SetMarker({
+              position:[info.long/10000000, info.lat/10000000],
+              pu_id: info.id,
+              pu_name: info.name
+            },el)
+
+            console.log(this.session.swGetPuChanel(info.id, 65536))
+            
+            this.LocateTerms.push(el)
     },
     SetLocateAllTerm(list) {
       this.LocateTerms = []
       console.log('SetLocateAllTerm',list)
       list.forEach(el => {
+        if(this.$store.state.locateCheckData[el.pu_id] && this.$store.state.locateCheckData[el.pu_id].length>0){
+          if(this.$store.state.locateCheckData[el.pu_id][0].isChecked == 'add'){
+            return
+          }
+        }
         this.SetPuInfoLatLon2Marker(el)
       })
       // this.LocateTerms.forEach(el => {
@@ -363,10 +495,15 @@ export default {
             // interval:5000,
             // repeat:-1,
             callback: (options, response) => {
+              el.swClose();
               if (response.emms.code != 0) return;
               this.$store.state.ErrorCode = response.emms.code;
               let lat = response.gps.lat / 10000000;
               let long = response.gps.long / 10000000;
+
+              if(!this.$tools.LatLongValid(lat,long)){
+                return
+              }
               // this.ChannelContent = true;
               // this.position = [long, lat,this.openChannel];
               AMap.convertFrom([long, lat], "gps", (status, result) => {
@@ -396,37 +533,8 @@ export default {
                     let puname =
                       el._parent._name_pu || el._parent._id_pu;
                     this.position[2] = el
-                    var info = `
-                      <p style="display:flex;width:220px;line-height:30px;height:30px">
-                        <span style='font-size:15px;font-weight:600'>${this.$t(
-                          "Monitor.Term"
-                        )} </span> 
-                        <span style="display:inline-block;padding-left:10px">${puname}
-                          <span style="color:#ccc;padding-left:5px">(${puid.slice(
-                            3
-                          )})</span>
-                        </span>
-                      </p>
-                      <p style="display:flex;width:220px;line-height:30px;height:30px">
-                        <span style='font-size:15px;font-weight:600'>${this.$t(
-                          "Monitor.Position"
-                        )} </span> 
-                        <span style="display:inline-block;flex:1;text-align:center">${
-                          long
-                        }</span>   
-                        <span style="display:inline-block;flex:1;text-align:center">${
-                          lat
-                        }</span>
-                      </p>
-                      <p style="margin-top:10px;text-align:center">
-                        <button class="openVideo ivu-btn ivu-btn-success" onclick="MapOpenVideo('${puid}')">${this.$t(
-                          "Monitor.LiveVideo"
-                        )}</button>
-                        <button class="ivu-btn ivu-btn-success" onclick="MapOpenSpeak('${puid}')">${this.$t(
-                          "Monitor.Intercom"
-                        )}</button>
-                      </p>
-                      `;
+                    
+                    var info = this.GetInfoWindowContent(puname,puid,[long, lat]);
 
                     let infoWindow = new AMap.InfoWindow({
                       anchor: "top-center",
@@ -438,18 +546,20 @@ export default {
                       infoWindowClose = false;
                     });
                     marker.resLnglat = resLnglat
-                    marker.on("click", () => {
+                    marker.on("click", (e) => {
                       if (!infoWindowClose) {
+                        // infoWindow.open(this.map, marker.resLnglat);
                         infoWindow.open(this.map, marker.resLnglat);
                         infoWindowClose = true;
                       }
                     });
 
                     el.marker = marker;
-
+                    el.marker.infoWindow = infoWindow
                     this.map.add(marker);
                   } else {
                     el.marker.setPosition(resLnglat);
+                    el.marker.infoWindow.setPosition(resLnglat)
                     el.marker.resLnglat = resLnglat
                   }
                   // this.map.setFitView();
@@ -508,17 +618,25 @@ export default {
           isSendAudio: true,
           isRecvAudio: true,
           callback: (options, response) => {
+            console.log('打开对讲回调',response.emms.code)
+            
             if (response.emms.code == jSW.RcCode.RC_CODE_S_OK) {
               this.StartMode = true;
               return;
             }
+            this.StartMode = false;
             this.$Message.error(this.$tools.findErrorCode(response.emms.code));
           },
           tag: channel
         });
+        if(result==0){
+          this.StartMode = true;
+        }
+        console.log('打开对讲返回',result)
       }else{
         var rc = channel.swCloseIntercom({
           callback: function(options, response) {
+            console.log('关闭对讲回调',response.emms.code)
             if (response.emms.code != 0) {
               this.$Message.error(
                 this.$tools.findErrorCode(response.emms.code)
@@ -526,6 +644,7 @@ export default {
             }
           }
         });
+        console.log('关闭对讲返回',rc)
         this.StartMode = false;
       }
     },
@@ -534,11 +653,66 @@ export default {
       this._OpenSpeak(!this.StartMode)
       
     },
-    ShowOneMarker(puid){
+    GetGPSValid(gps){
+      
+      return new Promise((resolve,reject)=>{
+          gps.swOpen({
+            callback: (options, response) => {
+              if (response.emms.code != 0){
+                console.log('GPS获取失败',this.$tools.findErrorCode(response.emms.code));
+                resolve(false)
+                return
+              } 
+
+              this.$store.state.ErrorCode = response.emms.code;
+              
+              let lat = response.gps.lat / 10000000;
+              let long = response.gps.long / 10000000;
+              console.log(lat,long)
+              if(!this.$tools.LatLongValid(lat,long)){
+                resolve(false)
+              }else{
+                resolve(true)
+              }
+            }
+        })
+      })
+
+    },
+    async ShowOneMarker(puid){
       let index = this.LocateTerms.findIndex(el=>el.pu_id == puid)
-      if(index==-1)return
+      if(index === -1){
+        let temp = {pu_id:puid,openInfo:true}
+        let gps = this.session.swGetPuChanel(temp.pu_id, 65536);
+        if (!gps) {
+          console.log("GPS 通道：",gps);
+          this.$Message.error(this.session.swGetPu(puid)['_name_pu'] +' '+ this.$t('Data.weizhihuoqushibai'))
+          return
+        }
+        // if(! (await this.GetGPSValid(gps)) ){
+        //   this.$Message.error(this.session.swGetPu(puid)['_name_pu'] +' '+ this.$t('Data.weizhihuoqushibai'))
+        //   return
+        // }
+        const result = await this.SetMarkerToMap(gps,temp)
+        debugger
+        if(!result) {
+          this.$Message.error(this.session.swGetPu(puid)['_name_pu'] +' '+ this.$t('Data.weizhihuoqushibai'))
+          console.log(this.$store.state.locateCheckData[puid])
+          return
+        }
+
+        this.map.setFitView([temp.marker],false,undefined,this.map.getZoom())
+
+        this.LocateTerms.push(temp)
+        return
+      }
+
       for(var i=0;i<this.LocateTerms.length;i++){
-        this.LocateTerms[i].marker.infoWindow.close()
+        if(this.LocateTerms[i].marker){
+          if(this.LocateTerms[i].marker.infoWindow) {
+            this.LocateTerms[i].marker.infoWindow.close()
+          }
+        }
       }
 
       this.map.setFitView([this.LocateTerms[index].marker],false,undefined,this.map.getZoom( ))
@@ -590,37 +764,8 @@ export default {
             puname = channel._parent._name_pu || channel._parent._id_pu;
           }
           
-          var info = `
-              <p style="display:flex;width:220px;line-height:30px;height:30px">
-                <span style='font-size:15px;font-weight:600'>${this.$t(
-                  "Monitor.Term"
-                )} </span> 
-                <span style="display:inline-block;padding-left:10px">${puname}
-                  <span style="color:#ccc;padding-left:5px">(${puid.slice(
-                    3
-                  )})</span>
-                </span>
-              </p>
-              <p style="display:flex;width:220px;line-height:30px;height:30px">
-                <span style='font-size:15px;font-weight:600'>${this.$t(
-                  "Monitor.Position"
-                )} </span> 
-                <span style="display:inline-block;flex:1;text-align:center">${
-                  options.position[0]
-                }</span>   
-                <span style="display:inline-block;flex:1;text-align:center">${
-                  options.position[1]
-                }</span>
-              </p>
-              <p style="margin-top:10px;text-align:center">
-                <button class="openVideo ivu-btn ivu-btn-success" onclick="MapOpenVideo('${options.pu_id}')">${this.$t(
-                  "Monitor.LiveVideo"
-                )}</button>
-                <button class="ivu-btn ivu-btn-success" onclick="MapOpenSpeak('${options.pu_id}')">${this.$t(
-                  "Monitor.Intercom"
-                )}</button>
-              </p>
-                    `;
+
+          var info = this.GetInfoWindowContent(puname,puid,[options.position[0],options.position[1]]);
           
           let infoWindow = new AMap.InfoWindow({
             anchor: "top-center",
@@ -641,9 +786,15 @@ export default {
           }else{
             infoWindow.open(this.map, resLnglat);
           }
-          marker.on("click", () => {
+          marker.on("click", (e) => {
             if (infoWindowClose) {
-              infoWindow.open(this.map, resLnglat);
+              // infoWindow.open(this.map, e.lnglat);
+              // if(marker.resLnglat){
+                // infoWindow.setPosition(marker.resLnglat)
+              // }else{
+                infoWindow.open(this.map, resLnglat);
+              // }
+              marker.setzIndex(++this.zindex);
               infoWindowClose = false;
             }
           });
@@ -652,7 +803,7 @@ export default {
       });
     },
     SetMap() {
-      this.loading = true;
+      // this.loading = true;
       // if(this.isFirst){
       //   this.map = new AMap.Map('container', {
       //     resizeEnable: true
@@ -663,17 +814,26 @@ export default {
       // }
       if (!this.map) {
         this.map = new AMap.Map("_container", {
-          resizeEnable: true
-          // zoom: 15
+          resizeEnable: true,
+          isHotspot: false,
+          zoom: 13,
+          zooms: [3,22]
         });
         console.log(this.map);
         this.map.on("complete", () => {
           this.SetUi();
           this.loading = false;
+          console.log('doJobs');
+          
+          this.complete_job.forEach(item=>{
+            item()
+          })
+            
         });
-      } else {
-        this.SetMarker();
-      }
+      } 
+      // else {
+      //   this.SetMarker();
+      // }
     },
     MP(key) {
       const p1 = new Promise(function(resolve, reject) {
@@ -766,6 +926,9 @@ export default {
 </script>
 
 <style lang="less">
+.marker_top {
+  z-index: 999999;
+}
 #container {
   width: 100%;
   height: 100%;

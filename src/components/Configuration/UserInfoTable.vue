@@ -121,14 +121,14 @@
             :checked="UserEditer.UpdatePasswd"
           >{{$t('Data.xiugaimima')}}</el-checkbox>
         </el-form-item>
-        <!-- <el-form-item v-if="Hidden" label="" >
-            <el-checkbox v-model="UserEditer.data.groupid">{{$t('Data.xiugaimima')}}</el-checkbox>
-        </el-form-item>-->
+        <el-form-item v-if="UserEditer.UpdatePasswd && UserEditer.data.id == this.user" :label="this.$t('Data.jiumima')" >
+            <el-input type="password" v-model="UserEditer.data.oldpasswd">{{$t('Data.jiumima')}}</el-input>
+        </el-form-item>
         <el-form-item v-if="UserEditer.UpdatePasswd" :label="this.$t('Data.xinmima')">
-          <el-input v-model="UserEditer.data.passwd"></el-input>
+          <el-input  type="password" v-model="UserEditer.data.passwd"></el-input>
         </el-form-item>
         <el-form-item v-if="UserEditer.UpdatePasswd" :label="this.$t('Data.zaicishuruxinmima')">
-          <el-input v-model="UserEditer.data.passwd_again"></el-input>
+          <el-input  type="password" v-model="UserEditer.data.passwd_again"></el-input>
         </el-form-item>
         <el-form-item :label="this.$t('Data.yuntaikongzhidengji')">
           <el-input min="0" minlength="1" type="number" v-model="UserEditer.data.iptz"></el-input>
@@ -198,7 +198,8 @@ export default {
   computed: {
     ...mapState({
       session: "session",
-      lang:'lang'
+      lang:'lang',
+      user: 'user'
     })
   },
   methods: {
@@ -235,11 +236,19 @@ export default {
           this.$Message.error(this.$t("Data.liangcimimabuyizhi"));
           return;
         }
+        if (
+          this.UserEditer.UpdatePasswd &&
+          (this.UserEditer.data.passwd=='' ||this.UserEditer.data.passwd_again=='' ||this.UserEditer.data.oldpasswd=='' )
+        ) {
+          this.$Message.error(this.$t("Data.mimabunengweikong"));
+          return;
+        }
         if (this.UserEditer.data.name.trim() == "") {
           this.$Message.error(this.$t("Data.mingchengbunengweikong"));
           return;
         }
         if(!this.UserEditer.UpdatePasswd){
+            this.UserEditer.data.oldpasswd = ''
             this.UserEditer.data.passwd = ''
           }
         this.$store.state.ErrorCode = _user.swModUser({
@@ -252,9 +261,10 @@ export default {
               return;
             }
             if(this.UserEditer.UpdatePasswd){
+              
               _user.swModPwd({
                 data: {
-                  password: "",
+                  password: this.UserEditer.data.id==this.user? this.UserEditer.data.oldpasswd:"",
                   newpassword: this.UserEditer.data.passwd
                 },
                 callback: (sender, option, data) => {
@@ -262,6 +272,12 @@ export default {
                     // this.$Message.error(this.$tools.findErrorCode(option.emms.code))
                     this.$Message.error(this.$t("Data.xiugaishibai"));
                     return;
+                  }
+                  if(this.UserEditer.UpdatePasswd && this.UserEditer.data.id==this.user){
+                    // this.$Message.success(this.$t("Data.xiugaichenggong"));
+                    setTimeout(() => {
+                      location.reload()
+                    }, 2000);
                   }
                   this.$Message.success(this.$t("Data.xiugaichenggong"));
                   Object.assign(this.UserEditer._data, this.UserEditer.data);
@@ -277,8 +293,10 @@ export default {
         });
         return;
       }
-
       this.$set(this.UserEditer, "UpdatePasswd", false);
+      data['oldpasswd'] = ''
+      data['passwd'] = ''
+      data['passwd_again'] = ''
       this.$set(this.UserEditer, "data", this.$lodash.cloneDeep(data));
       this.$set(this.UserEditer, "_data", data);
       this.EditerUserDialog = true;

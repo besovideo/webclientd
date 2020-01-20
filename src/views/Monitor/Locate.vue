@@ -35,10 +35,17 @@ export default {
     };
   },
   methods: {
-    OnCheckTerm(pu_id,tag,isChecked){
-      console.log('pu_id:',pu_id)
+    OnCheckTerm(_pu_id,tag,isChecked){
+      console.log('pu_id:',_pu_id)
       console.log('tag:',tag)
       console.log('isChecked:',isChecked)
+      let pu_id = _pu_id
+      if(isChecked && tag=='guiji') {
+        setTimeout(() => {
+          this.$refs['LocateMap'].SetPu2LocateTerms(pu_id,tag,isChecked?'add':'remove')
+        }, 2000);
+        return
+      }
       this.$refs['LocateMap'].SetPu2LocateTerms(pu_id,tag,isChecked?'add':'remove')
     },
     DontShowTooltip(){
@@ -63,14 +70,13 @@ export default {
       let temp = []
       termList.forEach(el=>{
         temp.push({
-          'pu_id':el.pu_id
+          'pu_id':el.pu_id,
+          'pu_info': el.pu_info
         })
       })
       this.$refs['LocateMap'].SetLocateAllTerm(temp)
     },
     ChanelClick(channel){
-      this.$refs['LocateMap'].ShowOneMarker(channel._parent._id_pu)
-      return
       if(null == channel){
         this.$Message.error(this.$t("Monitor.noGPSChannel"))        
         return
@@ -79,34 +85,34 @@ export default {
         this.$Message.error(this.$t("Monitor.noGPSChannel"))
         return
       }
-      channel = channel._parent._arr_gps[0];
-      if(channel!=this.openChannel){
-        if(this.openChannel!=undefined){
-          this.openChannel.swClose()
-        }
-        this.openChannel = channel
-        let code = undefined
-        this.$store.state.ErrorCode = code = this.openChannel.swOpen({
-          // interval:5000,
-          // repeat:-1,
-          callback: (options, response) => {
-            this.$store.state.ErrorCode = response.emms.code
-            if(response.gps.lat==0&&response.gps.long==0){
-              this.$Message.error(this.$t("Monitor.GPSLocationError"))
-              return
-            }
-            let lat = response.gps.lat / 10000000;
-            let long = response.gps.long / 10000000;
-            // this.ChannelContent = true;
-            this.position = [long, lat,this.openChannel];
-          }
-        })
-        console.log(code)
-      }
-      // this.session.swAddCallBack("pugpsdata",(sender, cmd, data)=>{
-      //   console.log(Math.random()," Math.random()")
-      //   console.log("gps==========",sender,cmd,data);
-      // })
+      
+      if(channel._parent._info_pu.onlinestatus==1)
+        this.$refs['LocateMap'].ShowOneMarker(channel._parent._id_pu)
+      else
+        return
+      
+      // channel = channel._parent._arr_gps[0];
+      // if(channel!=this.openChannel){
+      //   if(this.openChannel!=undefined){
+      //     this.openChannel.swClose()
+      //   }
+      //   this.openChannel = channel
+      //   let code = undefined
+      //   this.$store.state.ErrorCode = code = this.openChannel.swOpen({
+      //     callback: (options, response) => {
+      //       this.$store.state.ErrorCode = response.emms.code
+      //       if(response.gps.lat==0&&response.gps.long==0){
+      //         this.$Message.error(this.$t("Monitor.GPSLocationError"))
+      //         return
+      //       }
+      //       let lat = response.gps.lat / 10000000;
+      //       let long = response.gps.long / 10000000;
+      //       this.position = [long, lat,this.openChannel];
+      //     }
+      //   })
+      //   console.log(code)
+      // }
+      
     }
   },
   watch: {

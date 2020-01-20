@@ -104,8 +104,8 @@ module.exports = {
       Track_playback_tip: 'Mobile device history track playback',
       Picture_monitor: 'Picture monitor',
       Picture_monitor_tip: 'Device push picture information real-time monitoring',
-      Locate: 'Locate',
-      Scheduling: 'Cluster scheduling'
+      Locate: 'Map',
+      Scheduling: 'groupPTT'
     },
     Monitor: {
       Showonlyonlinedevices: 'Show only online devices',
@@ -125,7 +125,7 @@ module.exports = {
       Pleasecloseavideowindowfirst: 'Please close a video window first',
       LiveVideo: 'LiveVideo',
       LivePhoto: 'LivePhoto',
-      Intercom: 'Intercom',
+      Intercom: 'talk',
       Type: 'Type',
       Position: 'Position'
 
