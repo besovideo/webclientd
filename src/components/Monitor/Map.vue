@@ -195,7 +195,6 @@ export default {
           // }
 
           const result = await this.SetMarkerToMap(gps,temp)
-            debugger
           if(!result) {
             this.$Message.error(this.session.swGetPu(pu_id)['_name_pu'] +' '+ this.$t('Data.weizhihuoqushibai'))
             console.log(this.$store.state.locateCheckData[pu_id])
@@ -228,15 +227,14 @@ export default {
             
             return
           }
-          this.SetPuInfoLatLon2Marker({pu_id})
+          let lastGpsData = this.LocateTerms[index].lastGpsData
           clearInterval(this.LocateTerms[index].timer)
-          this.session.swGetPuChanel(pu_id, 65536).swClose()
+          this.SetPuInfoLatLon2Marker({pu_id,lastGpsData})
           if(this.LocateTerms[index].marker){
             this.LocateTerms[index].marker.infoWindow.close()
             this.map.remove(this.LocateTerms[index].marker) 
             this.LocateTerms[index].marker = undefined
           }
-          // this.LocateTerms.splice(index,1)
         }
       }else if(tag == 'guiji') {
         if(index==-1) {
@@ -423,9 +421,9 @@ export default {
               resolve(false)
             }
             if (el.lastGpsData.state[0] == 0 && el.lastGpsData.state[1] == 0) {
-              let {long,lat} = el.lastGpsData.data
+              let [long,lat] = el.lastGpsData.data
               SetMarkerAndInfoWindow(long,lat)
-            }
+            } 
           }
           
         })
@@ -439,26 +437,34 @@ export default {
       //          this.$Message.error(this.$tools.findErrorCode(response.emms.code))
       //          return
       //       }
-            let info = el.pu_info || this.session.swGetPu(el.pu_id)['_info_pu']
-            console.log(el.pu_id+":",info,info.lat ,info.long);
-            // if (0.0 > data.iLongitude/10000000 || 180.0 < data.iLongitude/10000000)
-            //   return 
-            //     //纬度最大是90° 最小是0°
-            // if (0.0 > data.iLatitude/10000000 || 90.0 < data.iLatitude/10000000)
-            //   return 
-            if(!this.$tools.LatLongValid(info.lat/10000000,info.long/10000000)){
-              // this.$Message.error(this.session.swGetPu(el.pu_id)['_name_pu'] +' '+ this.$t('Data.weizhihuoqushibai'))
-              return
-            }
-            this.SetMarker({
-              position:[info.long/10000000, info.lat/10000000],
-              pu_id: info.id,
-              pu_name: info.name
-            },el)
+        console.log("Map.vue 记录最后的位置信息:" , ( el.lastGpsData && el.lastGpsData.data ));
+        let info = el.pu_info || this.session.swGetPu(el.pu_id)['_info_pu']
+        if (!info || !info.lat || !info.long ) {
+          if(el.lastGpsData && el.lastGpsData.data) {
+            let [long,lat] = el.lastGpsData.data;
+            info.long = long
+            info.lat = lat
+          }
+        }
+        console.log(el.pu_id+":",info,info.lat ,info.long);
+        // if (0.0 > data.iLongitude/10000000 || 180.0 < data.iLongitude/10000000)
+        //   return 
+        //     //纬度最大是90° 最小是0°
+        // if (0.0 > data.iLatitude/10000000 || 90.0 < data.iLatitude/10000000)
+        //   return 
+        if(!this.$tools.LatLongValid(info.lat/10000000,info.long/10000000)){
+          // this.$Message.error(this.session.swGetPu(el.pu_id)['_name_pu'] +' '+ this.$t('Data.weizhihuoqushibai'))
+          return
+        }
+        this.SetMarker({
+          position:[info.long/10000000, info.lat/10000000],
+          pu_id: info.id,
+          pu_name: info.name
+        },el)
 
-            console.log(this.session.swGetPuChanel(info.id, 65536))
-            
-            this.LocateTerms.push(el)
+        console.log(this.session.swGetPuChanel(info.id, 65536))
+        
+        this.LocateTerms.push(el)
     },
     SetLocateAllTerm(list) {
       this.LocateTerms = []
@@ -715,8 +721,10 @@ export default {
         }
       }
 
-      this.map.setFitView([this.LocateTerms[index].marker],false,undefined,this.map.getZoom( ))
-      this.LocateTerms[index].marker.infoWindow.open(this.map,this.LocateTerms[index].marker.resLnglat)
+      if (this.LocateTerms[index].marker) {
+        this.map.setFitView([this.LocateTerms[index].marker],false,undefined,this.map.getZoom( ))
+        this.LocateTerms[index].marker.infoWindow.open(this.map,this.LocateTerms[index].marker.resLnglat)
+      }
       
     },
     SetMarker(options,el) {
