@@ -1,29 +1,49 @@
-# webcontrol
+# webclient
 
-## Project setup
+## 安装依赖
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+## 文档页面
+
+  - 本地搭建好服务器可访问 http://127.0.0.1:8081/doc/
+
+## 目录结构 
+``` 
+  public/                  index.html模板文件
+    index.html             script 方式加载 jsw SDK 
+                           script 方式加载 高德地图
+
+  src/                      
+    assets/                资源文件
+    components/            Vue 封装的组件
+    plugins/               插件
+    views/                 Vue 页面
+    App.vue                Vue Root组件
+    main.js                js入口文件
+    router.js              Vue-router路由配置文件
+    store.js               Vuex存储配置
+
+  static/                  layer 第三方js 引用(资源文件)
+  tools/                   封装的翻译工具 (可删)
+
 ```
+
+
+## 运行命令
+
+``` 
+开发环境
+
 npm run serve
-```
 
-### Compiles and minifies for production
-```
+
+生产(打包)环境
+打包后生成到 dist/ 目录中
+
 npm run build
+
+
 ```
 
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
