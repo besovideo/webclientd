@@ -229,12 +229,12 @@ export default {
           }
           let lastGpsData = this.LocateTerms[index].lastGpsData
           clearInterval(this.LocateTerms[index].timer)
-          this.SetPuInfoLatLon2Marker({pu_id,lastGpsData})
           if(this.LocateTerms[index].marker){
             this.LocateTerms[index].marker.infoWindow.close()
-            this.map.remove(this.LocateTerms[index].marker) 
-            this.LocateTerms[index].marker = undefined
+            // this.map.remove(this.LocateTerms[index].marker) 
+            // this.LocateTerms[index].marker = undefined
           }
+          // this.SetPuInfoLatLon2Marker({pu_id,lastGpsData})
         }
       }else if(tag == 'guiji') {
         if(index==-1) {
@@ -491,6 +491,7 @@ export default {
       this.SchedulingList.forEach(el => {
         el.marker = undefined;
       });
+      debugger
       if (this.IntervalGetGpsID != undefined) {
         clearInterval(this.IntervalGetGpsID);
       }

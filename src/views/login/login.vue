@@ -57,10 +57,10 @@ export default {
       // let url = 'https://115.28.79.237:9443'
 
       if(process.env.NODE_ENV=='development'){
-        // url = 'https://115.28.79.237:8081'
+        // url = 'https://115.28.79.237:9443'
         // url = 'https://112.30.114.240:9443';
-        url = 'https://192.168.8.7:9443'
-        // url = 'http://127.0.0.1:8081'
+        // url = 'https://192.168.8.7:9443'
+        url = 'https://127.0.0.1:9443'
         // url = 'https://127.0.0.1:9443'
         // url = 'http://192.168.6.59:8081'
       }
