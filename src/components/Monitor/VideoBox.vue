@@ -59,8 +59,8 @@
               >HttpFlv</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
-          <img  :src="voice?volumeOpenSrc:volumeCloseSrc" class="voice" @click="voice = !voice">
-          <Slider  v-model="volume" :step="10"></Slider>
+          <img v-if="!Loading" :src="voice?volumeOpenSrc:volumeCloseSrc" class="voice" @click="voice = !voice">
+          <Slider v-if="!Loading"  v-model="volume" :step="10"></Slider>
           <Icon
             type="md-expand item unselectable"
             size="20"
