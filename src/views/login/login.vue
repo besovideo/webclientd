@@ -60,21 +60,17 @@ export default {
         // url = 'https://115.28.79.237:9443'
         // url = 'https://112.30.114.240:9443';
         // url = 'https://192.168.8.7:9443'
-        url = 'https://127.0.0.1:9443'
+        url = 'https://61.191.27.18:9443'
         // url = 'https://127.0.0.1:9443'
         // url = 'http://192.168.6.59:8081'
       }
       this.spinShow = true
-      // this.Server = Server
-      // this.Server_Port = Server_Port
       this.userName = userName
       this.password = password
-      // console.log('-------------------------',Server ,Server_Port, userName, password )
-      // window.onload = ()=>{
+      
       let initCode = window.jSW.swInit({
         // url: window.location.origin, //bv_nginx.exe服务器地址
         url,
-        // url: '',
         calltype: window.jSW.CallProtoType.HTTP, // AUTO: IE优先使用OCX, 如果希望IE仍然使用HTTP通信, 请使用jSW.CallProtoType.HTTP
         config:{
           bManualLP:true

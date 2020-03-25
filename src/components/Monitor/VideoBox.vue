@@ -1,5 +1,5 @@
 <template>
-  <div class="videobox">
+  <div class="videobox" ref="VideoBox">
     <div class="head">
       <span v-if="ShowTag">{{ puname||"" }} {{ $t("Monitor.channel") }}{{ tag }}</span>
       <span v-if="Type" style="padding-left:10px;">{{ $t("Monitor.Type") }}:({{ Type }})</span>
@@ -26,25 +26,47 @@
         </div>
         <div class="right">
           <el-dropdown trigger="click" @command="DropdownClick" v-if="VideoTypeSetting">
-            <span class="el-dropdown-link" style="margin-right:10px">
+            <span class="el-dropdown-link" style="margin-right:10px;margin-top: 2.5px">
               <a href="javascript:void(0)">
-                <img :src="require('@/assets/images/videoSet.png')" width="20" style="line-height: 30px">
+                <img
+                  class="settingImg"
+                  :src="require('@/assets/images/videoSet.png')"
+                  width="20"
+                  style="line-height: 30px"
+                />
               </a>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" :disabled="$store.state.VideoType == 'auto'" :command="{'type':'videotype',val:'auto'}">AUTO</el-dropdown-item>
-              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" :disabled="$store.state.VideoType == 'rtmp'" :command="{'type':'videotype',val:'rtmp'}">RTMP</el-dropdown-item>
-              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" :disabled="$store.state.VideoType == 'hls'" :command="{'type':'videotype',val:'hls'}">HLS</el-dropdown-item>
-              <el-dropdown-item icon="ivu-icon ivu-icon-ios-apps" :disabled="$store.state.VideoType == 'httpflv'" :command="{'type':'videotype',val:'httpflv'}">HttpFlv</el-dropdown-item>
+              <el-dropdown-item
+                icon="ivu-icon ivu-icon-ios-apps"
+                :disabled="$store.state.VideoType == 'auto'"
+                :command="{'type':'videotype',val:'auto'}"
+              >AUTO</el-dropdown-item>
+              <el-dropdown-item
+                icon="ivu-icon ivu-icon-ios-apps"
+                :disabled="$store.state.VideoType == 'rtmp'"
+                :command="{'type':'videotype',val:'rtmp'}"
+              >RTMP</el-dropdown-item>
+              <el-dropdown-item
+                icon="ivu-icon ivu-icon-ios-apps"
+                :disabled="$store.state.VideoType == 'hls'"
+                :command="{'type':'videotype',val:'hls'}"
+              >HLS</el-dropdown-item>
+              <el-dropdown-item
+                icon="ivu-icon ivu-icon-ios-apps"
+                :disabled="$store.state.VideoType == 'httpflv'"
+                :command="{'type':'videotype',val:'httpflv'}"
+              >HttpFlv</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
+          <img  :src="voice?volumeOpenSrc:volumeCloseSrc" class="voice" @click="voice = !voice">
+          <Slider  v-model="volume" :step="10"></Slider>
           <Icon
             type="md-expand item unselectable"
             size="20"
             style="line-height:25px"
             @click="FullScreen()"
           />
-          
         </div>
       </div>
     </div>
@@ -54,31 +76,43 @@
 <script>
 import { mapState } from "vuex";
 export default {
-  props: ["tag", "puid", "tagEl", "noPlay", "isopen", "puname",'VideoTypeSetting'],
+  props: [
+    "tag",
+    "puid",
+    "tagEl",
+    "noPlay",
+    "isopen",
+    "puname",
+    "VideoTypeSetting"
+  ],
   data() {
     return {
       tagdata: undefined,
       playbtn: require("@/assets/images/Play-btn.png"),
       closePng: require("../../assets/images/close.png"),
       playLoadingSrc: require("@/assets/images/loading.png"),
+      volumeOpenSrc: require("@/assets/images/volumeOpen.png"),
+      volumeCloseSrc: require("@/assets/images/volumeClose.png"),
       playLoading: true,
       Loading: true,
       channel: undefined,
       Type: undefined,
       ShowTag: false,
-      OpenResult: undefined
+      OpenResult: undefined,
+      volume: 100,
+      voice: true
     };
   },
   methods: {
-    DropdownClick(data){
-      if(data.type=='window'){
-        this.videosize = data.val
-      }else if(data.type=='videotype'){
-        localStorage.setItem('VideoType',data.val)
+    DropdownClick(data) {
+      if (data.type == "window") {
+        this.videosize = data.val;
+      } else if (data.type == "videotype") {
+        localStorage.setItem("VideoType", data.val);
 
-        if(this.$store.state.VideoType!=data.val){
-          this.$store.state.VideoType = data.val
-          this.Play()
+        if (this.$store.state.VideoType != data.val) {
+          this.$store.state.VideoType = data.val;
+          this.Play();
         }
       }
     },
@@ -109,8 +143,8 @@ export default {
         this.$Message.error(this.$t("Monitor.plaseselectterm"));
         return;
       }
-      if(this.Loading && this.channel!=undefined){
-        return
+      if (this.Loading && this.channel != undefined) {
+        return;
       }
       this.Close();
       this.channel = this.session.swGetPuChanel(this.puid, parseInt(this.tag));
@@ -123,16 +157,17 @@ export default {
         ismuti: false,
         div: videoEl,
         // bstretch: true,
+        media: 10,
         prototype: this.$store.state.VideoType,
         bstretch: true,
         callback: (options, response, dlg) => {
           this.$store.state.ErrorCode = this.OpenResult = response.emms.code;
           console.log(options, response, dlg);
-          console.log()
-          
+          console.log();
+
           this.Loading = false;
           if (response.emms.code == 0) {
-            this.$store.state.notifyTip[this.puid] = false
+            this.$store.state.notifyTip[this.puid] = false;
             this.Loading = false;
             this.ShowTag = true;
             this.Type = this.$store.state.VideoType;
@@ -149,6 +184,26 @@ export default {
     })
   },
   watch: {
+    voice(val) {
+      let video = this.$refs.VideoBox.querySelector("video")
+      if(!video) return
+      if(!val) {
+        console.log(this.$refs.VideoBox)
+        video.volume = 0
+        this.volume = 0
+      }
+    },
+    volume(val) {
+      let video = this.$refs.VideoBox.querySelector("video")
+      if(!video) return
+
+      if(val == 0) {
+        this.voice = false
+        return
+      }
+      video.volume = val / 100
+      this.voice = true
+    },
     puid(val) {
       if (val != undefined) {
         // this.tagdata = parseInt(this.tag);
@@ -159,14 +214,13 @@ export default {
       }
     },
     notify(val) {
-      if(val==undefined && this.ShowTag)
-        return
-      if(this.puid == val.content._id_pu){
-        if(!this.$store.state.notifyTip[this.puid]){
-          this.$Message.error(this.$t('Data.shebeiyilixian'))
-          this.$store.state.notifyTip[this.puid] = true
+      if (val == undefined && this.ShowTag) return;
+      if (this.puid == val.content._id_pu) {
+        if (!this.$store.state.notifyTip[this.puid]) {
+          this.$Message.error(this.$t("Data.shebeiyilixian"));
+          this.$store.state.notifyTip[this.puid] = true;
         }
-        this.Close()
+        this.Close();
       }
     },
     // tag(val,oldVal){
@@ -186,15 +240,15 @@ export default {
           this.$Message.error(this.$t("Monitor.isopenchannel"));
         } else if (val == jSW.RcCode.RC_CODE_E_UNSUPPORTED) {
           this.$Message.error(this.$t("Monitor.otheropenfail_rtmp") + val);
-        } else if (val = jSW.RcCode.RC_CODE_E_BVCU_FAILED) {
+        } else if ((val = jSW.RcCode.RC_CODE_E_BVCU_FAILED)) {
           this.$Message.error("RC_CODE_E_BVCU_FAILED " + val);
-        } else if (val = jSW.RcCode.RC_CODE_E_BVCU_TIMEOUT) {
+        } else if ((val = jSW.RcCode.RC_CODE_E_BVCU_TIMEOUT)) {
           this.$Message.error("RC_CODE_E_BVCU_TIMEOUT " + val);
         } else {
           this.$Message.error(this.$t("Monitor.channelopenerror") + val);
         }
-        if(this.Loading){
-          this.Loading = false
+        if (this.Loading) {
+          this.Loading = false;
           this.channel = undefined;
         }
       }
@@ -222,7 +276,7 @@ export default {
     font-weight: 700;
     padding-left: 10px;
     background-color: rgba(0, 0, 0, 0.3);
-    color: white
+    color: white;
   }
   div.videoEl {
     // margin-top:25px;
@@ -242,30 +296,6 @@ export default {
     img.loading {
       animation: rotation 1.5s linear infinite;
     }
-
-    div.control {
-      position: absolute;
-      width: 100%;
-      padding: 0 10px;
-      height: 25px;
-      bottom: 0;
-      background-color: #000;
-      .item {
-        cursor: pointer;
-      }
-      .left {
-        float: left;
-        height: 100%;
-        img {
-          width: 20px;
-          margin-top: 2.5px;
-        }
-      }
-      .right {
-        float: right;
-        height: 100%;
-      }
-    }
   }
 }
 @keyframes rotation {
@@ -274,6 +304,68 @@ export default {
   }
   to {
     transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+</style>
+
+
+<style lang="less">
+div.control {
+  position: absolute;
+  width: 100%;
+  padding: 0 10px;
+  height: 25px;
+  bottom: 0;
+  background-color: #000;
+  .item {
+    cursor: pointer;
+  }
+  .left {
+    float: left;
+    height: 100%;
+    img {
+      width: 20px;
+      margin-top: 2.5px;
+    }
+  }
+  .right {
+    float: right;
+    flex: 1;
+    display: flex;
+    height: 100%;
+    .settingImg {
+      width: 18px;
+      height: 18px;
+      margin-top: 2.5px;
+    }
+    .voice {
+      display: block;
+      width: 18px;
+      margin-top: 3.5px;
+      height: 18px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    .ivu-slider {
+      width: 50px;
+      margin-right: 15px;
+      .ivu-slider-wrap {
+        margin: 0;
+        margin-top: 10.5px;
+        .ivu-slider-bar {
+          background: #225fb5;
+        }
+        .ivu-slider-button-dragging {
+          width: inherit;
+        }
+        .ivu-slider-button {
+          width: 10px;
+          height: 10px;
+          border: 2px solid #225fb5
+        }
+
+      }
+    }
   }
 }
 </style>
