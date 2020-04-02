@@ -12,7 +12,7 @@
             {{$t('login.login_tip')}}
         </p>
         <Dropdown slot="extra" @on-click='ChangeLanguage'>
-          <a  href="javascript:void(0)">
+          <a href="javascript:void(0)">
               {{$t('lang')}}
               <Icon type="ios-arrow-down"></Icon>
           </a>
@@ -52,7 +52,13 @@ export default {
       localStorage.setItem('locale',name)
       this.$store.state.lang = name
     },
-    handleSubmit ({userName, password }) {
+    handleSubmit ({userName, password ,Server="127.0.0.1",Server_Port="9701"}) {
+      if(Server.trim() == '' || Server_Port.trim() == '') {
+        this.$Message.error('Server port cannot be empty')
+        return
+      }
+
+      window.localStorage.setItem("lastConnect",JSON.stringify({Server,Server_Port}))
       let url = window.location.origin
       // let url = 'https://115.28.79.237:9443'
 
@@ -60,9 +66,9 @@ export default {
         // url = 'https://115.28.79.237:9443'
         // url = 'https://112.30.114.240:9443';
         // url = 'https://192.168.8.7:9443'
-        url = 'https://61.191.27.18:9443'
+        // url = 'https://61.191.27.18:9443'
         // url = 'https://127.0.0.1:9443'
-        // url = 'http://192.168.6.59:8081'
+        url = 'https://192.168.0.68:9443'
       }
       this.spinShow = true
       this.userName = userName
@@ -78,8 +84,8 @@ export default {
         oninit: (code)=>{
           if(code==jSW.RcCode.RC_CODE_S_OK){
               this.$store.state.session = new window.jSW.SWSession({
-              // server: Server,
-              // port: 9700,
+              server: Server,
+              port: Server_Port,
               onopen: sess => {
                 sess.swLogin({
                   user: userName,
@@ -116,7 +122,7 @@ export default {
                   this.$Message.error('Authorize Failed')
                 break;
                 case jSW.RcCode.RC_CODE_E_BVCU_CONNECTFAILED:
-                  this.$Message.error('ConnectFailed')
+                  this.$Message.error('Connect Failed')
                 break;
                 default:
                   this.$Message.error('Fail, error code: ' + code)

@@ -21,6 +21,16 @@
         </Col>
       </Row>
     </FormItem> -->
+    <!-- // -->
+    <FormItem class="portSet">
+      <Input v-model="form.Server" :placeholder="$t('Server')">
+        <span slot="prepend">
+          <Icon :size="16" type="logo-codepen"></Icon>
+        </span>
+      </Input>
+      <Input v-model="form.Server_Port" style="margin-left: 20px;width: 70px"/>
+      <!-- <el-tag @click="" size="small" style="cursor: pointer;">{{$t('SetPort')}}</el-tag> -->
+    </FormItem>
     <FormItem prop="userName">
       <Input v-model="form.userName" :placeholder="$t('login.plzuser')">
         <span slot="prepend">
@@ -35,6 +45,10 @@
         </span>
       </Input>
     </FormItem>
+    <div style="position: relative;transform: translateY(-10px);height: 20px">
+      
+    </div>
+
     <div id="cb_rember">
       <Checkbox>记住密码</Checkbox>
     </div>
@@ -54,10 +68,18 @@ export default {
       form: {
         userName: window.localStorage.getItem('userName'),
         password: '',
+        Server: '127.0.0.1',
+        Server_Port: '9701'
         // Server: window.localStorage.getItem('Server'),
         // Server_Port: window.localStorage.getItem('Server_Port')
       }
     }
+  },
+  created(){
+    let lastConnect = window.localStorage.getItem("lastConnect") || '{ "Server":"127.0.0.1","Server_Port": "9701"}'
+    let {Server,Server_Port} = JSON.parse(lastConnect)
+    this.form.Server = Server
+    this.form.Server_Port = Server_Port
   },
   computed: {
     rules () {
@@ -85,7 +107,9 @@ export default {
             // Server: this.form.Server,
             // Server_Port: this.form.Server_Port,
             userName: this.form.userName,
-            password: this.form.password
+            password: this.form.password,
+            Server: this.form.Server,
+            Server_Port: this.form.Server_Port
           })
         }
       })
@@ -98,6 +122,10 @@ export default {
 #cb_rember{
   display: none;
   margin-bottom:10px
+}
+.portSet > .ivu-form-item-content {
+  display: flex;
+  
 }
 </style>
 
