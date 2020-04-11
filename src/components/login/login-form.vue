@@ -75,7 +75,7 @@ export default {
       }
     }
   },
-  created(){
+  created() {
     let lastConnect = window.localStorage.getItem("lastConnect") || '{ "Server":"127.0.0.1","Server_Port": "9701"}'
     let {Server,Server_Port} = JSON.parse(lastConnect)
     this.form.Server = Server
