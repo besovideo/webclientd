@@ -11,6 +11,7 @@ export default {
   name: 'App',
   data(){
     return {
+      flash_tip: true 
     }
   },
   methods:{
@@ -20,9 +21,9 @@ export default {
         a.href = 'http://www.macromedia.com/go/getflashplayer'
         a.click()
       } else {
-        this.$confirm(`${this.$t('Data.ciwangzhanxuyaokaiqiFlashgongneng')} <br> ${this.$t('Data.qingzaixinchuangkoudakaicilianjie,bingkaiqiFlashdequanxian')}<br>${"chrome://settings/content/siteDetails?site="+window.location.origin}
+        this.flash_tip && this.$confirm(`${this.$t('Data.ciwangzhanxuyaokaiqiFlashgongneng')} <br> ${this.$t('Data.qingzaixinchuangkoudakaicilianjie,bingkaiqiFlashdequanxian')}<br>${"chrome://settings/content/siteDetails?site="+window.location.origin}
           <br>
-          
+          <input type="checkbox" id="notip" oninput="NoTip()"/> ${this.$t('Data.buzaitishi')}
         `, this.$t('Data.kaiqiFlash'), {
           confirmButtonText: this.$t('Data.queren'),
           cancelButtonText: this.$t('Data.quxiao'),
@@ -61,6 +62,16 @@ export default {
     })
   },
   created() {
+
+    window.NoTip = function() {
+      let checked = document.querySelector("#notip").checked
+      localStorage.flash_tip = !checked
+    }
+
+    if (localStorage.flash_tip == 'false' || !localStorage.flash_tip) {
+      this.flash_tip = false
+    }
+
     console.log(window.btoa('2019-9-23 09:30:09'))
     
     if(!this.$tools.checkFlash().f){
