@@ -82,11 +82,11 @@ export default {
       switch (name){
         case 'exit':
           let code = this.$store.state.session.swLogout()
-          if(code==jSW.RcCode.RC_CODE_E_DISCONNECTED){
-            // this.$store.state.session = undefined
-            // window.location.href = window.location.origin
-            location.reload()
-            // this.$router.push({path:'/login'})
+          if(code==jSW.RcCode.RC_CODE_S_OK){
+              // window.location.reload()
+            this.$router.push({path:'/login'})
+          } else {
+            window.location.reload()
           }
         break
         case 'info':
