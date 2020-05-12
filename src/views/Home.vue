@@ -114,9 +114,7 @@ export default {
       this.$store.state.session.swAddCallBack('logout', (sender, event, json)=>{
         if ('logout' == event) {
           if (json.code == jSW.RcCode.RC_CODE_S_OK) {
-              // this.$store.state.session = undefined
-              window.location.href = window.location.origin
-              // this.$router.push({path:'/login'})
+             // do something
           } else{
             this.$Message.error('Fail, error code: ' + json.code)
           }
