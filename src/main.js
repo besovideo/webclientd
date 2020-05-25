@@ -19,8 +19,9 @@ import lodash from 'lodash'
 
 Vue.prototype.$lodash = lodash
 
-// require('../static/layui-src/src/layui.js')
-// require('../static/layui-src/src/css/layui.css')
+Vue.prototype.$config = window
+
+document.title = window.config_title
 
 
 

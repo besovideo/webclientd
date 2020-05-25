@@ -6,7 +6,8 @@
   <div class="login">
 
     <div class="login-con">
-      <h1 class="login_titile" style="">可视化指挥调度平台SmartEye</h1>
+      <h1 class="login_titile" style=""> {{$config.config_title}}
+  </h1>
       <Card icon="log-in" :bordered="false">
         <p slot="title">
             {{$t('login.login_tip')}}
@@ -67,6 +68,7 @@ export default {
         // url = 'https://112.30.114.240:9443';
         // url = 'https://192.168.8.7:9443'
         // url = 'https://61.191.27.18:9443'
+        // url = 'https://192.168.0.68:9443'
         url = 'https://127.0.0.1:9443'
         // url = 'https://192.168.0.68:9443'
       }
@@ -184,6 +186,7 @@ export default {
     
   },
   created(){
+    console.log(this)
     localStorage.getItem('VideoType')? '': localStorage.setItem('VideoType','auto')
     this.$store.state.VideoType = localStorage.getItem('VideoType')
     this.$store.state.lang = localStorage.getItem('locale')

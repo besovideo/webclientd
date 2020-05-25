@@ -4,7 +4,7 @@
       <Header>
         <Menu mode="horizontal" theme="dark" active-name="1">
           <div class="layout-nav-left">
-            可视指挥调度平台SmartEye
+            {{$config.config_title}}
           </div>
           <div class="layout-nav">
             <MenuItem name="Home" to="/Home"  :style="{'background':this.Name=='Home'?'rgb(30, 87, 163)':''}" >

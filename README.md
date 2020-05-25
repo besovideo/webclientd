@@ -28,6 +28,7 @@ npm install
   static/                  layer 第三方js 引用(资源文件)
   tools/                   封装的翻译工具 (可删)
 
+  config.js                页面里配置文件
 ```
 
 
