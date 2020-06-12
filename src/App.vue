@@ -75,17 +75,17 @@ export default {
     console.log(window.btoa('2019-9-23 09:30:09'))
     
     if(!this.$tools.checkFlash().f){
-      let target = navigator.userAgent.match(/Chrome\/(\d{2})/)
-      if(target==null) {
-        this.$confirm(this.$t('Data.qingshiyongChromeneihe(jisumoshi)fangwengaiwangzhan'), this.$t('Data.tishi'), {
-          confirmButtonText: this.$t('Data.queren'),
-          cancelButtonText: this.$t('Data.quxiao'),
-          type: 'primary',
-          center: true
-        })
-      }else if( target.length > 0){
-        this.openCheckFlash(target[1])
-      }
+      // let target = navigator.userAgent.match(/Chrome\/(\d{2})/)
+      // if(target==null) {
+      //   this.$confirm(this.$t('Data.qingshiyongChromeneihe(jisumoshi)fangwengaiwangzhan'), this.$t('Data.tishi'), {
+      //     confirmButtonText: this.$t('Data.queren'),
+      //     cancelButtonText: this.$t('Data.quxiao'),
+      //     type: 'primary',
+      //     center: true
+      //   })
+      // }else if( target.length > 0){
+      //   this.openCheckFlash(target[1])
+      // }
     }
   },
   destroyed() {
