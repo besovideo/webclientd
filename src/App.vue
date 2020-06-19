@@ -1,5 +1,6 @@
 <template>
   <div id="app" ref="app">
+    <configset/>
     <router-view />
   </div>
 </template>
@@ -7,8 +8,12 @@
 <script>
 import {mapState} from 'vuex'
 import { scrypt } from 'crypto';
+import configset from './components/configset/configset.vue';
 export default {
   name: 'App',
+  components: {
+    configset
+  },
   data(){
     return {
       flash_tip: true 
@@ -62,7 +67,7 @@ export default {
     })
   },
   created() {
-
+    console.log(this.$store)
     window.NoTip = function() {
       let checked = document.querySelector("#notip").checked
       localStorage.flash_tip = !checked

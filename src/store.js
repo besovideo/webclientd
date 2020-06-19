@@ -7,7 +7,9 @@ export default new Vuex.Store({
   state: {
     ip_port: 'http://127.0.0.1:8081',
     session: undefined,
+    ConfigSetDialog: false,
     user: '',
+    MapType: 'tian',
     lang: '',
     VideoType: '',
     ErrorCode: -1,

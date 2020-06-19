@@ -51,8 +51,10 @@
 </template>
 
 <script>
+let BVMap;
 import VideoBox from "../../components/Monitor/VideoBox.vue";
 import { mapState } from "vuex";
+// import { BVMap } from "@/plugins/map";
 export default {
   components: { VideoBox },
   props: ["position", "SchedulingList", "target"],
@@ -93,17 +95,19 @@ export default {
           clearInterval(this.LocateTerms[index].timer);
         }
         if (this.LocateTerms[index].marker) {
-          this.LocateTerms[index].marker._label &&
-            this.map.removeOverLay(this.LocateTerms[index].marker._label);
-          this.LocateTerms[index].marker.closeInfoWindow();
-          this.map.removeOverLay(this.LocateTerms[index].marker);
+          this.LocateTerms[index].marker.infoWindow.close();
+          this.map.remove(this.LocateTerms[index].marker);
         }
 
         if (this.LocateTerms[index].Polyline) {
           this.LocateTerms[index].ShowLocus = false;
-          this.map.removeOverLay(this.LocateTerms[index].Polyline);
+          this.map.remove(this.LocateTerms[index].Polyline);
           this.LocateTerms[index].LocusPath = undefined;
         }
+        // if(this.LocateTerms[index].ShowLocus) {
+        //   this.LocateTerms[index].ShowLocus = false
+        //   this.LocateTerms[index].LocusPath = undefined
+        // }
 
         this.LocateTerms.splice(index, 1);
       } else {
@@ -166,15 +170,12 @@ export default {
           if (index != -1) {
             temp = this.LocateTerms[index];
             if (temp.marker) {
-              // temp.lastGpsData = undefined
-              // temp.marker.setMap(null)
-              this.map.removeOverLay(temp.marker);
-              temp.marker._label && this.map.removeOverLay(temp.marker._label);
-              temp.marker.infoWindow && temp.marker.closeInfoWindow();
+              temp.marker.setMap(null);
+              temp.marker.infoWindow && temp.marker.infoWindow.close();
               temp.marker = undefined;
             }
           }
-
+          // this.session.swGetPuChanel(temp.pu_id, 65536).swClose()
           let gps = this.session.swGetPuChanel(temp.pu_id, 65536);
           if (gps == null) {
             this.$store.state.locateCheckData[pu_id].forEach(setting => {
@@ -197,8 +198,12 @@ export default {
             return;
           }
 
-          this.map.panTo(temp.marker.getLngLat());
-          // this.map.setFitView([temp.marker],false,undefined,this.map.getZoom())
+          this.map.setFitView(
+            [temp.marker],
+            false,
+            undefined,
+            this.map.getZoom()
+          );
 
           temp["timer"] = setInterval(async () => {
             await this.SetMarkerToMap(gps, temp);
@@ -223,8 +228,11 @@ export default {
           let lastGpsData = this.LocateTerms[index].lastGpsData;
           clearInterval(this.LocateTerms[index].timer);
           if (this.LocateTerms[index].marker) {
-            this.LocateTerms[index].marker.closeInfoWindow();
+            this.LocateTerms[index].marker.infoWindow.close();
+            // this.map.remove(this.LocateTerms[index].marker)
+            // this.LocateTerms[index].marker = undefined
           }
+          // this.SetPuInfoLatLon2Marker({pu_id,lastGpsData})
         }
       } else if (tag == "guiji") {
         if (index == -1) {
@@ -245,7 +253,7 @@ export default {
               : []);
         } else {
           temp.ShowLocus = false;
-          temp.Polyline && this.map.removeOverLay(temp.Polyline);
+          temp.Polyline && this.map.remove(temp.Polyline);
           temp.Polyline = undefined;
         }
       }
@@ -257,14 +265,15 @@ export default {
       term.LocusPath.push(term.marker.resLnglat);
 
       if (!term.Polyline) {
-        term.Polyline = new T.Polyline(term.LocusPath, {
-          weight: 5, // 线条宽度，默认为 1
-          // color: this.$tools.getRandomColor(), // 线条颜色
-          color: "#2b64b0" // 线条颜色
+        term.Polyline = BVMap.Polyline({
+          path: term.LocusPath,
+          borderWeight: 2, // 线条宽度，默认为 1
+          strokeColor: this.$tools.getRandomColor(), // 线条颜色
+          lineJoin: "round" // 折线拐点连接处样式
         });
-        this.map.addOverLay(term.Polyline);
+        this.map.add(term.Polyline);
       } else {
-        term.Polyline.setLngLats(term.LocusPath);
+        term.Polyline.setPath(term.LocusPath);
       }
     },
     GetInfoWindowContent(puname, puid, Lnglat) {
@@ -301,92 +310,80 @@ export default {
     SetMarkerToMap(gps, el, success_cb, error_cb) {
       return new Promise((resolve, reject) => {
         let SetMarkerAndInfoWindow = (long, lat) => {
-          var resLnglat = new T.LngLat(long, lat);
-          let marker;
-          if (!el.marker) {
-            let icon = new T.Icon({
-              iconUrl: require("@/assets/images/gps.png"),
-              iconSize: new T.Point(19, 27),
-              iconAnchor: new T.Point(10, 25)
-            });
-            marker = new T.Marker(resLnglat, { icon: icon });
+          BVMap.convertFrom([long, lat], "gps", (status, result) => {
+            if (result.info === "ok") {
+              var resLnglat = result.locations[0];
+              let marker;
+              if (!el.marker) {
+                marker = BVMap.Marker({
+                  position: resLnglat,
+                  icon: require("@/assets/images/gps.png")
+                });
+                let markerContent = document.createElement("div");
+                let markerSpan = document.createElement("span");
+                let markerImg = document.createElement("img");
+                markerImg.className = "markerlnglat";
+                // markerImg.src = "//a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png";
+                markerImg.src = require("@/assets/images/gps.png");
+                markerContent.appendChild(markerImg);
+                markerSpan.className = "marker";
+                markerSpan.innerHTML =
+                  gps._parent._name_pu || gps._parent._id_pu;
+                markerContent.appendChild(markerSpan);
+                marker.setContent(markerContent);
 
-            let label = new T.Label({
-              text: gps._parent._name_pu || gps._parent._id_pu,
-              position: marker.getLngLat(),
-              offset: new T.Point(0, -15)
-            });
-            marker._label = label;
-            this.map.addOverLay(label);
-            this.map.addOverLay(marker);
+                //设备信息
+                let puid = gps._parent._id_pu;
+                let puname = gps._parent._name_pu || gps._parent._id_pu;
+                this.position[2] = gps;
+                var info = this.GetInfoWindowContent(puname, puid, [long, lat]);
 
-            //设备信息
-            let puid = gps._parent._id_pu;
-            let puname = gps._parent._name_pu || gps._parent._id_pu;
-            this.position[2] = gps;
-            var info = this.GetInfoWindowContent(puname, puid, [long, lat]);
+                let infoWindow = BVMap.InfoWindow({
+                  anchor: "top-center",
+                  content: info //使用默认信息窗体框样式，显示信息内容
+                });
 
-            let infoWindow = new T.InfoWindow(info);
-            // infoWindow.setLngLat(resLnglat)
-            // this.map.addOverLay(infoWindow);
-            marker.resLnglat = resLnglat;
-            let infoWindowClose = false;
-            infoWindow.addEventListener("close", () => {
-              infoWindowClose = false;
-            });
-            marker.addEventListener("click", e => {
-              if (!infoWindowClose) {
-                // marker.setzIndex(++this.zindex);
-                marker.openInfoWindow(infoWindow);
-                // infoWindow.open(this.map,marker.resLnglat)
-                infoWindowClose = true;
+                marker.resLnglat = resLnglat;
+                let infoWindowClose = false;
+                infoWindow.on("close", () => {
+                  infoWindowClose = false;
+                });
+                marker.on("click", e => {
+                  if (!infoWindowClose) {
+                    marker.setzIndex(++this.zindex);
+                    infoWindow.open(this.map.getMap(), marker.resLnglat);
+                    infoWindowClose = true;
+                  }
+                });
+
+                if (el.openInfo) {
+                  infoWindow.open(this.map.getMap(), resLnglat);
+                  infoWindowClose = true;
+                }
+
+                el.marker = marker;
+                marker.infoWindow = infoWindow;
+
+                this.map.add(marker);
+
+                // 为了双击设备后居中回调
+                resolve(true);
+              } else {
+                el.marker.resLnglat = resLnglat;
+                el.marker.setPosition(resLnglat);
+                let puid = gps._parent._id_pu;
+                let puname = gps._parent._name_pu || gps._parent._id_pu;
+                el.marker.infoWindow.setContent(
+                  this.GetInfoWindowContent(puname, puid, [long, lat])
+                );
+                el.marker.infoWindow.setPosition(resLnglat);
+                resolve(true);
               }
-            });
-
-            if (el.openInfo) {
-              marker.openInfoWindow(infoWindow);
-              infoWindowClose = true;
+              if (el.ShowLocus) {
+                this.ShowLocus2Map(el);
+              }
             }
-
-            el.marker = marker;
-            marker.infoWindow = infoWindow;
-
-            // 为了双击设备后居中回调
-            resolve(true);
-          } else {
-            if (resLnglat.equals(el.marker.getLngLat())) {
-              resolve(true);
-              return;
-            }
-            let isopen = el.marker.infoWindow.isOpen();
-            if (isopen) {
-              el.marker.infoWindow.closeInfoWindow();
-            }
-            el.marker.resLnglat = resLnglat;
-            el.marker._label && el.marker._label.setLngLat(resLnglat);
-            let puid = gps._parent._id_pu;
-            let puname = gps._parent._name_pu || gps._parent._id_pu;
-
-            // el.marker.infoWindow.setLngLat.call(el.marker.infoWindow,resLnglat)
-            el.marker.infoWindow.setContent.call(
-              el.marker.infoWindow,
-              this.GetInfoWindowContent(puname, puid, [long, lat])
-            );
-
-            console.log("setLnglat ", resLnglat);
-            el.marker.setLngLat.call(el.marker, resLnglat);
-
-            if (isopen) {
-              el.marker.openInfoWindow.call(el.marker, el.marker.infoWindow);
-            }
-
-            if (el.marker) resolve(true);
-          }
-          if (el.ShowLocus) {
-            this.ShowLocus2Map(el);
-          }
-
-          // })
+          });
         };
         if (!el.lastGpsData) {
           el.lastGpsData = {
@@ -394,7 +391,6 @@ export default {
             data: []
           };
           el.lastGpsData.state[0] = this.$store.state.ErrorCode = gps.swOpen({
-            tag: gps,
             callback: (options, response) => {
               el.lastGpsData.state[1] = response.emms.code;
               if (response.emms.code != 0) {
@@ -501,7 +497,7 @@ export default {
       // })
     },
     SetSchedulingMap() {
-      this.map.clearOverLays();
+      this.map.clearMap();
       this.SchedulingList.forEach(el => {
         el.marker = undefined;
       });
@@ -527,82 +523,67 @@ export default {
               }
               // this.ChannelContent = true;
               // this.position = [long, lat,this.openChannel];
+              BVMap.convertFrom([long, lat], "gps", (status, result) => {
+                if (result.info === "ok") {
+                  var resLnglat = result.locations[0];
+                  let marker;
+                  if (!el.marker) {
+                    marker = BVMap.Marker({
+                      position: resLnglat,
+                      icon: require("@/assets/images/gps.png")
+                    });
+                    let markerContent = document.createElement("div");
+                    let markerSpan = document.createElement("span");
+                    let markerImg = document.createElement("img");
+                    markerImg.className = "markerlnglat";
+                    // markerImg.src = "//a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png";
+                    markerImg.src = require("@/assets/images/gps.png");
+                    markerContent.appendChild(markerImg);
+                    markerSpan.className = "marker";
+                    markerSpan.innerHTML =
+                      el._parent._name_pu || el._parent._id_pu;
+                    markerContent.appendChild(markerSpan);
+                    marker.setContent(markerContent);
 
-              var resLnglat = new T.LngLat(long, lat);
-              let marker;
-              if (!el.marker) {
-                let icon = new T.Icon({
-                  iconUrl: require("@/assets/images/gps.png"),
-                  iconSize: new T.Point(19, 27),
-                  iconAnchor: new T.Point(10, 25)
-                });
-                marker = new T.Marker(resLnglat, { icon: icon });
+                    //设备信息
+                    let puid = el._parent._id_pu;
+                    let puname = el._parent._name_pu || el._parent._id_pu;
+                    this.position[2] = el;
 
-                let label = new T.Label({
-                  text: el._parent._name_pu || el._parent._id_pu,
-                  position: marker.getLngLat(),
-                  offset: new T.Point(0, -15)
-                });
-                marker._label = label;
-                this.map.addOverLay(label);
-                this.map.addOverLay(marker);
+                    var info = this.GetInfoWindowContent(puname, puid, [
+                      long,
+                      lat
+                    ]);
 
-                //设备信息
-                let puid = gps._parent._id_pu;
-                let puname = el._parent._name_pu || el._parent._id_pu;
-                this.position[2] = gps;
-                var info = this.GetInfoWindowContent(puname, puid, [long, lat]);
+                    let infoWindow = BVMap.InfoWindow({
+                      anchor: "top-center",
+                      content: info //使用默认信息窗体框样式，显示信息内容
+                    });
 
-                let infoWindow = new T.InfoWindow(info);
+                    let infoWindowClose = false;
+                    infoWindow.on("close", () => {
+                      infoWindowClose = false;
+                    });
+                    marker.resLnglat = resLnglat;
+                    marker.on("click", e => {
+                      if (!infoWindowClose) {
+                        // infoWindow.open(this.map, marker.resLnglat);
+                        infoWindow.open(this.map.getMap(), marker.resLnglat);
+                        infoWindowClose = true;
+                      }
+                    });
 
-                this.position[2] = el;
-
-                let infoWindowClose = false;
-                infoWindow.addEventListener("close", () => {
-                  infoWindowClose = false;
-                });
-                marker.resLnglat = resLnglat;
-                marker.addEventListener("click", e => {
-                  if (!infoWindowClose) {
-                    // infoWindow.open(this.map, marker.resLnglat);
-                    marker.openInfoWindow(infoWindow);
-                    // infoWindow.open(this.map, marker.resLnglat);
-                    infoWindowClose = true;
+                    el.marker = marker;
+                    el.marker.infoWindow = infoWindow;
+                    this.map.add(marker);
+                  } else {
+                    el.marker.setPosition(resLnglat);
+                    el.marker.infoWindow.setPosition(resLnglat);
+                    el.marker.resLnglat = resLnglat;
                   }
-                });
-
-                el.marker = marker;
-                el.marker.infoWindow = infoWindow;
-                this.map.addOverLay(marker);
-              } else {
-                if (resLnglat.equals(el.marker.getLngLat())) {
-                  resolve(true);
-                  return;
+                  // this.map.setFitView();
                 }
-                let isopen = el.marker.infoWindow.isOpen();
-                if (isopen) {
-                  el.marker.infoWindow.closeInfoWindow();
-                }
-                el.marker._label && el.marker._label.setLngLat(resLnglat);
-                let puid = el._parent._id_pu;
-                let puname = el._parent._name_pu || el._parent._id_pu;
-                el.marker.infoWindow.setContent.call(
-                  el.marker.infoWindow,
-                  this.GetInfoWindowContent(puname, puid, [long, lat])
-                );
-
-                el.marker.setLngLat(resLnglat);
-                // el.marker.setPosition(resLnglat);
-                // el.marker.infoWindow.setPosition(resLnglat)
-                el.marker.resLnglat = resLnglat;
-                if (isopen) {
-                  el.marker.openInfoWindow.call(
-                    el.marker,
-                    el.marker.infoWindow
-                  );
-                }
-              }
-              // this.map.setFitView();
+              });
             }
           });
         });
@@ -735,7 +716,7 @@ export default {
         //   return
         // }
         const result = await this.SetMarkerToMap(gps, temp);
-
+        debugger;
         if (!result) {
           this.$Message.error(
             this.session.swGetPu(puid)["_name_pu"] +
@@ -746,7 +727,12 @@ export default {
           return;
         }
 
-        this.map.panTo(temp.marker.getLngLat());
+        this.map.setFitView(
+          [temp.marker],
+          false,
+          undefined,
+          this.map.getZoom()
+        );
 
         this.LocateTerms.push(temp);
         return;
@@ -755,17 +741,21 @@ export default {
       for (var i = 0; i < this.LocateTerms.length; i++) {
         if (this.LocateTerms[i].marker) {
           if (this.LocateTerms[i].marker.infoWindow) {
-            this.LocateTerms[i].marker.closeInfoWindow();
-            // this.LocateTerms[i].marker.infoWindow.close()
+            this.LocateTerms[i].marker.infoWindow.close();
           }
         }
       }
 
       if (this.LocateTerms[index].marker) {
-        this.map.panTo(this.LocateTerms[index].marker.getLngLat());
-        // this.LocateTerms[index].marker.infoWindow.open(this.map,this.LocateTerms[index].marker.resLnglat)
-        this.LocateTerms[index].marker.openInfoWindow(
-          this.LocateTerms[index].marker.infoWindow
+        this.map.setFitView(
+          [this.LocateTerms[index].marker],
+          false,
+          undefined,
+          this.map.getZoom()
+        );
+        this.LocateTerms[index].marker.infoWindow.open(
+          this.map.getMap,
+          this.LocateTerms[index].marker.resLnglat
         );
       }
     },
@@ -774,88 +764,106 @@ export default {
         this.SetMap();
         return;
       }
-      // AMap.convertFrom(options.position, "gps", (status, result) => {
-      //   if (result.info === "ok") {
-      var resLnglat = new T.LngLat(options.position[0], options.position[1]);
-      let marker = new T.Marker(resLnglat);
-      let icon = new T.Icon({
-        iconUrl: require("@/assets/images/gps.png"),
-        iconSize: new T.Point(19, 27),
-        iconAnchor: new T.Point(10, 25)
-      });
-      marker = new T.Marker(resLnglat, { icon: icon });
+      BVMap.convertFrom(options.position, "gps", (status, result) => {
+        if (result.info === "ok") {
+          var resLnglat = result.locations[0];
+          let marker = BVMap.Marker({
+            position: resLnglat,
+            icon: require("@/assets/images/gps.png")
+          });
 
-      let label = new T.Label({
-        text: options.pu_name || options.pu_id,
-        position: marker.getLngLat(),
-        offset: new T.Point(0, -15)
-      });
-      marker._label = label;
-      this.map.addOverLay(label);
-      this.map.addOverLay(marker);
-      //this.map.setFitView();
-      // this.map.setZoom(15);
-      this.loading = false;
+          // this.map.clearMap();
 
-      //设备信息
-      let puid, puname;
-      if (options) {
-        puid = options.pu_id;
-        puname = options.pu_name || options.pu_id;
-      } else {
-        let channel = this.position[2];
-        puid = channel._parent._id_pu;
-        puname = channel._parent._name_pu || channel._parent._id_pu;
-      }
+          let markerContent = document.createElement("div");
+          let markerSpan = document.createElement("span");
+          let markerImg = document.createElement("img");
+          markerImg.className = "markerlnglat";
+          // markerImg.src = "//a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png";
+          markerImg.src = require("@/assets/images/gps.png");
+          markerContent.appendChild(markerImg);
+          markerSpan.className = "marker";
+          markerSpan.innerHTML = options.pu_name || options.pu_id;
+          markerContent.appendChild(markerSpan);
+          marker.setContent(markerContent);
 
-      var info = this.GetInfoWindowContent(puname, puid, [
-        options.position[0],
-        options.position[1]
-      ]);
+          this.map.add(marker);
+          //this.map.setFitView();
+          // this.map.setZoom(15);
+          this.loading = false;
 
-      let infoWindow = new T.InfoWindow(info);
-      marker.resLnglat = resLnglat;
-      let infoWindowClose = false;
-      infoWindow.addEventListener("close", () => {
-        infoWindowClose = true;
-      });
-      marker.infoWindow = infoWindow;
-      if (options) {
-        if (options.openInfo) {
-          marker.openInfoWindow(infoWindow);
-          // infoWindow.open(this.map, resLnglat);
-        } else {
-          infoWindowClose = true;
+          //设备信息
+          let puid, puname;
+          if (options) {
+            puid = options.pu_id;
+            puname = options.pu_name || options.pu_id;
+          } else {
+            let channel = this.position[2];
+            puid = channel._parent._id_pu;
+            puname = channel._parent._name_pu || channel._parent._id_pu;
+          }
+
+          var info = this.GetInfoWindowContent(puname, puid, [
+            options.position[0],
+            options.position[1]
+          ]);
+
+          let infoWindow = BVMap.InfoWindow({
+            anchor: "top-center",
+            content: info //使用默认信息窗体框样式，显示信息内容
+          });
+          marker.resLnglat = resLnglat;
+          let infoWindowClose = false;
+          infoWindow.on("close", () => {
+            infoWindowClose = true;
+          });
+          marker.infoWindow = infoWindow;
+          if (options) {
+            if (options.openInfo) {
+              infoWindow.open(this.map.getMap(), resLnglat);
+            } else {
+              infoWindowClose = true;
+            }
+          } else {
+            infoWindow.open(this.map.getMap(), resLnglat);
+          }
+          marker.on("click", e => {
+            if (infoWindowClose) {
+              // infoWindow.open(this.map, e.lnglat);
+              // if(marker.resLnglat){
+              // infoWindow.setPosition(marker.resLnglat)
+              // }else{
+              infoWindow.open(this.map.getMap(), resLnglat);
+              // }
+              marker.setzIndex(++this.zindex);
+              infoWindowClose = false;
+            }
+          });
+          el.marker = marker;
         }
-      } else {
-        marker.openInfoWindow(infoWindow);
-      }
-      marker.addEventListener("click", e => {
-        if (infoWindowClose) {
-          // marker.setzIndex(++this.zindex);
-          marker.openInfoWindow(infoWindow);
-          // infoWindow.open(this.map,marker.resLnglat)
-          // marker.setzIndex(++this.zindex);
-
-          infoWindowClose = false;
-        }
       });
-
-      el.marker = marker;
-      //   }
-      // });
     },
     SetMap() {
+      // this.loading = true;
+      // if(this.isFirst){
+      //   this.map = new AMap.Map('container', {
+      //     resizeEnable: true
+      //   })
+      //   this.isFirst = false
+      //   this.loading = false
+      //   return
+      // }
       if (!this.map) {
-        this.map = new T.Map("_container", {
-          projection: "EPSG:4326"
+        this.map = new BVMap("_container", {
+          resizeEnable: true,
+          isHotspot: false,
+          zoom: 13,
+          zooms: [3, 22]
         });
-        this.map.centerAndZoom(new T.LngLat(116.40769, 39.89945), 13);
-        console.log(this.map);
+        console.log("this.map === ", this.map);
         this.loading = false;
 
         this.map.on("complete", () => {
-          // this.SetUi();
+          this.SetUi();
           this.loading = false;
           console.log("doJobs");
 
@@ -864,40 +872,52 @@ export default {
           });
         });
       }
-    },
-    loadScript(key = "b8c1489d4fa591bb6e3c322be75f66cf") {
-      return new Promise(function(resolve, reject) {
-        if (document.querySelector("#Map")) {
-          resolve(T);
-          return;
-        }
-        let script = document.createElement("script");
-        script.type = "text/javascript";
-        script.id = "Map";
-        script.src = "//api.tianditu.gov.cn/api?v=4.0&tk=" + key;
-        script.onload = () => {
-          console.log("天地图-------onload", T);
-          resolve(T);
-        };
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
+      // else {
+      //   this.SetMarker();
+      // }
     }
   },
   mounted() {
-    this.loadScript()
-      .then(data => {
-        this.SetMap();
-      })
-      .catch(err => {
-        console.error("地图加载失败： ", err);
-      });
+    import(`@/plugins/map/${this.$store.state.MapType}.js`).then(
+      ({ BVMap: bvmap, loadScript }) => {
+        BVMap = bvmap;
+        loadScript()
+          .then(data => {
+            BVMap.Init(data);
+            this.SetMap();
+          })
+          .catch(err => {
+            console.error("地图加载失败： ", err);
+          });
+      }
+    );
   },
   created() {
     console.log("created");
     this.loading = true;
+    // this.MP("2d7458fc3ae350eb4b0b40bd82cc3f94").then(data => {
+    //   console.log(data);
+    //   this.SetMap();
+    // });
     window.MapOpenVideo = this.Open;
     window.MapOpenSpeak = this.OpenSpeakDialog;
+    // AMap.plugin("AMap.Geolocation", function() {
+    //   var geolocation = new AMap.Geolocation({
+    //     enableHighAccuracy: true, //是否使用高精度定位，默认:true
+    //     timeout: 10000, //超过10秒后停止定位，默认：5s
+    //     buttonPosition: "RB", //定位按钮的停靠位置
+    //     buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+    //     zoomToAccuracy: true //定位成功后是否自动调整地图视野到定位点
+    //   });
+    //   map.addControl(geolocation);
+    //   geolocation.getCurrentPosition(function(status, result) {
+    //     if (status == "complete") {
+
+    //     } else {
+
+    //     }
+    //   });
+    // });
   },
   destroyed() {
     if (undefined != this.IntervalGetGpsID) {
@@ -910,7 +930,7 @@ export default {
     if (this.StartMode) {
       this._OpenSpeak(false);
     }
-    this.map.destroy && this.map.destroy();
+    this.map.destroy();
   }
 };
 </script>
