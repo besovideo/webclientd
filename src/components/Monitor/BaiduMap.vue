@@ -331,7 +331,7 @@ export default {
                         gps._parent._name_pu || gps._parent._id_pu;
                       this.position[2] = gps
                       var info = this.GetInfoWindowContent(puname,puid,[long, lat]);
-
+                      
                       let infoWindow = new AMap.InfoWindow({
                         anchor: "top-center",
                         content: info //使用默认信息窗体框样式，显示信息内容
