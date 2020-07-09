@@ -5,7 +5,7 @@ var path = require('path')
 var process = require('process')
 const { exec } = require('child_process')
 
-let FilePath = path.resolve('public/lang/data_backup.json')
+let FilePath = path.resolve('public/lang/data.json')
 let data 
 eval('data = ' + fs.readFileSync(FilePath).toString())
 // console.log(data)

@@ -672,17 +672,21 @@ export default {
       // }
 
       // im.vm = im.$mount('#IMParent')
-
-      layui.use(["layim"], layim => {
-        //先来个客服模式压压精
-        layim.chat({
-          name: data.label,
-          type: "group", //群组类型
-          avatar: "http://tp2.sinaimg.cn/5488749285/50/5719808192/1",
-          id: data.id, //定义唯一的id方便你处理信息
-          members: 123 //成员数，不好获取的话，可以设置为0
+        layui.use(["layim"], layim => {
+          try {
+            layim.chat({
+              name: data.label,
+              type: "group", //群组类型
+              avatar: "http://tp2.sinaimg.cn/5488749285/50/5719808192/1",
+              id: data.id, //定义唯一的id方便你处理信息
+              members: 123 //成员数，不好获取的话，可以设置为0
+            });
+          } catch {
+            console.log("error==============")
+          }
         });
-      });
+     
+      
     },
     TermSearch(val, page) {},
     HandleChannelClick(data, node,el) {
@@ -888,6 +892,13 @@ export default {
         case this.imsgtypes.FILE:
           _data += "file(" + receivedata[0].stFile.szFile + ")["+receivedata[0].stFile.szSrcFile.split('/').splice(-1)[0]+"]"
           break
+        case this.imsgtypes.GPS:
+          let stGpsData = receivedata[0].stGpsData
+          _data = `lat: ${stGpsData.lat / 10000000}  lng: ${stGpsData.long / 10000000} [${this.$t('Data.zanbuzhichigaileixingxiaoxi')}]`
+          break
+        default:
+          _data = `[${this.$t('Data.zanbuzhichigaileixingxiaoxi')}]`
+          return
       }
       this.layim.getMessage({
         // username: this.$t('Data.weizhi'), //消息来源用户名
@@ -1084,7 +1095,14 @@ export default {
   },
 
   created() {
-    
+    var cache =  layui.layim.cache();
+    var local = layui.data('layim')[cache.mine.id]; //获取当前用户本地数据
+    delete local.chatlog;
+    layui.data('layim', {
+      key: cache.mine.id
+      ,value: local
+    });
+
     this.jSW = window.jSW
     console.log("SchedulingTreeList,created");
     console.log(this.Personexit);
@@ -1170,6 +1188,7 @@ export default {
     
   },
   destroyed() {
+    
     $(".layui-layim-min").remove()
     $(".layui-layim").remove()
     $(".layui-layim-chat").remove()

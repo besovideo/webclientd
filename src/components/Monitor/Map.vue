@@ -867,7 +867,8 @@ export default {
     if (this.StartMode) {
       this._OpenSpeak(false);
     }
-    this.map.destroy && this.map.destroy();
+    BVMap.destroy()
+    // this.map.destroy && this.map.destroy();
   }
 };
 </script>

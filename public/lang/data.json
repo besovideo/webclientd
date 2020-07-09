@@ -231,7 +231,8 @@
       "mimabunengweikong": "密码不能为空",
       "weizhihuoqushibai": "位置获取失败",
       "buzaitishi": "不再提示",
-      "wuyinpinfasonghuojieshoutongdao": "无音频发送或接收通道"
+      "wuyinpinfasonghuojieshoutongdao": "无音频发送或接收通道",
+      "zanbuzhichigaileixingxiaoxi": "暂不支持该类型消息"
     }
   },
   "en": {
@@ -462,7 +463,8 @@
       "mimabunengweikong": "Password cannot be empty",
       "weizhihuoqushibai": "Location for failure",
       "buzaitishi": "No longer prompt",
-      "wuyinpinfasonghuojieshoutongdao": "No audio sending or receiving channel"
+      "wuyinpinfasonghuojieshoutongdao": "No audio sending or receiving channel",
+      "zanbuzhichigaileixingxiaoxi": "Temporary does not support this type of message"
     }
   },
   "korean": {
