@@ -831,14 +831,18 @@ export default {
       // });
     },
     async SetMap() {
+      if(this.loading) {
+        return
+      }
       if (!this.map) {
+        this.loading = true;
         this.map = await BVMap.Init("_container", {
           projection: "EPSG:4326"
         });
         this.loading = false;
         console.log(this.map);
         console.log("doJobs");
-
+  
         this.complete_job.forEach(item => {
           item();
         });
@@ -852,7 +856,6 @@ export default {
   },
   created() {
     console.log("created");
-    this.loading = true;
     window.MapOpenVideo = this.Open;
     window.MapOpenSpeak = this.OpenSpeakDialog;
   },
