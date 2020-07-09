@@ -10,36 +10,14 @@
   
   
   <% if(NODE_ENV == 'development'){ %>
-    <script type="text/javascript">
-      dojoConfig = {
-        parseOnLoad: true,
-        packages: [{
-          name: 'tdlib',
-          location: "http://127.0.0.1:8081/arcgis/tdlib"
-        }]
-      };
-    </script>
   <!-- <script src="https://115.28.79.237:9443/js/jsw.js"></script> -->
   <!-- <script src="https://192.168.0.67:9443/js/jsw.js"></script> -->
   <!-- <script src="http://127.0.0.1:8081/js/jsw.js"></script> -->
   <!-- <script src="http://127.0.0.1:8081/js/jsw.js"></script> -->
   <script src="https://127.0.0.1:9443/js/jsw.js"></script>
   <!-- <script src="http://120.79.160.104:8081/js/jsw.js"></script> -->
-  <script src="http://127.0.0.1:8081/arcgis/arcgis_config.js"></script>
-  <script src="http://127.0.0.1:8081/arcgis/load_layer.js"></script>
   <% } else { %>
-    <script type="text/javascript">
-      dojoConfig = {
-        parseOnLoad: true,
-        packages: [{
-          name: 'tdlib',
-          location: "/arcgis/tdlib"
-        }]
-      };
-    </script>
   <script src="/js/jsw.js"></script>
-  <script src="/arcgis/arcgis_config.js"></script>
-  <script src="/arcgis/load_layer.js"></script>
   <% } %>
   <script src="config.js"></script>
   <!--     
