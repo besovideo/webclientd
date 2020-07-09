@@ -1095,6 +1095,8 @@ export default {
   },
 
   created() {
+
+    //  清楚数据
     var cache =  layui.layim.cache();
     var local = layui.data('layim')[cache.mine.id]; //获取当前用户本地数据
     delete local.chatlog;
