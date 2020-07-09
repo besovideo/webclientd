@@ -31,6 +31,7 @@
     "@vue/cli-service": "^3.7.0",
     "@vue/eslint-config-standard": "^4.0.0",
     "@xunlei/vue-context-menu": "^1.0.2",
+    "axios": "^0.19.2",
     "babel-eslint": "^10.0.1",
     "copy-webpack-plugin": "^5.0.4",
     "css-loader": "^3.2.0",
@@ -40,6 +41,8 @@
     "less": "^3.0.4",
     "less-loader": "^5.0.0",
     "rightmenu": "^1.1.0",
+    "ts-loader": "^7.0.5",
+    "typescript": "^3.9.5",
     "vue-cli-plugin-iview": "^1.0.6",
     "vue-loader": "^15.7.1",
     "vue-template-compiler": "^2.6.10"

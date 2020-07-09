@@ -1,10 +1,9 @@
-{ 
-  "type": 
-    {
-      "zh": "中文",
-      "en": "English"
-    }
-  ,
+{
+  "type": {
+    "zh": "中文",
+    "en": "English",
+    "korean": "한국인"
+  },
   "zh": {
     "SetPort": "设置端口",
     "Server": "服务器",
@@ -231,7 +230,8 @@
       "jiumima": "旧密码",
       "mimabunengweikong": "密码不能为空",
       "weizhihuoqushibai": "位置获取失败",
-      "buzaitishi": "不再提示"
+      "buzaitishi": "不再提示",
+      "wuyinpinfasonghuojieshoutongdao": "无音频发送或接收通道"
     }
   },
   "en": {
@@ -461,7 +461,73 @@
       "jiumima": "The old password",
       "mimabunengweikong": "Password cannot be empty",
       "weizhihuoqushibai": "Location for failure",
-      "buzaitishi": "No longer prompt"
+      "buzaitishi": "No longer prompt",
+      "wuyinpinfasonghuojieshoutongdao": "No audio sending or receiving channel"
+    }
+  },
+  "korean": {
+    "login": {
+      "login": "로그인",
+      "login_tip": "로그인팁",
+      "plzuser": "ID를입력해주세요",
+      "plzpasswd": "비밀번호를 입력해주세요.",
+      "error_nouser": "존재하지 않는 ID입니다.",
+      "error_nopasswd": "비밀번호가 올바르자 않습니다.",
+      "error_noserver": "서버가 존재하지 않습니다.",
+      "error_nopport": "포트가 잘못되었습니다."
+    },
+    "lang": "Language",
+    "lang_zh": "한글",
+    "lang_en": "English",
+    "tab": {
+      "Home": "홈",
+      "monitor": "모니터링",
+      "inquiry": "문의",
+      "Configuration": "구성",
+      "Personal": {
+        "Basic_Info": "기본정보",
+        "change_Password": "비밀번호 변경",
+        "exit": "로그아웃"
+      }
+    },
+    "home": {
+      "more": "더보기",
+      "online": "온라인",
+      "Online_rate_statistics": "온라인현황",
+      "LivePreview": "Live-View",
+      "LivePreview_tip": "Live-View tip",
+      "Video_playback": "영상 재생",
+      "Video_playback_tip": "이전영상 다운로드",
+      "location": "위치",
+      "location_tip": "실시간 위치정보",
+      "Track_playback": "트래킹 플레이",
+      "Track_playback_tip": "이동기록 재생",
+      "Picture_monitor": "사진모니터링",
+      "Picture_monitor_tip": "장치사진모니터링",
+      "Locate": "위치",
+      "Scheduling": "계획"
+    },
+    "Monitor": {
+      "Showonlyonlinedevices": "온라인장치보기",
+      "Server": "서버",
+      "Meeting": "회의목록",
+      "Server_Port": "포트",
+      "channel": "채널",
+      "noTerm": "장치를 찾을 수 없습니다.",
+      "Term": "장치",
+      "noGPSChannel": "GPS채널이없습니다.",
+      "GPSLocationError": "GPS위치에러",
+      "isopenchannel": "영상채널이 켜져있습니다.",
+      "otheropenfail": "영상을 열지 못했습니다.",
+      "channelopenerror": "채널열기실패",
+      "otheropenfail_rtmp": "영상을 열지 못했습니다. RTMP기능을 켜세요",
+      "plaseselectterm": "장치를 선택하십시오",
+      "Pleasecloseavideowindowfirst": "먼저 비디오 창을 닫으십시오",
+      "LiveVideo": "실시간영상",
+      "LivePhoto": "실시간사진",
+      "Intercom": "인터콤",
+      "Type": "유형",
+      "Position": "위치"
     }
   }
 }

@@ -18,8 +18,8 @@
               <Icon type="ios-arrow-down"></Icon>
           </a>
           <DropdownMenu slot="list">
-              <DropdownItem name='zh'>{{$t('lang_zh')}}</DropdownItem>
-              <DropdownItem name='en'>{{$t('lang_en')}}</DropdownItem>
+              <DropdownItem v-for="(item,name) in langData.type" :name='name' :key="name">{{item}}</DropdownItem>
+              <!-- <DropdownItem name='en'>{{$t('lang_en')}}</DropdownItem> -->
           </DropdownMenu>
         </Dropdown>
         <div class="form-con">
@@ -41,7 +41,8 @@ export default {
       Server:'',
       Server_Port:'', 
       userName:'', 
-      password:''
+      password:'',
+      langData: window.langData
     }
   },
   components: {

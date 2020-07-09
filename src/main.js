@@ -12,10 +12,11 @@ import 'font-awesome/css/font-awesome.css'
 import tools from './plugins/tools.js'
 import VueI18n from 'vue-i18n'
 import rightMenu from 'rightMenu'
-import data from './plugins/data.json'
-import messages from './plugins/messages.js'
+// import data from './plugins/data.json'
+// import messages from './plugins/messages.js'
 import '@/components/Monitor/TreeList.less'
 import lodash from 'lodash'
+import './plugins/lang.js'
 
 Vue.prototype.$lodash = lodash
 
@@ -31,12 +32,13 @@ Vue.use(VueI18n)
 Vue.use(ElementUI)
 
 
-Object.assign(messages.zh, data.zh)
-Object.assign(messages.en, data.en)
+// Object.assign(messages.zh, data.zh)
+// Object.assign(messages.en, data.en)
+
 store.state.lang = localStorage.getItem('locale') || 'zh'
 const i18n = new VueI18n({
   locale: store.state.lang,
-  messages: messages
+  messages: langData
 })
 
 Vue.prototype.$tools = tools

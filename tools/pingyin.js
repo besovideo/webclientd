@@ -5,7 +5,7 @@ var path = require('path')
 var process = require('process')
 const { exec } = require('child_process')
 
-let FilePath = path.resolve('src/plugins/data.json')
+let FilePath = path.resolve('public/lang/data_backup.json')
 let data 
 eval('data = ' + fs.readFileSync(FilePath).toString())
 // console.log(data)
@@ -29,7 +29,7 @@ function saveData () {
 function Fangyi (str, target) {
   let code = pinyin(str, { style: pinyin.STYLE_NORMAL }).join('')
   console.log('code: ', code)
-  GetGoogle(str).then(body => {
+  GetYoudao(str).then(body => {
     body = JSON.parse(body)
     if (body.errorCode == 0) {
       let en = body.translateResult[0][0].tgt
@@ -92,7 +92,7 @@ function Fangyi (str, target) {
 // let num = tool.getTk('%E6%9C%8D%E5%8A%A1%E5%99%A8')
 // console.log(num)
 
-function GetGoogle (str) {
+function GetYoudao (str) {
   return new Promise((resolve, reject) => {
     let url = `http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i=${encodeURIComponent(str)}`
     // let url = `http://www.baidu.com`

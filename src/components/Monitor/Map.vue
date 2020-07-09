@@ -249,7 +249,7 @@ export default {
               : []);
         } else {
           temp.ShowLocus = false;
-          temp.Polyline && this.map.removeOverLay(temp.Polyline);
+          temp.Polyline && BVMap.removeOverLay(temp.Polyline);
           temp.Polyline = undefined;
         }
       }
@@ -607,8 +607,26 @@ export default {
         this.OpenSpeak();
       }
     },
+    FindEnableChannel() {
+      let puInfo = this.session.swGetPu(this.puid)
+      let arrChannel = puInfo._arr_channel
+
+      for(let index in arrChannel) {
+        let channel = arrChannel[index]
+
+        if( (channel._info_chanel.media & 12) == 12) {
+          return index
+        }
+      }
+      return -1
+    },
     _OpenSpeak(on_off) {
-      let channel = this.session.swGetPuChanel(this.puid, 0);
+      let channelNo = this.FindEnableChannel()
+      if (channelNo === -1) {
+        this.$Message.error(this.$t('Data.wuyinpinfasonghuojieshoutongdao'))
+      }
+      let channel = this.session.swGetPuChanel(this.puid, channelNo);
+
       if (on_off) {
         var result = channel.swOpenIntercom({
           isSendAudio: true,
@@ -676,7 +694,9 @@ export default {
     },
     async ShowOneMarker(puid) {
       let index = this.LocateTerms.findIndex(el => el.pu_id == puid);
+      
       if (index === -1) {
+        
         let temp = { pu_id: puid, openInfo: true };
         let gps = this.session.swGetPuChanel(temp.pu_id, 65536);
         if (!gps) {
@@ -724,6 +744,17 @@ export default {
         // this.LocateTerms[index].marker.openInfoWindow(
         //   this.LocateTerms[index].marker.infoWindow
         // );
+      } else {
+          let el = this.LocateTerms[index]
+         this.SetMarker(
+          {
+            position: [el.pu_info.long / 10000000, el.pu_info.lat / 10000000],
+            pu_id: el.pu_info.id,
+            pu_name: el.pu_info.name,
+            openInfo: true
+          },
+          el
+        );
       }
     },
     async SetMarker(options, el) {
