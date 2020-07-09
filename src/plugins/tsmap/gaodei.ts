@@ -171,7 +171,7 @@ export default class BVMap implements BvMap {
     this.map.destroy && this.map.destroy()
   }
   clearOverLays(): void {
-    this.map.clearMap && this.map.clearOverLays()
+    this.map.clearMap && this.map.clearMap()
   }
   
 }
