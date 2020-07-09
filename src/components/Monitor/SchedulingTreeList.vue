@@ -1095,15 +1095,17 @@ export default {
   },
 
   created() {
-
+    layui.use(["layim"],layim=>{
+      var cache =  layui.layim.cache();
+      var local = layui.data('layim')["100000"]; //获取当前用户本地数据
+      delete local.chatlog;
+      layui.data('layim', {
+        key: "100000"
+        ,value: local
+      });
+    })
     //  清楚数据
-    var cache =  layui.layim.cache();
-    var local = layui.data('layim')[cache.mine.id]; //获取当前用户本地数据
-    delete local.chatlog;
-    layui.data('layim', {
-      key: cache.mine.id
-      ,value: local
-    });
+    
 
     this.jSW = window.jSW
     console.log("SchedulingTreeList,created");
