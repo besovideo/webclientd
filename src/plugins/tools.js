@@ -108,6 +108,17 @@ export default {
     // let dateStr = year+'-'+mon+'-'+day+' '+noon +' '+hour+':'+min;
     let dateStr = year + '-' + mon + '-' + day + ' ' + hour + ':' + min
     return dateStr
+  },
+  getQueryVariable(variable) {
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i = 0; i < vars.length; i++) {
+      var pair = vars[i].split("=");
+      if (pair[0] == variable) {
+        return pair[1];
+      }
+    }
+    return false;
   }
   // getCookie: (name, defaultValue) => {
   //   let reg = new RegExp('(^| )' + name + '=([^;]*)(;|$)')

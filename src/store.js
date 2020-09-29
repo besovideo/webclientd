@@ -7,6 +7,7 @@ export default new Vuex.Store({
   state: {
     ip_port: 'http://127.0.0.1:8081',
     session: undefined,
+    AutoLogin: undefined,
     ConfigSetDialog: false,
     user: '',
     MapType: 'tian',
@@ -17,6 +18,7 @@ export default new Vuex.Store({
     notify_term: undefined,
     notifyTip: {},
     UserManageInit: false,
+    fullscreenLoading: false,
     locateCheckData: {}
   },
   mutations: {

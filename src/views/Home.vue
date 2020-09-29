@@ -83,7 +83,9 @@ export default {
         case 'exit':
           let code = this.$store.state.session.swLogout()
           if(code==jSW.RcCode.RC_CODE_S_OK){
-              // window.location.reload()
+            // window.location.reload()
+            window.localStorage.login_info = ""
+
             this.$router.push({path:'/login'})
           } else {
             window.location.reload()
@@ -105,22 +107,22 @@ export default {
     }
   },
   created(){
-    if(this.$store.state.session==undefined)this.$router.push({name: 'login'})
+    // if(this.$store.state.session==undefined)this.$router.push({name: 'login'})
 
-    this.Name = this.$route.meta.Name;
-    if(this.$store.state.session == undefined){
-      this.$router.push({path:'/login'})
-    }else{
-      this.$store.state.session.swAddCallBack('logout', (sender, event, json)=>{
-        if ('logout' == event) {
-          if (json.code == jSW.RcCode.RC_CODE_S_OK) {
-             // do something
-          } else{
-            this.$Message.error('Fail, error code: ' + json.code)
-          }
-        }
-      });
-    }
+    // this.Name = this.$route.meta.Name;
+    // if(this.$store.state.session == undefined){
+    //   this.$router.push({path:'/login'})
+    // }else{
+    //   this.$store.state.session.swAddCallBack('logout', (sender, event, json)=>{
+    //     if ('logout' == event) {
+    //       if (json.code == jSW.RcCode.RC_CODE_S_OK) {
+    //          // do something
+    //       } else{
+    //         this.$Message.error('Fail, error code: ' + json.code)
+    //       }
+    //     }
+    //   });
+    // }
   }
 };
 </script>

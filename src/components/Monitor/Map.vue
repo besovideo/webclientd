@@ -512,7 +512,6 @@ export default {
       this.SchedulingList.forEach(el => {
         el.marker = undefined;
       });
-      debugger;
       if (this.IntervalGetGpsID != undefined) {
         clearInterval(this.IntervalGetGpsID);
       }

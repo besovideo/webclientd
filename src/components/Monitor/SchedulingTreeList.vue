@@ -1098,6 +1098,8 @@ export default {
     layui.use(["layim"],layim=>{
       var cache =  layui.layim.cache();
       var local = layui.data('layim')["100000"]; //获取当前用户本地数据
+
+      if (!local) return
       delete local.chatlog;
       layui.data('layim', {
         key: "100000"

@@ -7,7 +7,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: '/login'
+      // redirect: '/login'
+      redirect: '/Monitor'
     },
     {
       path: '/login',
@@ -16,6 +17,14 @@ export default new Router({
         title: 'Login'
       },
       component: () => import(/* webpackChunkName: "Login" */ './views/login/login.vue')
+    },
+    {
+      path: '/nologin',
+      name: 'nologin',
+      meta: {
+        title: 'Login'
+      },
+      component: () => import(/* webpackChunkName: "Login" */ './components/Nologin.vue')
     },
     {
       path: '/Home',
