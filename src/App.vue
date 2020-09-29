@@ -48,10 +48,10 @@ export default {
       if (process.env.NODE_ENV == "development") {
         // url = 'https://115.28.79.237:9443'
         // url = 'https://112.30.114.240:9443';
-        url = "https://192.168.8.7:9443";
+        // url = "https://192.168.8.7:9443";
         // url = 'https://61.191.27.18:9443'
         // url = 'https://192.168.0.68:9443'
-        // url = 'https://127.0.0.1:9443'
+        url = 'https://127.0.0.1:9443'
         // url = 'https://192.168.0.68:9443'
       }
       this.userName = userName;
