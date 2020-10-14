@@ -210,21 +210,20 @@ export default {
   },
   created() {
     
-
+    window.localStorage.login_info = ""
     console.log(this);
     localStorage.getItem("VideoType")
-      ? ""
-      : localStorage.setItem("VideoType", "auto");
+      ? "" 
+      : localStorage.setItem("VideoType", "httpflv");
     this.$store.state.VideoType = localStorage.getItem("VideoType");
+
     this.$store.state.lang = localStorage.getItem("locale");
-    if (
-      process.env.NODE_ENV == "development" &&
-      window.localStorage.getItem("login") == "true"
-    ) {
-      // this.handleSubmit({userName:'admin',password:'123456'})
-      this.handleSubmit({ userName: "test", password: "123" });
-      // this.handleSubmit({userName:'root',password:'besovideo88'})
-    }
+    // if (
+    //   process.env.NODE_ENV == "development" &&
+    //   window.localStorage.getItem("login") == "true"
+    // ) {
+    //   this.handleSubmit({ userName: "test", password: "123" });
+    // }
   },
 };
 </script>

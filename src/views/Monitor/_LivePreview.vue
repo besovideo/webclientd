@@ -172,6 +172,7 @@ export default {
     })
   },
   created() {
+    this.$store.state.VideoType = localStorage.VideoType || this.$store.state.VideoType
     for(var i=0;i<16;i++){
       this.videoinfo.push({index:i,puid:undefined,puname:undefined,tag:undefined,isopen:undefined})
     }

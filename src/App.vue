@@ -31,7 +31,7 @@ export default {
       password,
       Server = "127.0.0.1",
       Server_Port = "9701",
-    }) {
+    },cb=(()=>{})) {
       if (Server.trim() == "" || Server_Port.trim() == "") {
         this.$Message.error("Server port cannot be empty");
         return;
@@ -82,7 +82,7 @@ export default {
             window._session = this.$store.state.session;
             this.$store.state.session.swAddCallBack(
               "login",
-              this.sessionCallback
+              (...args)=>{ this.sessionCallback(cb,...args) }
             );
             this.$store.state.session.swAddCallBack("logout", () => {
               if (this.$store.state.session) {
@@ -137,7 +137,7 @@ export default {
       }
       // console.log('notify: ',sender, event, json);
     },
-    sessionCallback(sender, event, json) {
+    sessionCallback(cb, sender, event, json) {
       console.log("Login:", json);
       this.$store.state.fullscreenLoading = false
 
@@ -148,31 +148,33 @@ export default {
 
         window.localStorage.login_info = JSON.stringify({user: this.userName, pass: this.password, Server: this.Server, Server_Port: this.Server_Port })
         
+        cb(true, {})
         this.$store.state.user = this.userName;
         this.$router.push({ path: window.localStorage.lastUrl || "/Monitor" });
       } else {
         this.$store.state.ErrorCode = json.code;
+        let msg = "Fail, error code: " + json.code
         switch (parseInt(json.code)) {
           case jSW.RcCode.RC_CODE_E_INVALIDIP:
-            this.$Message.error("Server IP Error");
+            msg = "Server IP Error"
             break;
           case jSW.RcCode.RC_CODE_E_INVALIDPORT:
-            this.$Message.error("Server Port Error");
+            msg = "Server Port Error";
             break;
           case jSW.RcCode.RC_CODE_E_USERNAME:
           case jSW.RcCode.RC_CODE_E_PASSWORD:
-            this.$Message.error("No User Or Password error");
+            msg = "No User Or Password error";
             break;
           case jSW.RcCode.RC_CODE_E_BVCU_AUTHORIZE_FAILED:
-            this.$Message.error("Authorize Failed");
+            msg = "Authorize Failed"
             break;
           case jSW.RcCode.RC_CODE_E_BVCU_CONNECTFAILED:
-            this.$Message.error("ConnectFailed");
-            break;
-          default:
-            this.$Message.error("Fail, error code: " + json.code);
+            msg = "ConnectFailed"
             break;
         }
+        this.$Message.error(msg)
+        cb(false,{msg,code:parseInt(json.code) })
+
       }
     },
     openCheckFlash(version) {

@@ -12,7 +12,7 @@ export default new Vuex.Store({
     user: '',
     MapType: 'tian',
     lang: '',
-    VideoType: '',
+    VideoType: 'httpflv',
     ErrorCode: -1,
     notify: undefined,
     notify_term: undefined,
