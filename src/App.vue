@@ -51,7 +51,7 @@ export default {
         // url = "https://192.168.8.7:9443";
         // url = 'https://61.191.27.18:9443'
         // url = 'https://192.168.0.68:9443'
-        url = 'https://127.0.0.1:9443'
+        url = 'https://192.168.8.7:9443'
         // url = 'https://192.168.0.68:9443'
       }
       this.userName = userName;

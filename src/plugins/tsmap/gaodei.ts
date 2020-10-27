@@ -52,12 +52,14 @@ export default class BVMap implements BvMap {
   Init(ele: string,opts: any): Promise<object> {
     return new Promise(async (resolve,reject)=>{
       let AMap:any = await this.LoadScript()
-  
+
+
       this.map = new AMap.Map(ele,{
         resizeEnable: true,
         isHotspot: false,
-        zoom: 13,
-        zooms: [3, 22]
+        zoom: opts.zoom || 13,
+        zooms: [3, 22],
+        center: opts['center'] ? [opts['center']?.lng, opts['center']?.lat] : undefined
       })
     
       this.map.on("complete", () => {

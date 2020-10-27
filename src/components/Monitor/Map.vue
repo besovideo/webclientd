@@ -836,7 +836,10 @@ export default {
       if (!this.map) {
         this.loading = true;
         this.map = await BVMap.Init("_container", {
-          projection: "EPSG:4326"
+          projection: "EPSG:4326",
+          zoom: this.$config['config_map_zoom'],
+          center: this.$config['config_map_center'] ? { lng: this.$config['config_map_center'][0], lat: this.$config['config_map_center'][1] } : undefined
+
         });
         this.loading = false;
         console.log(this.map);
