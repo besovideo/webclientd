@@ -1,8 +1,17 @@
 <template>
   <div id="TermList">
-    <Input class="search" @on-search="TermSearch" v-model="Search" search clearable placeholder />
+    <Input
+      class="search"
+      @on-search="TermSearch"
+      v-model="Search"
+      search
+      clearable
+      placeholder
+    />
     <div class="showonline">
-      <Checkbox class="cb" v-model="Cb_isOnline">{{$t('Monitor.Showonlyonlinedevices')}}</Checkbox>
+      <Checkbox class="cb" v-model="Cb_isOnline">{{
+        $t("Monitor.Showonlyonlinedevices")
+      }}</Checkbox>
     </div>
     <!-- 设备列表 -->
     <div class="TreeList" ref="treeTerm" @contextmenu="BoxRightClick($event)">
@@ -14,11 +23,10 @@
         node-key="key"
         :indent="8"
         :default-expanded-keys="['0']"
-        :expand-on-click-node='false'
+        :expand-on-click-node="false"
         @check="CheckTermBox"
       >
-        <span class="custom-tree-node" slot-scope="{ node, data }" >
-
+        <span class="custom-tree-node" slot-scope="{ node, data }">
           <!-- <el-tooltip  placement="right" :disabled="disabled" :transfer="true" effect="light" v-if="data.pu_id!=='0'">
             <template slot="content" >
               <div style="font-size:16px;margin-bottom:10px;" v-if="data.isChannel">{{ChanneTooltip}}</div>
@@ -27,38 +35,53 @@
                 <el-link type="success" @click="$emit('on-tooltip-disabled')">{{$t('Data.buzaixianshi')}}</el-link>
               </div>
             </template> -->
-            <span @dblclick="HandleChannelClick(data,node)" >
-              <i v-if="node.label==''" class="el-icon-s-data" style="padding-right:5px;"></i>
-              <img
-                v-if="data.isTerm"
-                :src="data.isOnline==0?VideoErrorState:VideoState"
-                width="15"
-                height="15"
-                style="display:block;float: left;margin:3px 5px 0 0 ;"
-                alt
-              />
-              <img
-                v-if="data.isChannel"
-                :src="ChannelUrl"
-                width="15"
-                height="15"
-                style="display:block;float: left;margin:3px 5px 0 0 ;"
-                alt
-              />
-                <!-- @dblclick.stop.prevent="HandleTreeClick(data,node)" -->
-              
-                <span
-                  slot="reference" 
-                  class="unselectable TermTree"
-                  
-                  :puid="data.pu_id"
-                  :style="{color:data.isOnline==0?'#ccc':'inherit',paddingLeft:10}"
-                >{{ node.label }}</span>
-              <span class="pu_id" v-if="data.isTerm" :title="data.pu_id.slice(3)">
-                <!-- {{node.label==node.pu_id?"":`(${node.pu_id})`}} -->
-                ({{data.pu_id.slice(3)}})
-              </span>
+          <span @dblclick="HandleChannelClick(data, node)">
+            <i
+              v-if="node.label == ''"
+              class="el-icon-s-data"
+              style="padding-right: 5px"
+            ></i>
+            <img
+              v-if="data.isGroup"
+              :src="DeviceGroup"
+              width="15"
+              height="15"
+              style="display: block; float: left; margin: 3px 5px 0 0"
+              alt
+            />
+            <img
+              v-if="data.isTerm"
+              :src="data.isOnline == 0 ? VideoErrorState : VideoState"
+              width="15"
+              height="15"
+              style="display: block; float: left; margin: 3px 5px 0 0"
+              alt
+            />
+            <img
+              v-if="data.isChannel"
+              :src="ChannelUrl"
+              width="15"
+              height="15"
+              style="display: block; float: left; margin: 3px 5px 0 0"
+              alt
+            />
+            <!-- @dblclick.stop.prevent="HandleTreeClick(data,node)" -->
+
+            <span
+              slot="reference"
+              class="unselectable TermTree"
+              :puid="data.pu_id"
+              :style="{
+                color: data.isOnline == 0 ? '#ccc' : 'inherit',
+                paddingLeft: 10,
+              }"
+              >{{ node.label }}</span
+            >
+            <span class="pu_id" v-if="data.isTerm" :title="data.pu_id.slice(3)">
+              <!-- {{node.label==node.pu_id?"":`(${node.pu_id})`}} -->
+              ({{ data.pu_id.slice(3) }})
             </span>
+          </span>
           <!-- </el-tooltip > -->
           <!-- <span v-if="data.key=='0'">
             {{data.label}}
@@ -80,41 +103,60 @@
       ></el-pagination>
     </div>
     <!-- 分页 -->
-    
-    <div v-if="contextMenuVisible" @click="contextMenuVisible=false"  @contextmenu.stop.prevent="contextMenuVisible=false" style="background:rgba(0,0,0,0);position: fixed;width:100%;height:100%;top:0;left:0;z-index: 998">
-    </div>
 
-      <context-menu class="right-menu" 
-        :target="$refs.treeTerm" 
-        :show="contextMenuVisible"
-        >
-        <!-- @update:show="(show) => contextMenuVisible = show"> -->
-        <ul class="rightMenu-ul" v-for="item in this.$store.state.locateCheckData[rigthClickPuID]"> 
-          <li>
-            <i v-if="item.isChecked" class="el-icon-check"/>
-            <a href="javascript:;" 
-              @click="SetRightMenuVal(item)">{{item.label}}</a></li>
-        </ul>
-      </context-menu>
+    <div
+      v-if="contextMenuVisible"
+      @click="contextMenuVisible = false"
+      @contextmenu.stop.prevent="contextMenuVisible = false"
+      style="
+        background: rgba(0, 0, 0, 0);
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 998;
+      "
+    ></div>
+
+    <context-menu
+      class="right-menu"
+      :target="$refs.treeTerm"
+      :show="contextMenuVisible"
+    >
+      <!-- @update:show="(show) => contextMenuVisible = show"> -->
+      <ul
+        class="rightMenu-ul"
+        v-for="item in this.$store.state.locateCheckData[rigthClickPuID]"
+      >
+        <li>
+          <i v-if="item.isChecked" class="el-icon-check" />
+          <a href="javascript:;" @click="SetRightMenuVal(item)">{{
+            item.label
+          }}</a>
+        </li>
+      </ul>
+    </context-menu>
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
-import { component as VueContextMenu } from '@xunlei/vue-context-menu'
+import { component as VueContextMenu } from "@xunlei/vue-context-menu";
 export default {
-  props: ["noShowChannel","TermTooltip","ChanneTooltip"], // 'disabled'
-  components:{
-    'context-menu': VueContextMenu
+  props: ["noShowChannel", "TermTooltip", "ChanneTooltip"], // 'disabled'
+  components: {
+    "context-menu": VueContextMenu,
   },
   data() {
     return {
+      DeviceGroup: require("@/assets/images/deviceGroup.png"),
       VideoState: require("@/assets/images/video2.png"),
       VideoErrorState: require("@/assets/images/video2-error.png"),
       ChannelUrl: require("@/assets/images/channel.png"),
       Cb_isOnline: true,
       TreeLoading: true,
-      contextMenuVisible:false,
+      contextMenuVisible: false,
       isFirst: true,
       NameSearch: "",
       NameSelect: "1",
@@ -123,112 +165,147 @@ export default {
       Total: undefined,
       Search: "",
       SearchStatus: undefined,
-      allCheckedTerm:[],
-      rigthClickPuID:undefined,
-      locateCheckData:{
-      },
+      allCheckedTerm: [],
+      rigthClickPuID: undefined,
+      locateCheckData: {},
       TermListData: [
         {
           label: this.$t("Monitor.Server"),
-          pu_id: '0',
-          key: '0',
+          pu_id: "0",
+          key: "0",
           children: [
             {
-              label: ""
-            }
-          ]
-        }
-      ]
+              label: "",
+            },
+          ],
+        },
+      ],
     };
   },
   methods: {
-    SetRightMenuVal(item){
-      console.log('item.key :',item.key,item.isChecked);
-      this.contextMenuVisible = false
-      let clickID = this.rigthClickPuID + '';
-      this.$set(item,'isChecked',!item.isChecked)
-      if(item.key == 'guiji' && item.isChecked) {
-        let Weizhi = this.$store.state.locateCheckData[this.rigthClickPuID][0]
-        if(!Weizhi.isChecked){
-          Weizhi.isChecked = true
+    SetRightMenuVal(item) {
+      console.log("item.key :", item.key, item.isChecked);
+      this.contextMenuVisible = false;
+      let clickID = this.rigthClickPuID + "";
+      this.$set(item, "isChecked", !item.isChecked);
+      if (item.key == "guiji" && item.isChecked) {
+        let Weizhi = this.$store.state.locateCheckData[this.rigthClickPuID][0];
+        if (!Weizhi.isChecked) {
+          Weizhi.isChecked = true;
 
-          this.$emit('on-check-term',clickID,'weizhi',item.isChecked)
+          this.$emit("on-check-term", clickID, "weizhi", item.isChecked);
         }
-      } 
-      this.$emit('on-check-term',clickID,item.key,item.isChecked)
+      }
+      this.$emit("on-check-term", clickID, item.key, item.isChecked);
     },
-    BoxRightClick(e){
-      
-      // let div = document.querySelector('.TermTree')
-      if(e.target.classList.contains('TermTree') && this.noShowChannel ){
-        this.rigthClickPuID = e.target.getAttribute('puid')
-        let PuIdData = this.TermListData[0].children.find(el=>el.pu_id == this.rigthClickPuID)
-        if(!PuIdData.isOnline){
-          return
-        }
-         
-        if(!this.$store.state.locateCheckData[this.rigthClickPuID]){
-          this.$set(this.$store.state.locateCheckData,this.rigthClickPuID,[
+    FindPuNode() {
+      let funcFindPuNode = (el) => {
+          if(el == undefined || el == null)
+          {
+            return null
+          }
+
+          if(el.isTerm){
+            if( el.pu_id == this.rigthClickPuID )
             {
-              label: this.$t('Data.xianshishishiweizhi'),
+              return el
+            }
+          }else if(el.isGroup)
+          {
+            for(let i = 0; i < el.children.length; i++) {
+              let result = funcFindPuNode(el.children[i])
+              if(result != null)
+              {
+                return result
+              }
+          }
+        }
+
+        return null
+      }
+
+      for(let i =0; i < this.TermListData[0].children.length;i++) {
+        let el = this.TermListData[0].children[i]
+        let result = funcFindPuNode(el)
+        if(result != null)
+        {
+          return result
+        }
+      }       
+
+      return null
+    },
+    BoxRightClick(e) {
+      // let div = document.querySelector('.TermTree')
+      if (e.target.classList.contains("TermTree") && this.noShowChannel) {
+        this.rigthClickPuID = e.target.getAttribute("puid");
+        // let PuIdData = this.TermListData[0].children.find(
+        //   (el) => el.pu_id == this.rigthClickPuID
+        // );
+        let PuIdData = this.FindPuNode()
+
+        if (PuIdData == null || !PuIdData.isOnline) {
+          return;
+        }
+
+        if (!this.$store.state.locateCheckData[this.rigthClickPuID]) {
+          this.$set(this.$store.state.locateCheckData, this.rigthClickPuID, [
+            {
+              label: this.$t("Data.xianshishishiweizhi"),
               isChecked: false,
-              key: 'weizhi'
+              key: "weizhi",
             },
             {
-              label: this.$t('Data.xianshiguiji'),
+              label: this.$t("Data.xianshiguiji"),
               isChecked: false,
-              key: 'guiji'
-            }
-          ])
+              key: "guiji",
+            },
+          ]);
         }
-        this.contextMenuVisible = true
-      }else{
-        this.contextMenuVisible = false
+        this.contextMenuVisible = true;
+      } else {
+        this.contextMenuVisible = false;
       }
     },
-    CheckTermBox(self,allCheckedNodes){
-      let check = allCheckedNodes.checkedKeys
-      this.allCheckedTerm = check
+    CheckTermBox(self, allCheckedNodes) {
+      let check = allCheckedNodes.checkedKeys;
+      this.allCheckedTerm = check;
 
-      console.log(self,allCheckedNodes)
-      if(self.pu_id=='0'){
-        
-        return
+      console.log(self, allCheckedNodes);
+      if (self.pu_id == "0") {
+        return;
       }
-      
+
       // if(check.findIndex(el=>el==self.pu_id)==-1){
       //   this.$emit('on-check-term','remove',[self.pu_id])
       // }else{
       //   this.$emit('on-check-term','add',[self.pu_id])
       // }
-      
-
     },
-    TermSearch(val,page) {
+    TermSearch(val, page) {
       console.log(val);
-      let isOnline = this.Cb_isOnline
+      let isOnline = this.Cb_isOnline;
       let code = this.session.swSearchPuList({
-        iPosition: page==undefined?0:page,
+        iPosition: page == undefined ? 0 : page,
         iCount: 100,
         stFilter: {
-          iOnlineStatus: isOnline?1:0,
+          iOnlineStatus: isOnline ? 1 : 0,
           iTimeBegin: 0,
           iTimeEnd: 0,
-          szIDOrName: val
+          szIDOrName: val,
         },
         callback: (options, response, data) => {
-
           // let term = this.session.swGetPu(val);
           if (data.puList.length == 0) {
             this.$Message.error(this.$t("Monitor.noTerm"));
             return;
           }
-          console.log('search',data);
-          this.CurrentPage = page==undefined?1:(page+1);
+          console.log("search", data);
+          this.CurrentPage = page == undefined ? 1 : page + 1;
           this.Total = data.info.itotalcount;
           this.Search2SetData(data);
           return;
-        }
+        },
       });
     },
     HandleCentContentShow(target) {
@@ -282,7 +359,7 @@ export default {
         return;
       }
       if (data.isOnline == 0) {
-        this.$Message.error(this.$t('Data.shebeiyilixian'));
+        this.$Message.error(this.$t("Data.shebeiyilixian"));
         return;
       }
       if (!data.isTerm) {
@@ -294,9 +371,9 @@ export default {
       this.CurrentPuInfo = data;
     },
     ChangePage(page) {
-      if(this.SearchStatus){
-        this.TermSearch(this.Search,page-1)
-        return
+      if (this.SearchStatus) {
+        this.TermSearch(this.Search, page - 1);
+        return;
       }
       this.GetTermList(page - 1, 100, this.Cb_isOnline);
     },
@@ -305,13 +382,13 @@ export default {
       this.SearchStatus = true;
       data.puList.forEach((ele, i) => {
         let children = [];
-        if(!this.noShowChannel){
+        if (!this.noShowChannel) {
           ele._arr_channel.forEach((el, i) => {
             children.push({
               label: this.$t("Monitor.channel") + i,
               index: i,
               pu_id: el._id_pu,
-              isChannel: true
+              isChannel: true,
             });
           });
         }
@@ -320,10 +397,10 @@ export default {
           pu_id: ele._id_pu,
           isTerm: true,
           isOnline: ele._info_pu.onlinestatus,
-          children
+          children,
         });
       });
-      
+
       this.$set(this.TermListData[0], "children", []);
       this.$set(this.TermListData[0], "children", temp);
       this.TreeLoading = false;
@@ -341,25 +418,22 @@ export default {
       // this.$set(this.TermListData[0], "children", list);
       this.TreeLoading = true;
       let CurrentPage = this.CurrentPage;
-      if(this.CurrentPage > Math.ceil(this.session[name].length / 100)){
-        CurrentPage =  Math.ceil(this.session[name].length / 100)
+      if (this.CurrentPage > Math.ceil(this.session[name].length / 100)) {
+        CurrentPage = Math.ceil(this.session[name].length / 100);
       }
 
       let temp = [];
       if (name == "_arr_pu") {
         let num = [];
-        if (
-          (CurrentPage - 1) * 100 <
-          this.session["_arr_pu_online"].length
-        ) {
+        if ((CurrentPage - 1) * 100 < this.session["_arr_pu_online"].length) {
           this.session[name].forEach((el, i) => {
             if (el._info_pu.onlinestatus == 1) {
               num.push(i);
             }
           });
           num
-            .filter(el => el > 99)
-            .forEach(_i => {
+            .filter((el) => el > 99)
+            .forEach((_i) => {
               this.session[name].forEach((el, i) => {
                 if (el._info_pu.onlinestatus != 1) {
                   let temp = this.session[name][i];
@@ -372,10 +446,7 @@ export default {
       }
       this.session[name].forEach((ele, i) => {
         // this.Total = this.session[name].length;
-        if (
-          i >= (CurrentPage - 1) * 100 &&
-          i < (CurrentPage - 1) * 100 + 100
-        ) {
+        if (i >= (CurrentPage - 1) * 100 && i < (CurrentPage - 1) * 100 + 100) {
           let children = [];
           if (this.noShowChannel) {
           } else {
@@ -385,7 +456,7 @@ export default {
                   label: this.$t("Monitor.channel") + i,
                   index: i,
                   pu_id: ele._id_pu,
-                  isChannel: true
+                  isChannel: true,
                 });
             });
           }
@@ -395,7 +466,7 @@ export default {
             isTerm: true,
             pu_info: ele._info_pu,
             isOnline: ele._info_pu.onlinestatus,
-            children
+            children,
           });
         }
       });
@@ -406,32 +477,77 @@ export default {
         return;
       }
 
-      
-      let giveLocateOnlineTerm = []
+      let giveLocateOnlineTerm = [];
       let SortTemp = [];
-      temp.forEach(el => {
+      temp.forEach((el) => {
         if (el.isOnline) {
           SortTemp.unshift(el);
-          giveLocateOnlineTerm.push(el)
+          giveLocateOnlineTerm.push(el);
         } else {
           SortTemp.push(el);
         }
       });
-      
 
+      // 获取设备组
+      let funcAddGroup = (parent, group) => {
+        let children = [];
 
-      this.$set(this.TermListData[0], "children", []);
-      this.$set(this.TermListData[0], "children", SortTemp);
-      if (document.querySelector(".TreeList"))
-        document.querySelector(".TreeList").scrollTop = 0;
-      this.TreeLoading = false;
-      if (this.isFirst) {
-        // giveLocateOnlineTerm.forEach(item=>{
-          
-        // })
-        this.$emit('on-online-term',giveLocateOnlineTerm)
-        this.isFirst = false;
-      }
+        group.items.forEach((childGroup) => {
+          funcAddGroup(children, childGroup);
+        });
+
+        this.$store.state.ErrorCode = this.session.swGetPuGroupInfo({
+          info: { groupid: group.szid },
+          callback: (options, response, data) => {
+            data.ppuidList.forEach((puid) => {
+              let index = -1;
+              SortTemp.forEach((puObj, i) => {
+                if (puid == puObj.pu_id) {
+                  children.push(puObj);
+                  index = i;
+                }
+              });
+              //  将已添加到设备组中的设备从原来的设备列表中删除
+              // delete SortTemp[index];
+              if(-1 != index)
+              {
+                SortTemp.splice(index,1)
+              }
+            });
+
+            parent.unshift({
+              label: group.szname,
+              group_id: group.szid,
+              parent_group_id: group.szparentid,
+              isGroup: true,
+              children,
+            });
+          },
+        });
+      };
+
+      this.$store.state.ErrorCode = this.session.swGetPuGroupList({
+        callback: (options, response, data) => {
+          this.$store.state.ErrorCode = response.emms.code;
+          data.struct.forEach((group) => {
+            funcAddGroup(SortTemp, group);
+          });
+
+          this.$set(this.TermListData[0], "children", []);
+          this.$set(this.TermListData[0], "children", SortTemp);
+
+          if (document.querySelector(".TreeList"))
+            document.querySelector(".TreeList").scrollTop = 0;
+          this.TreeLoading = false;
+          if (this.isFirst) {
+            // giveLocateOnlineTerm.forEach(item=>{
+
+            // })
+            this.$emit("on-online-term", giveLocateOnlineTerm);
+            this.isFirst = false;
+          }
+        },
+      });
 
       // this.$nextTick(()=>{
       //   if(this.allCheckedTerm[0]=='0'){
@@ -446,18 +562,18 @@ export default {
       //   this.SetTreeData("_arr_pu_online");
       // }
       // this.TreeLoading = true
-      let code = undefined
+      let code = undefined;
       this.$store.state.ErrorCode = code = this.session.swSearchPuList({
         iPosition: page * 100,
         iCount: pagesize,
         stFilter: {
           iOnlineStatus: isOnline ? 1 : 0,
           iTimeBegin: 0,
-          iTimeEnd: 0
+          iTimeEnd: 0,
         },
         callback: (options, response, data) => {
           // debugger
-          this.$store.state.ErrorCode = response.emms.code 
+          this.$store.state.ErrorCode = response.emms.code;
           // console.log(
           //   "searchlist============================\n",
           //   options,
@@ -478,16 +594,16 @@ export default {
           // }
           this.SetTreeData(isOnline ? "_arr_pu_online" : "_arr_pu");
           this.Cb_isOnline = isOnline;
-        }
+        },
       });
     },
-    initLocateCheckData(data){
-      for(let key in data){
-        data[key].forEach(el=>{
-          this.$emit('on-check-term',key,el.key,el.isChecked)
-        })
+    initLocateCheckData(data) {
+      for (let key in data) {
+        data[key].forEach((el) => {
+          this.$emit("on-check-term", key, el.key, el.isChecked);
+        });
       }
-    }
+    },
   },
   watch: {
     Search(val) {
@@ -504,7 +620,7 @@ export default {
     //     this.GetTermList(this.CurrentPage-1,100,false)
     //   }
     // },
-    
+
     notify(val) {
       // console.log('allCheck',this.$refs.tree.getCheckedKeys())
       // if(this.TreeLoading)return
@@ -518,51 +634,52 @@ export default {
       }
     },
     Cb_isOnline(val) {
-      if(val == true) {
-        localStorage.setItem('cb_online',val)
-      }else {
-        localStorage.removeItem('cb_online')
+      if (val == true) {
+        localStorage.setItem("cb_online", val);
+      } else {
+        localStorage.removeItem("cb_online");
       }
       // if (!this.isFirst) {
-        if(this.SearchStatus){
-          this.TermSearch(this.Search,0)
-        }else{
-          this.GetTermList(0, 100, val);
-        }
-      // } 
-    }
+      if (this.SearchStatus) {
+        this.TermSearch(this.Search, 0);
+      } else {
+        this.GetTermList(0, 100, val);
+      }
+      // }
+    },
   },
   computed: {
     ...mapState({
       session: "session",
-      notify: "notify"
-    })
+      notify: "notify",
+    }),
   },
-  mounted(){
-    this.initLocateCheckData(this.$store.state.locateCheckData)
+  mounted() {
+    this.initLocateCheckData(this.$store.state.locateCheckData);
   },
   created() {
     console.log("created");
     console.log(this.session);
-    console.log('this.$store.state.locateCheckData ',this.$store.state.locateCheckData);
-    
-    if(localStorage.getItem('cb_online',undefined)) {
-      this.Cb_isOnline = true
+    console.log(
+      "this.$store.state.locateCheckData ",
+      this.$store.state.locateCheckData
+    );
+
+    if (localStorage.getItem("cb_online", undefined)) {
+      this.Cb_isOnline = true;
       this.GetTermList(0, 100, true);
-      return 
+      return;
     }
 
-    this.Cb_isOnline = false
+    this.Cb_isOnline = false;
 
     this.GetTermList(0, 100, false);
-    
-
-  }
+  },
 };
 </script>
 
 <style lang="less">
-@import "./TreeList.less"; 
+@import "./TreeList.less";
 // #TermList {
 //   width: 100%;
 //   height: 100%;
@@ -612,76 +729,72 @@ export default {
 //   overflow: initial!important;
 // }
 .right-menu {
-    position: fixed;
-    background: #fff;
-    border: 2px solid #ccc;
-    box-shadow: 0 .5em 1em 0 rgba(0,0,0,.1);
-    border-radius: 1px;
-    z-index: 999;
-    display: none;
-    > .rightMenu-ul {
-      &:nth-child( n+2 ){
-        border-top: 1px solid #ccc;
-      }
-      li {
-        padding-left: 24px;
-        position: relative;
-        height: 28px;
-        background-color: rgba(110, 107, 107, 0.2);
-        >i{
-          display: inline-block;
-          width: 20px;
-          height: 20px;
-          font-weight: 700;
-          font-size: 16px;
-          
-          color: #000;
-          border: 1px solid skyblue;
-          background-color: #fff;
-          line-height: 20px;
-          position: absolute;
-          left: 2px;
-          top: 4px;
-          text-align: center;
-        }
+  position: fixed;
+  background: #fff;
+  border: 2px solid #ccc;
+  box-shadow: 0 0.5em 1em 0 rgba(0, 0, 0, 0.1);
+  border-radius: 1px;
+  z-index: 999;
+  display: none;
+  > .rightMenu-ul {
+    &:nth-child(n + 2) {
+      border-top: 1px solid #ccc;
+    }
+    li {
+      padding-left: 24px;
+      position: relative;
+      height: 28px;
+      background-color: rgba(110, 107, 107, 0.2);
+      > i {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        font-weight: 700;
+        font-size: 16px;
+
+        color: #000;
+        border: 1px solid skyblue;
+        background-color: #fff;
+        line-height: 20px;
+        position: absolute;
+        left: 2px;
+        top: 4px;
+        text-align: center;
       }
     }
+  }
 }
 
 .right-menu a {
-    // width: 100px;
-    height: 28px;
-    background: #fff;
-    line-height: 20px;
-    text-align: left;
-    display: block;
-    color: #1a1a1a
+  // width: 100px;
+  height: 28px;
+  background: #fff;
+  line-height: 20px;
+  text-align: left;
+  display: block;
+  color: #1a1a1a;
 }
 
 .right-menu a:hover {
-    background: #eee;
-    color: #fff
+  background: #eee;
+  color: #fff;
 }
 
-body,html {
-    height: 100%
+body,
+html {
+  height: 100%;
 }
 
-
-
-.rightMenu-ul
-
-a {
-    text-decoration: none
+.rightMenu-ul a {
+  text-decoration: none;
 }
 
 .right-menu a {
-    padding: 5px
+  padding: 5px;
 }
 
 .right-menu a:hover {
-    background: #42b983
+  background: #42b983;
 }
-
 </style>
 
