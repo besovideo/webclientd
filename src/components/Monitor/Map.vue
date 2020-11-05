@@ -21,7 +21,7 @@
       </div>-->
     </Modal>
 
-    <Modal footer-hide v-model="SpeakModal" width="300" height="300" draggable scrollable>
+    <Modal footer-hide v-model="SpeakModal" width="300" height="300" draggable scrollable >
       <p slot="header" style="color:#000;text-align:center">
         <span>{{ $t("Monitor.Intercom")}}</span>
       </p>
@@ -140,6 +140,14 @@ export default {
           this.SpeakModal = false;
           this.$store.state.notifyTip[this.puid] = true;
         }
+      }
+    },
+    SpeakModal(val,oldVal) {
+      if(!val && oldVal) {
+        if (this.StartMode) {
+          this._OpenSpeak(false)
+        }
+
       }
     }
   },

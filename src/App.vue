@@ -44,15 +44,15 @@ export default {
 
       let url = window.location.origin;
       // let url = 'https://115.28.79.237:9443'
-
       if (process.env.NODE_ENV == "development") {
+        console.log('测试')
         // url = 'https://115.28.79.237:9443'
         // url = 'https://112.30.114.240:9443';
         // url = "https://192.168.8.7:9443";
         // url = 'https://61.191.27.18:9443'
         // url = 'https://192.168.0.68:9443'
-        url = 'https://192.168.8.7:9443'
-        // url = 'https://192.168.0.68:9443'
+        // url = 'https://192.168.8.7:9443'
+        url = 'https://192.168.0.68:9443'
       }
       this.userName = userName;
       this.password = password;
