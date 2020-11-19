@@ -495,58 +495,66 @@ export default {
         group.items.forEach((childGroup) => {
           funcAddGroup(children, childGroup);
         });
+        group.szpu.forEach((pu) => {
+          let index = -1;
+          SortTemp.forEach((puObj, i) => {
+            if (pu._id_pu == puObj.pu_id) {
+              children.push(puObj);
+              index = i
+            }
+          });
+          //  将已添加到设备组中的设备从原来的设备列表中删除
+          if(-1 != index)
+          {
+            SortTemp.splice(index,1)
+          }
+        });
 
-        this.$store.state.ErrorCode = this.session.swGetPuGroupInfo({
-          info: { groupid: group.szid },
-          callback: (options, response, data) => {
-            data.ppuidList.forEach((puid) => {
-              let index = -1;
-              SortTemp.forEach((puObj, i) => {
-                if (puid == puObj.pu_id) {
-                  children.push(puObj);
-                  index = i;
-                }
-              });
-              //  将已添加到设备组中的设备从原来的设备列表中删除
-              // delete SortTemp[index];
-              if(-1 != index)
-              {
-                SortTemp.splice(index,1)
-              }
-            });
-
-            parent.unshift({
-              label: group.szname,
-              group_id: group.szid,
-              parent_group_id: group.szparentid,
-              isGroup: true,
-              children,
-            });
-          },
+        parent.unshift({
+          label: group.szname,
+          group_id: group.szid,
+          parent_group_id: group.szparentid,
+          isGroup: true,
+          children,
         });
       };
 
-      this.$store.state.ErrorCode = this.session.swGetPuGroupList({
-        callback: (options, response, data) => {
-          this.$store.state.ErrorCode = response.emms.code;
-          data.struct.forEach((group) => {
-            funcAddGroup(SortTemp, group);
-          });
+      this.$store.state.ErrorCode = this.session.swPuGroupFillGroupList({
+         tag: this,
+         callback: function(options, response, data){
+            // console.log(data)
+            let that = options.tag
+            that.$store.state.ErrorCode = response.emms.code;
+            data.result.forEach(group => {
+                  funcAddGroup(SortTemp,group)
+            });
 
-          this.$set(this.TermListData[0], "children", []);
-          this.$set(this.TermListData[0], "children", SortTemp);
+            that.$set(that.TermListData[0], "children", []);
+            that.$set(that.TermListData[0], "children", SortTemp);
 
-          if (document.querySelector(".TreeList"))
-            document.querySelector(".TreeList").scrollTop = 0;
-          this.TreeLoading = false;
-          if (this.isFirst) {
-            // giveLocateOnlineTerm.forEach(item=>{
+            if (document.querySelector(".TreeList"))
+              document.querySelector(".TreeList").scrollTop = 0;
+            that.TreeLoading = false;
+            if (that.isFirst) {
+              // giveLocateOnlineTerm.forEach(item=>{
 
-            // })
-            this.$emit("on-online-term", giveLocateOnlineTerm);
-            this.isFirst = false;
-          }
-        },
+              // })
+              that.$emit("on-online-term", giveLocateOnlineTerm);
+              that.isFirst = false;
+            } 
+            },
+            filterCallback: function(puInfo, puId) {
+              for(let i = 0; i < SortTemp.length; i++){
+                if(puId === SortTemp[i].pu_id)
+                {
+                  return true
+                }
+              }
+              return false
+            },//过滤组内的设备
+            filterListCallback: function(puInfo) {
+                return true;
+            }//过滤组外的设备，puInfo就是组外的设备
       });
 
       // this.$nextTick(()=>{

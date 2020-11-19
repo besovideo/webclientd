@@ -200,6 +200,23 @@ export default {
       this.$set(this.TermListData[0], "children", temp);
       this.TreeLoading = false;
     },
+    GroupIsExistPu(group,puList) {
+      for(let i = 0; i < group.szpu.length; i++) {
+        for(let j = 0; j < puList.length; j++) {
+          if(group.szpu[i]._id_pu === puList[j].pu_id) {
+            return true
+          }
+        }
+      }
+      for(let i = 0; i < group.items.length; i++) {
+        let result = this.GroupIsExistPu(group.items[i],puList)
+        if(result) {
+          return result
+        }  
+      }
+
+      return false
+    },    
     SetTreeData(name) {
       if (this.SearchStatus) return;
       this.TreeLoading = true;
@@ -272,57 +289,90 @@ export default {
       });
 
       // 获取设备组
+      /*
+      let PuGroupList = []
+      let funcGetPuGroupInfo = (parent, group, callback) => {
+        let puGroup = {}
+        puGroup.id = group.szid
+        puGroup.name = group.szname
+        puGroup.parentId = group.szparentid
+        puGroup.groupList = []
+        puGroup.puList = []
+
+        group.items.forEach((childGroup) => {
+          funcGetPuGroupInfo(puGroup.groupList, childGroup);
+        });
+
+        this.$store.state.ErrorCode = this.session.swGetPuGroupInfo({
+          info: { groupid: group.szid },
+          callback: (options, response, data) => {
+            puGroup.puList = data.ppuidList
+            parent.push(puGroup)
+
+          },
+        });
+      };
+      */
       let funcAddGroup = (parent, group) => {
         let children = [];
 
         group.items.forEach((childGroup) => {
           funcAddGroup(children, childGroup);
         });
+        group.szpu.forEach((pu) => {
+          let index = -1;
+          SortTemp.forEach((puObj, i) => {
+            if (pu._id_pu == puObj.pu_id) {
+              children.push(puObj);
+              index = i
+            }
+          });
+          //  将已添加到设备组中的设备从原来的设备列表中删除
+          if(-1 != index)
+          {
+            SortTemp.splice(index,1)
+          }
+        });
 
-        this.$store.state.ErrorCode = this.session.swGetPuGroupInfo({
-          info: { groupid: group.szid },
-          callback: (options, response, data) => {
-            data.ppuidList.forEach((puid) => {
-              let index = -1;
-              SortTemp.forEach((puObj, i) => {
-                if (puid == puObj.pu_id) {
-                  children.push(puObj);
-                  index = i
-                }
-              });
-              //  将已添加到设备组中的设备从原来的设备列表中删除
-              if(-1 != index)
-              {
-                SortTemp.splice(index,1)
-              }
-            });
-
-            parent.unshift({
-              label: group.szname,
-              group_id: group.szid,
-              parent_group_id: group.szparentid,
-              isGroup: true,
-              children,
-            });
-          },
+        parent.unshift({
+          label: group.szname,
+          group_id: group.szid,
+          parent_group_id: group.szparentid,
+          isGroup: true,
+          children,
         });
       };
 
-      this.$store.state.ErrorCode = this.session.swGetPuGroupList({
-        callback: (options, response, data) => {
-          this.$store.state.ErrorCode = response.emms.code;
-          data.struct.forEach((group) => {
-            funcAddGroup(SortTemp, group);
-          });
+      this.$store.state.ErrorCode = this.session.swPuGroupFillGroupList({
+         tag: this,
+         callback: function(options, response, data){
+                console.log(data)
+              let that = options.tag
+              that.$store.state.ErrorCode = response.emms.code;
+              data.result.forEach(group => {
+                    funcAddGroup(SortTemp,group)
+                  });
 
-          this.$set(this.TermListData[0], "children", []);
-          this.$set(this.TermListData[0], "children", SortTemp);
+              that.$set(that.TermListData[0], "children", []);
+              that.$set(that.TermListData[0], "children", SortTemp);
 
-          if (document.querySelector(".TreeList"))
-            document.querySelector(".TreeList").scrollTop = 0;
-          this.TreeLoading = false;
-          if (this.isFirst) this.isFirst = false;
-        },
+              if (document.querySelector(".TreeList"))
+                document.querySelector(".TreeList").scrollTop = 0;
+              that.TreeLoading = false;
+              if (that.isFirst) that.isFirst = false;  
+            },
+            filterCallback: function(puInfo, puId) {
+              for(let i = 0; i < SortTemp.length; i++){
+                if(puId === SortTemp[i].pu_id)
+                {
+                  return true
+                }
+              }
+              return false
+            },//过滤组内的设备
+            filterListCallback: function(puInfo) {
+                return true;
+            }//过滤组外的设备，puInfo就是组外的设备
       });
     },
     GetTermList(page, pagesize, isOnline) {
