@@ -22,7 +22,7 @@ Vue.prototype.$lodash = lodash
 
 Vue.prototype.$config = window
 
-document.title = window.config_title
+
 
 
 
@@ -41,6 +41,7 @@ const i18n = new VueI18n({
   messages: langData
 })
 
+document.title = window.config_title || langData[store.state.lang]["title"] 
 Vue.prototype.$tools = tools
 Vue.config.productionTip = false
 Vue.use(VueVideoPlayer)

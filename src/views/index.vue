@@ -3,7 +3,7 @@
     <div style="height: 100%;width: 100%;padding-top:20px;background:#f5f7f9">
       <Row>
         <Col span='18' >
-          <div style="background:#fff;height:250px;padding-top:20px" class="box_content">
+          <div style="background:#fff;height:130px;padding-top:20px" class="box_content">
             <div class="box_content_tip">
               <p>{{$t('Data.jiankongzhongxin')}}</p>
             </div>
@@ -16,8 +16,7 @@
                 </div>
               </div>
             </Col>
-            <Col span="6" style="height:100px;line-height:100px">
-              <!-- <div class="item_box" @click="$router.push({name:'VideoPlayback'})"> -->
+            <!-- <Col span="6" style="height:100px;line-height:100px">
               <div class="item_box" >
                 <div class="img"><img  style="margin-top:-10px"  src="../assets/images/icon2.png" alt=""></div>
                 <div class="content">
@@ -25,7 +24,7 @@
                     <p class="body">{{$t('home.Video_playback_tip')}}</p>
                 </div>
               </div>
-            </Col>
+            </Col> -->
             <Col span="6" style="height:100px;line-height:100px" >
               <div class="item_box" @click="$router.push({name:'Locate'})">
                   <div class="img"><img style="margin-top:-10px"  src="../assets/images/icon3.png" alt=""></div>
@@ -35,7 +34,7 @@
                   </div>
                 </div>
             </Col>
-            <Col span="6" style="height:100px;line-height:100px">
+            <!-- <Col span="6" style="height:100px;line-height:100px">
             <div class="item_box" >
                   <div class="img"><img src="../assets/images/icon4.png" alt=""></div>
                   <div class="content">
@@ -43,8 +42,8 @@
                       <p class="body">{{$t('home.Track_playback_tip')}}</p>
                   </div>
                 </div>
-            </Col>
-            <Divider dashed style="margin-bottom:10px"/>
+            </Col> -->
+            <!-- <Divider dashed style="margin-bottom:10px"/> -->
             <Col span="6" style="height:100px;line-height:100px">
                 <div class="item_box" @click="$router.push({name:'Scheduling'})">
                   <div class="img"><img src="../assets/images/diaodu.png" alt=""></div>
@@ -92,7 +91,8 @@
         <Col class="see" span="6">
           <div class="content">
             <div class="see_hd">
-                <p><span>{{$t('tab.monitor')}}</span><a href='#'>{{$t('home.more')}}&gt;</a></p>
+                <p><span>{{$t('tab.monitor')}}</span></p>
+                <!-- <a href='#'>{{$t('home.more')}}&gt;</a> -->
             </div>
             <i-circle
               :size="200"

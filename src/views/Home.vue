@@ -13,9 +13,9 @@
             <MenuItem name="Monitor" :to="{name:'Monitor'}" :style="{'background':this.Name=='Monitor'?'rgb(30, 87, 163)':''}">
               {{$t('tab.monitor')}}
             </MenuItem>
-            <MenuItem name="3" :style="{'background':this.Name=='123'?'rgb(30, 87, 163)':''}">
+            <!-- <MenuItem name="3" :style="{'background':this.Name=='123'?'rgb(30, 87, 163)':''}">
               {{$t('tab.inquiry')}}
-            </MenuItem>
+            </MenuItem> -->
             <MenuItem name="4" :to="{name:'Configuration'}"  :style="{'background':this.Name=='Configuration'?'rgb(30, 87, 163)':''}">
               {{$t('tab.Configuration')}}
             </MenuItem>
@@ -28,7 +28,7 @@
                   <DropdownItem name='en'>{{$t('lang_en')}}</DropdownItem>
               </DropdownMenu>
             </Dropdown> -->
-            <Dropdown style="float:left;"  @on-click="ChangePersonal">             
+            <Dropdown style="float:left;margin-right: 10px"  @on-click="ChangePersonal">             
               <Icon type="md-person" size='20' style="color:#fff"></Icon><Icon type="ios-arrow-down" size='16' style="color:#fff"></Icon>
               <DropdownMenu slot="list">
                   <DropdownItem :disabled='true'>{{$store.state.user}}</DropdownItem>
@@ -38,10 +38,10 @@
               </DropdownMenu>
             </Dropdown>
 
-            <Dropdown style="float:left;margin:0 10px">             
+            <Dropdown style="float:left;margin:0 10px"  @on-click="ChangePersonal">             
               <Icon type="md-settings" size='20' style="color:#fff"></Icon><Icon type="ios-arrow-down" size='16' style="color:#fff"></Icon>
               <DropdownMenu slot="list">
-                  <DropdownItem>{{$t('tab.Configuration')}}</DropdownItem>
+                  <DropdownItem name="config">{{$t('tab.Configuration')}}</DropdownItem>
               </DropdownMenu>
             </Dropdown>
 
@@ -93,6 +93,9 @@ export default {
         break
         case 'info':
           this.ShowInfoModal = true
+        break;
+        case 'config':
+          this.$router.push({name:'UserManage'})
         break;
       }
     }

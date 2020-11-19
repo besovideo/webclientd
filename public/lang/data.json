@@ -5,6 +5,7 @@
     "korean": "한국인"
   },
   "zh": {
+    "title": "可视化指挥调度平台",
     "SetPort": "设置端口",
     "Server": "服务器",
     "Port": "端口",
@@ -236,6 +237,7 @@
     }
   },
   "en": {
+    "title": "SmartEye Web Client",
     "login": {
       "login": "Login",
       "login_tip": "Welcome to login",
@@ -468,6 +470,7 @@
     }
   },
   "korean": {
+    "title": "SmartEye Web Client",
     "login": {
       "login": "로그인",
       "login_tip": "로그인팁",
