@@ -147,7 +147,7 @@ export default {
         window.localStorage.setItem("userName", this.userName);
 
         window.localStorage.login_info = JSON.stringify({user: this.userName, pass: this.password, Server: this.Server, Server_Port: this.Server_Port })
-        
+
         cb(true, {})
         this.$store.state.user = this.userName;
         this.$router.push({ path: window.localStorage.lastUrl || "/Monitor" });
@@ -194,9 +194,9 @@ export default {
           type: 'primary',
           center: true
         }).then(() => {
-          
+
         }).catch(() => {
-          
+
         })
       }
     }
@@ -229,9 +229,9 @@ export default {
     var Server = this.$tools.getQueryVariable("server") || undefined;
     var Server_Port = this.$tools.getQueryVariable("port") || undefined;
     // window.onload = () => {
-      
 
-    
+
+
     // if (LoginInfo.user && LoginInfo.pass ) {
     //   this.$router.push('/nologin')
     // }
@@ -261,7 +261,7 @@ export default {
     }
 
     console.log(window.btoa('2019-9-23 09:30:09'))
-    
+
     if(!this.$tools.checkFlash().f){
       // let target = navigator.userAgent.match(/Chrome\/(\d{2})/)
       // if(target==null) {
@@ -281,7 +281,7 @@ export default {
     layui.use(['layui','layim'], function(layim){
       var cache =  layui.layim.cache();
       var local = layui.data('layim')[cache.mine.id]; //获取当前用户本地数据
-      
+
       //这里以删除本地聊天记录为例
       delete local.chatlog;
     })

@@ -2,7 +2,7 @@
   <Content :style="{margin: '0 auto',height: '100%',width: '1250px'}">
     <div style="height: 100%;width: 100%;padding-top:20px;background:#f5f7f9">
       <Row>
-        <Col span='18' >
+        <Col span='24' >
           <div style="background:#fff;height:130px;padding-top:20px" class="box_content">
             <div class="box_content_tip">
               <p>{{$t('Data.jiankongzhongxin')}}</p>
@@ -88,37 +88,39 @@
             </div>
           </Col> -->
         </Col>
-        <Col class="see" span="6">
-          <div class="content">
-            <div class="see_hd">
-                <p><span>{{$t('tab.monitor')}}</span></p>
-                <!-- <a href='#'>{{$t('home.more')}}&gt;</a> -->
-            </div>
-            <i-circle
-              :size="200"
-              :trail-width="10"
-              :stroke-width="9"
-              :percent="75"
-              stroke-linecap="square"
-              stroke-color="#43a3fb">
-              <div class="demo-Circle-custom">
-                  <h1>42,776</h1>
-                  <p>{{$t('home.Online_rate_statistics')}}</p>
-                  <span>
-                      {{$t('home.online')}}
-                    <i>75%</i>
-                  </span>
-              </div>
-          </i-circle>
-          </div>
-        </Col>
+<!--        <Col class="see" span="6">-->
+<!--          <div class="content">-->
+<!--            <div class="see_hd">-->
+<!--                <p><span>{{$t('tab.monitor')}}</span></p>-->
+<!--                &lt;!&ndash; <a href='#'>{{$t('home.more')}}&gt;</a> &ndash;&gt;-->
+<!--            </div>-->
+<!--            <i-circle-->
+<!--              :size="200"-->
+<!--              :trail-width="10"-->
+<!--              :stroke-width="9"-->
+<!--              :percent="75"-->
+<!--              stroke-linecap="square"-->
+<!--              stroke-color="#43a3fb">-->
+<!--              <div class="demo-Circle-custom">-->
+<!--                  <h1>42,776</h1>-->
+<!--                  <p>{{$t('home.Online_rate_statistics')}}</p>-->
+<!--                  <span>-->
+<!--                      {{$t('home.online')}}-->
+<!--                    <i>75%</i>-->
+<!--                  </span>-->
+<!--              </div>-->
+<!--          </i-circle>-->
+<!--          </div>-->
+<!--        </Col>-->
       </Row>
 
-      
+
     </div>
   </Content>
 </template>
 <script>
+
+
 export default {
 
 };
@@ -149,11 +151,11 @@ export default {
       background: rgb(236, 244, 254)
     }
     cursor: pointer;
-    width: 200px;
+    width: 100%;
     height: 80px;
     margin: 10px auto;
     transform: translateX(20px);
-    display: inline-block;
+    display: flex;
     // border: 1px solid #000;
     .img{
       float: left;
@@ -168,7 +170,15 @@ export default {
     }
     .content {
       float: left;
-      width: 140px;
+      //width: 140px;
+      flex: 0 0 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-left: 10px;
+      p {
+        flex: 1;
+      }
       p.title{
         margin-left: 5px;
         width: 100%;
@@ -178,7 +188,7 @@ export default {
       }
       p.body{
         margin-left: 5px;
-        line-height: 15px;
+        line-height: 20px;
       }
     }
     span{
@@ -255,8 +265,8 @@ export default {
         }
     }
     }
-    
+
   }
-  
+
 </style>
 

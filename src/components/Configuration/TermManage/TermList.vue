@@ -137,6 +137,7 @@ export default {
           szIDOrName: val,
         },
         callback: (options, response, data) => {
+
           // let term = this.session.swGetPu(val);
           if (data.puList.length == 0) {
             this.$Message.error(this.$t("Monitor.noTerm"));
@@ -212,11 +213,11 @@ export default {
         let result = this.GroupIsExistPu(group.items[i],puList)
         if(result) {
           return result
-        }  
+        }
       }
 
       return false
-    },    
+    },
     SetTreeData(name) {
       if (this.SearchStatus) return;
       this.TreeLoading = true;
@@ -359,7 +360,7 @@ export default {
               if (document.querySelector(".TreeList"))
                 document.querySelector(".TreeList").scrollTop = 0;
               that.TreeLoading = false;
-              if (that.isFirst) that.isFirst = false;  
+              if (that.isFirst) that.isFirst = false;
             },
             filterCallback: function(puInfo, puId) {
               for(let i = 0; i < SortTemp.length; i++){
