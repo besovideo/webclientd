@@ -3,10 +3,16 @@
     <div class="title"></div>
     <div class="bottom">
       <div class="left">
-        <img :src="closePng" class="close" @click="CloseVideo">
+        <img :src="closePng" class="close" @click="CloseVideo" />
       </div>
       <div class="right">
-        <Icon type="md-expand" size="20" style="line-height:25px" @click="FullScreen()"/>
+        <Icon type="md-cut" size="20" style="line-height: 25px" />
+        <Icon
+          type="md-expand"
+          size="20"
+          style="line-height: 25px"
+          @click="FullScreen()"
+        />
       </div>
     </div>
   </div>
@@ -14,15 +20,15 @@
 
 <script>
 export default {
-  props:['hdlg'],
+  props: ["hdlg"],
   data() {
     return {
-      closePng: require("../../assets/images/close.png")
+      closePng: require("../../assets/images/close.png"),
     };
   },
   methods: {
-    CloseVideo(e){
-      this.$emit('closevideo')
+    CloseVideo(e) {
+      this.$emit("closevideo");
     },
     FullScreen(target) {
       let videoEl = event.target.parentElement.parentElement.parentElement;
@@ -37,8 +43,8 @@ export default {
         this.$tools.launchIntoFullscreen(videoEl);
         videoEl.dataset["isfullscreen"] = true;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

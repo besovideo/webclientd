@@ -1,13 +1,17 @@
 <template>
   <div class="videobox" ref="VideoBox">
     <div class="head">
-      <span v-if="ShowTag">{{ puname||"" }} {{ $t("Monitor.channel") }}{{ tag }}</span>
-      <span v-if="Type" style="padding-left:10px;">{{ $t("Monitor.Type") }}:({{ Type }})</span>
+      <span v-if="ShowTag"
+        >{{ puname || "" }} {{ $t("Monitor.channel") }}{{ tag }}</span
+      >
+      <span v-if="Type" style="padding-left: 10px"
+        >{{ $t("Monitor.Type") }}:({{ Type }})</span
+      >
     </div>
     <div class="videoEl">
-      <div class="video_div" />
+      <div ref="video_div" class="video_div" />
       <img
-        v-if="playLoading&&!noPlay"
+        v-if="playLoading && !noPlay"
         class="playloading"
         :src="playbtn"
         width="100"
@@ -16,17 +20,28 @@
       />
       <img
         class="playloading loading"
-        v-if="(!playLoading&&Loading)"
+        v-if="!playLoading && Loading"
         :src="playLoadingSrc"
         width="100"
       />
       <div class="control">
         <div class="left">
-          <img :src="closePng" class="close item unselectable" @click="Close()" />
+          <img
+            :src="closePng"
+            class="close item unselectable"
+            @click="Close()"
+          />
         </div>
         <div class="right">
-          <el-dropdown trigger="click" @command="DropdownClick" v-if="VideoTypeSetting">
-            <span class="el-dropdown-link" style="margin-right:10px;margin-top: 2.5px">
+          <el-dropdown
+            trigger="click"
+            @command="DropdownClick"
+            v-if="VideoTypeSetting"
+          >
+            <span
+              class="el-dropdown-link"
+              style="margin-right: 10px; margin-top: 2.5px"
+            >
               <a href="javascript:void(0)">
                 <img
                   class="settingImg"
@@ -40,31 +55,55 @@
               <el-dropdown-item
                 icon="ivu-icon ivu-icon-ios-apps"
                 :disabled="$store.state.VideoType == 'auto'"
-                :command="{'type':'videotype',val:'auto'}"
-              >AUTO</el-dropdown-item>
+                :command="{ type: 'videotype', val: 'auto' }"
+                >AUTO</el-dropdown-item
+              >
               <el-dropdown-item
                 icon="ivu-icon ivu-icon-ios-apps"
                 :disabled="$store.state.VideoType == 'rtmp'"
-                :command="{'type':'videotype',val:'rtmp'}"
-              >RTMP</el-dropdown-item>
+                :command="{ type: 'videotype', val: 'rtmp' }"
+                >RTMP</el-dropdown-item
+              >
               <el-dropdown-item
                 icon="ivu-icon ivu-icon-ios-apps"
                 :disabled="$store.state.VideoType == 'hls'"
-                :command="{'type':'videotype',val:'hls'}"
-              >HLS</el-dropdown-item>
+                :command="{ type: 'videotype', val: 'hls' }"
+                >HLS</el-dropdown-item
+              >
               <el-dropdown-item
                 icon="ivu-icon ivu-icon-ios-apps"
                 :disabled="$store.state.VideoType == 'httpflv'"
-                :command="{'type':'videotype',val:'httpflv'}"
-              >HttpFlv</el-dropdown-item>
+                :command="{ type: 'videotype', val: 'httpflv' }"
+                >HttpFlv</el-dropdown-item
+              >
             </el-dropdown-menu>
           </el-dropdown>
-          <img v-if="!Loading" :src="voice?volumeOpenSrc:volumeCloseSrc" class="voice" @click="voice = !voice">
-          <Slider v-if="!Loading"  v-model="volume" :step="10"></Slider>
+          <img
+            v-if="!Loading"
+            :src="voice ? volumeOpenSrc : volumeCloseSrc"
+            class="voice"
+            @click="voice = !voice"
+          />
+          <Slider v-if="!Loading" v-model="volume" :step="10"></Slider>
+
+          <Icon
+            type="md-download item unselectable"
+            size="20"
+            style="line-height: 25px"
+            @click="Record()"
+            :class="bRecording ? 'recording' : ''"
+          />
+
+          <Icon
+            type="md-cut item unselectable"
+            size="20"
+            style="line-height: 25px"
+            @click="SnapShot()"
+          />
           <Icon
             type="md-expand item unselectable"
             size="20"
-            style="line-height:25px"
+            style="line-height: 25px"
             @click="FullScreen()"
           />
         </div>
@@ -83,7 +122,7 @@ export default {
     "noPlay",
     "isopen",
     "puname",
-    "VideoTypeSetting"
+    "VideoTypeSetting",
   ],
   data() {
     return {
@@ -100,10 +139,94 @@ export default {
       ShowTag: false,
       OpenResult: undefined,
       volume: 100,
-      voice: true
+      voice: true,
+      bRecording: false,
     };
   },
   methods: {
+    Record() {
+      if (this.channel != undefined) {
+        let displayDiv = this.$refs.video_div;
+        let szVideoEle = displayDiv.getElementsByTagName("video");
+        if (szVideoEle.length > 0) {
+          if (this.mediaRecord) {
+            this.DownloadRecordMeida();
+          } else if (typeof this.mediaRecord == "undefined") {
+            let videoEle = szVideoEle[0];
+            var mediaStream = videoEle.captureStream();
+            if (mediaStream && mediaStream.active) {
+              this.mediaRecord = new MediaRecorder(mediaStream);
+              this.mediaRecord.ondataavailable = this.onRecordDataavailable;
+              this.mediaRecord.start();
+              this.bRecording = !this.bRecording;
+            }
+          }
+        }
+      }
+    },
+
+    onRecordDataavailable(blobEvent) {
+      var videoURL = window.URL.createObjectURL(blobEvent.data);
+      let channleId = parseInt(this.tag);
+      let currentTime = new Date().toString();
+      let snapshotName = `Record_${this.puid}_${channleId}_${currentTime}.webm`;
+      let aEle = document.createElement("a");
+      aEle.href = videoURL;
+      aEle.download = snapshotName;
+      aEle.click();
+      this.bRecording = false;
+      this.$notify({
+        title: snapshotName,
+        dangerouslyUseHTMLString: true,
+        message: `<video src=${videoURL} controls muted style='width: 100%'>`,
+        duration: 5000,
+      });
+    },
+
+    DownloadRecordMeida() {
+      if (this.mediaRecord) {
+        this.mediaRecord.stop();
+        this.mediaRecord = undefined;
+      }
+    },
+
+    SnapShot() {
+      if (this.channel != undefined) {
+        let displayDiv = this.$refs.video_div;
+        let szVideoEle = displayDiv.getElementsByTagName("video");
+        if (szVideoEle.length > 0) {
+          let videoEle = szVideoEle[0];
+          if (videoEle.paused == false) {
+            this.session
+              .swGetPuChanel(this.puid, parseInt(this.tag))
+              .swLocalSnapshot({
+                callback: this.OnSnapshotResult,
+              });
+          }
+        }
+      }
+    },
+
+    OnSnapshotResult(opt, response, data) {
+      if (data.length < 7) {
+        return;
+      }
+
+      let aEle = document.createElement("a");
+      aEle.href = data;
+      let channleId = parseInt(this.tag);
+      let currentTime = new Date().toString();
+      let snapshotName = `${this.puid}_${channleId}_${currentTime}`;
+      aEle.download = `${snapshotName}.png`;
+      aEle.click();
+      this.$notify({
+        title: snapshotName,
+        dangerouslyUseHTMLString: true,
+        message: `<img src=${data} style='width: 100%'>`,
+        duration: 3000,
+      });
+    },
+
     DropdownClick(data) {
       if (data.type == "window") {
         this.videosize = data.val;
@@ -116,6 +239,7 @@ export default {
         }
       }
     },
+
     //全屏
     FullScreen() {
       if (this.channel != undefined)
@@ -123,8 +247,10 @@ export default {
           .swGetPuChanel(this.puid, parseInt(this.tag))
           .swFullScreen(0);
     },
+
     //停止播放
     Close() {
+      this.DownloadRecordMeida();
       console.log("===========close", this.tagEl);
       this.$emit("on-open", this.tagEl, false);
       if (this.noPlay) {
@@ -173,36 +299,36 @@ export default {
             this.Type = this.$store.state.VideoType;
             this.$emit("on-open", this.tagEl, true);
           }
-        }
+        },
       });
-    }
+    },
   },
   computed: {
     ...mapState({
       session: "session",
-      notify: "notify"
-    })
+      notify: "notify",
+    }),
   },
   watch: {
     voice(val) {
-      let video = this.$refs.VideoBox.querySelector("video")
-      if(!video) return
-      if(!val) {
-        console.log(this.$refs.VideoBox)
-        video.volume = 0
-        this.volume = 0
+      let video = this.$refs.VideoBox.querySelector("video");
+      if (!video) return;
+      if (!val) {
+        console.log(this.$refs.VideoBox);
+        video.volume = 0;
+        this.volume = 0;
       }
     },
     volume(val) {
-      let video = this.$refs.VideoBox.querySelector("video")
-      if(!video) return
+      let video = this.$refs.VideoBox.querySelector("video");
+      if (!video) return;
 
-      if(val == 0) {
-        this.voice = false
-        return
+      if (val == 0) {
+        this.voice = false;
+        return;
       }
-      video.volume = val / 100
-      this.voice = true
+      video.volume = val / 100;
+      this.voice = true;
     },
     puid(val) {
       if (val != undefined) {
@@ -252,14 +378,48 @@ export default {
           this.channel = undefined;
         }
       }
-    }
+    },
   },
   destroyed() {
     this.Close();
-  }
+  },
 };
 </script>
 <style lang="less" scoped>
+.recording {
+  color: red;
+  animation: warn 1.5s ease-in;
+  -webkit-animation: warn 1.5s ease-in;
+  -moz-animation: warn 1.5s ease-in;
+
+  /*规定动画无限次播放*/
+  -webkit-animation-iteration-count: infinite;
+  -moz-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+}
+
+@keyframes warn {
+  100% {
+    opacity: 1;
+  }
+
+  75% {
+    opacity: 0.8;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+
+  25% {
+    opacity: 0.5;
+  }
+
+  0% {
+    opacity: 0.4;
+  }
+}
+
 .videobox {
   position: relative;
   width: 100%;
@@ -319,6 +479,7 @@ div.control {
   background-color: #000;
   .item {
     cursor: pointer;
+    margin-left: 5px;
   }
   .left {
     float: left;
@@ -361,9 +522,8 @@ div.control {
         .ivu-slider-button {
           width: 10px;
           height: 10px;
-          border: 2px solid #225fb5
+          border: 2px solid #225fb5;
         }
-
       }
     }
   }
