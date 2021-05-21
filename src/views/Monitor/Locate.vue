@@ -1,16 +1,17 @@
 <template>
   <div class="content">
     <div class="left">
-      <term-tree-list 
-        ref="LocateTree" 
-        key="LocateTree" 
-        :disabled="disabled" 
-        :ChanneTooltip="''" 
-        :TermTooltip="$t('Data.shuangjidakaishebeidingwei')" 
-        @on-tooltip-disabled="DontShowTooltip" 
-        @on-online-term="GetOnlineTerm" 
-        @on-check-term="OnCheckTerm" 
-        :noShowChannel="true" 
+      <term-tree-list
+        ref="LocateTree"
+        key="LocateTree"
+        :disabled="disabled"
+        :ChanneTooltip="''"
+        :TermTooltip="$t('Data.shuangjidakaishebeidingwei')"
+        @on-tooltip-disabled="DontShowTooltip"
+        @on-online-term="GetOnlineTerm"
+        @on-check-term="OnCheckTerm"
+        :showLocateMenu="true"
+        :show-menu="true"
         @on-term-click='ChanelClick'/>
     </div>
     <div class="body">
@@ -78,19 +79,19 @@ export default {
     },
     ChanelClick(channel){
       if(null == channel){
-        this.$Message.error(this.$t("Monitor.noGPSChannel"))        
+        this.$Message.error(this.$t("Monitor.noGPSChannel"))
         return
       }
       if(channel._parent._arr_gps.length==0){
         this.$Message.error(this.$t("Monitor.noGPSChannel"))
         return
       }
-      
+
       if(channel._parent._info_pu.onlinestatus==1)
         this.$refs['LocateMap'].ShowOneMarker(channel._parent._id_pu)
       else
         return
-      
+
       // channel = channel._parent._arr_gps[0];
       // if(channel!=this.openChannel){
       //   if(this.openChannel!=undefined){
@@ -112,11 +113,11 @@ export default {
       //   })
       //   console.log(code)
       // }
-      
+
     }
   },
   watch: {
-    
+
   },
   computed: {
     ...mapState({
@@ -130,8 +131,8 @@ export default {
     //     this.GetTermList();
     //   }, 2000);
     // });
-    // this.GetTermList(); 
-    this.disabled = localStorage.getItem('localeDisabled') == null ? false:true 
+    // this.GetTermList();
+    this.disabled = localStorage.getItem('localeDisabled') == null ? false:true
   }
 };
 </script>

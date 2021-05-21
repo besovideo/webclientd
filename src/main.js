@@ -7,9 +7,9 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import VueVideoPlayer from 'vue-video-player'
 import 'videojs-contrib-hls'
-import 'video.js/dist/video-js.css' 
+import 'video.js/dist/video-js.css'
 import 'font-awesome/css/font-awesome.css'
-import tools from './plugins/tools.js' 
+import tools from './plugins/tools.js'
 import VueI18n from 'vue-i18n'
 import rightMenu from 'rightmenu'
 // import data from './plugins/data.json'
@@ -18,10 +18,12 @@ import '@/components/Monitor/TreeList.less'
 import lodash from 'lodash'
 import './plugins/lang.js'
 
+import moment from "moment";
+
 Vue.prototype.$lodash = lodash
+Vue.prototype.$moment = moment
 
 Vue.prototype.$config = window
-
 
 
 
@@ -41,7 +43,7 @@ const i18n = new VueI18n({
   messages: langData
 })
 
-document.title = window.config_title || langData[store.state.lang]["title"] 
+document.title = window.config_title || langData[store.state.lang]["title"]
 Vue.prototype.$tools = tools
 Vue.config.productionTip = false
 Vue.use(VueVideoPlayer)

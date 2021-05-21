@@ -7,6 +7,8 @@
       </TabPane>
       <TabPane :label="$t('home.Scheduling')" name="Scheduling" tab='tabs'>
       </TabPane>
+      <TabPane :label="$t('home.FileSearch')" name="FileSearch" tab='tabs'>
+      </TabPane>
     </Tabs>
 
     <!-- <el-tabs v-model="tabs" type="border-card" @tab-click="ChangeTabs">
@@ -34,7 +36,7 @@ export default {
       this.tabs = name;
       this.$router.push({name:name})
     },
-    
+
   },
   watch:{
     $route(to,from){
@@ -71,7 +73,7 @@ export default {
   // flex:1;
   // display: flex;
   // flex-direction: column;
-  
+
 }
 .ivu-tabs-content{
   height: 0;

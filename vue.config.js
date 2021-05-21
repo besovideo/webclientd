@@ -3,7 +3,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')// npm install --save-de
 
 module.exports = {
   devServer: {
-    https: true
+    // https: true
   },
   css: {
     loaderOptions: {
@@ -47,7 +47,7 @@ module.exports = {
           })
 
     config.plugin('define').tap(args => {
-      args[1] = { jSW: 'window.jSW' } 
+      args[1] = { jSW: 'window.jSW' }
       return args
     })
   },

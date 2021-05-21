@@ -1,7 +1,7 @@
 <template>
   <div class="lp_content">
     <div class="lp_left">
-      <term-tree-list  @on-click='ChanelClick' :disabled="disabled" :ChanneTooltip="$t('Data.shuangjichanneldakaishipinyulan')" :TermTooltip="$t('Data.shuangjichanneldakaishipinyulan')" @on-tooltip-disabled="DontShowTooltip" />
+      <term-tree-list  @on-click='ChanelClick' :showMenu="true" :disabled="disabled" :ChanneTooltip="$t('Data.shuangjichanneldakaishipinyulan')" :TermTooltip="$t('Data.shuangjichanneldakaishipinyulan')" @on-tooltip-disabled="DontShowTooltip" />
     </div>
     <div class="lp_body">
       <div id="right_VideoContent">
@@ -56,7 +56,7 @@
             </el-dropdown-menu>
           </el-dropdown>
 
-          
+
         </div>
       </div>
     </div>
@@ -152,7 +152,7 @@ export default {
         case 16:
           this.videoboxclass = {width:"25%",height:"25%",float:'left',border:"1px solid rgb(72, 123, 194)"}
           break
-      }  
+      }
     },
   },
 
@@ -176,8 +176,8 @@ export default {
     for(var i=0;i<16;i++){
       this.videoinfo.push({index:i,puid:undefined,puname:undefined,tag:undefined,isopen:undefined})
     }
-    this.disabled = localStorage.getItem('LivePreviewDisabled') == null ? false:true 
-    
+    this.disabled = localStorage.getItem('LivePreviewDisabled') == null ? false:true
+
   },
   updated() {
   }

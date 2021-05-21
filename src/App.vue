@@ -51,7 +51,9 @@ export default {
         // url = "https://192.168.8.7:9443";
         // url = 'https://61.191.27.18:9443'
         // url = 'https://192.168.0.68:9443'
-        url = 'https://192.168.8.7:9443'
+        // url = 'https://192.168.8.7:9443'
+        url = 'http://192.168.8.7:8081'
+        // url = 'http://192.168.6.51:8088'
         // url = 'https://192.168.0.68:9443'
       }
       this.userName = userName;
@@ -126,13 +128,17 @@ export default {
       console.log("initCode:", initCode);
     },
     notifyCallback(sender, event, json) {
-      console.log("notify: ", json.msg);
+      console.log("notify: ", json.msg, event, json);
 
       switch (json.msg) {
         case "notify_pu_onoffline":
           console.log("notify_pu_onoffline");
           this.$store.state.notify = json.content;
           this.$store.state.notify_term = json.content;
+          break;
+        case "notify_pu_record_status":
+
+          this.$store.state.record_status = json.content
           break;
       }
       // console.log('notify: ',sender, event, json);

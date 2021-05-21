@@ -15,6 +15,7 @@ export default new Vuex.Store({
     VideoType: 'httpflv',
     ErrorCode: -1,
     notify: undefined,
+    record_status: undefined,
     notify_term: undefined,
     notifyTip: {},
     UserManageInit: false,
@@ -24,6 +25,6 @@ export default new Vuex.Store({
   mutations: {
   },
   actions: {
-    
+
   }
 })

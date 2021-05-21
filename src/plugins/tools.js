@@ -74,6 +74,15 @@ export default {
       cb()
     }
   },
+  handleUnit(value, units = ['B', 'KB', 'MB', 'GB']) {
+    let count = 0;
+    let val = value;
+    while (val >= 1024) {
+      val /= 1024;
+      count += 1;
+    }
+    return `${val.toFixed(0)}${units[count]}`;
+  },
   // eslint-disable-next-line camelcase
   utc2beijing: (new_datetime) => {
     let timestamp

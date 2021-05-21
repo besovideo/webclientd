@@ -91,7 +91,17 @@ export default new Router({
                 Name: 'Monitor'
               },
               component: () => import(/* webpackChunkName: "Monitor" */ './views/Monitor/Scheduling.vue')
-            }
+            },
+            {
+              path: 'FileSearch',
+              name: 'FileSearch',
+              meta: {
+                title: 'home.FileSearch',
+                keepAlive: true,
+                Name: 'Monitor'
+              },
+              component: () => import(/* webpackChunkName: "Monitor" */ './views/Monitor/FileSearch.vue')
+            },
           ],
           component: () => import(/* webpackChunkName: "Monitor" */ './views/Monitor.vue')
         },

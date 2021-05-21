@@ -39,7 +39,7 @@ module.exports = {
       Picture_monitor: '图片监控',
       Picture_monitor_tip: '设备推送图片信息实时监控',
       Locate: '实时定位',
-      Scheduling: '集群调度'      
+      Scheduling: '集群调度'
 
     },
     Monitor: {

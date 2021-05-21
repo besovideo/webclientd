@@ -35,7 +35,7 @@
                 <el-link type="success" @click="$emit('on-tooltip-disabled')">{{$t('Data.buzaixianshi')}}</el-link>
               </div>
             </template> -->
-          <span @dblclick="HandleChannelClick(data, node)">
+          <span @dblclick="HandleChannelClick(data, node)" >
             <i
               v-if="node.label == ''"
               class="el-icon-s-data"
@@ -98,7 +98,7 @@
         :page-size="100"
         layout="prev, pager, next"
         :total="Total"
-        :pager-count="5"
+        :pager-count="4"
         @current-change="ChangePage"
       ></el-pagination>
     </div>
@@ -125,17 +125,41 @@
       :show="contextMenuVisible"
     >
       <!-- @update:show="(show) => contextMenuVisible = show"> -->
-      <ul
-        class="rightMenu-ul"
-        v-for="item in this.$store.state.locateCheckData[rigthClickPuID]"
-      >
-        <li>
-          <i v-if="item.isChecked" class="el-icon-check" />
-          <a href="javascript:;" @click="SetRightMenuVal(item)">{{
-            item.label
-          }}</a>
-        </li>
-      </ul>
+
+        <ul
+          class="rightMenu-ul"
+        >
+          <li v-if="showLocateMenu" v-for="(item,index) in this.$store.state.locateCheckData[rigthClickPuID]" class="right_menu_li" :key="index">
+            <i v-if="item.isChecked" class="el-icon-check" />
+            <a href="javascript:;" @click="SetRightMenuVal(item)">{{
+                item.label
+              }}</a>
+          </li>
+          <li v-if="showMenu"  v-for="(item,index) in normalMenu"  class="right_menu_li">
+              <i v-if="item.isChecked" class="el-icon-check" />
+              <a href="javascript:;" @click="SetRightMenuVal(item)">{{
+                  item.label
+                }}</a>
+          </li>
+
+<!--          <el-tooltip class="menu-tooltip"  effect="light"  placement="right" v-else>-->
+<!--            <template slot="content">-->
+<!--              <li class="right_menu_li">-->
+<!--                <a href="javascript:;" >开启</a>-->
+<!--              </li>-->
+<!--              <li class="right_menu_li" >-->
+<!--                <a href="javascript:;">关闭</a>-->
+<!--              </li>-->
+<!--            </template>-->
+<!--            <li class="right_menu_li">-->
+<!--              <a href="javascript:;">远程抓拍2</a>-->
+<!--            </li>-->
+<!--          </el-tooltip>-->
+        </ul>
+
+
+
+
     </context-menu>
   </div>
 </template>
@@ -144,7 +168,7 @@
 import { mapState } from "vuex";
 import { component as VueContextMenu } from "@xunlei/vue-context-menu";
 export default {
-  props: ["noShowChannel", "TermTooltip", "ChanneTooltip"], // 'disabled'
+  props: ["showLocateMenu", "TermTooltip", "ChanneTooltip", "showMenu"], // 'disabled'
   components: {
     "context-menu": VueContextMenu,
   },
@@ -168,6 +192,29 @@ export default {
       allCheckedTerm: [],
       rigthClickPuID: undefined,
       locateCheckData: {},
+
+      optionsRecord: {
+        time: 100,
+        filename: '',
+        fileType: 1,
+      },
+      normalMenu: [
+        {
+          label: this.$t('Data.yuanchengluyin'),
+          isChecked: false,
+          key: "brecordaudio",
+        },
+        {
+          label: this.$t('Data.yuanchengluxiang'),
+          isChecked: false,
+          key: "brecordvideo",
+        },
+        {
+          label: this.$t('Data.yuanchengzhuapai'),
+          isChecked: false,
+          key: "brecordimage",
+        },
+      ],
       TermListData: [
         {
           label: this.$t("Monitor.Server"),
@@ -183,20 +230,157 @@ export default {
     };
   },
   methods: {
+
     SetRightMenuVal(item) {
       console.log("item.key :", item.key, item.isChecked);
       this.contextMenuVisible = false;
       let clickID = this.rigthClickPuID + "";
-      this.$set(item, "isChecked", !item.isChecked);
+
       if (item.key == "guiji" && item.isChecked) {
         let Weizhi = this.$store.state.locateCheckData[this.rigthClickPuID][0];
         if (!Weizhi.isChecked) {
           Weizhi.isChecked = true;
-
           this.$emit("on-check-term", clickID, "weizhi", item.isChecked);
         }
       }
       this.$emit("on-check-term", clickID, item.key, item.isChecked);
+
+      switch (item.key) {
+        case "brecordvideo":
+          this.puRecordVideo(clickID, !item.isChecked, 9)
+          break;
+        case "brecordaudio":
+          this.puRecordVideo(clickID, !item.isChecked, 8)
+          break;
+        case "brecordimage":
+          this.puSnapshot(clickID, !item.isChecked)
+          break;
+        default:
+          this.$set(item, "isChecked", !item.isChecked);
+          break
+      }
+    },
+    puSnapshot(id, checked) {
+      let pu = this.session.swGetPu(id);
+      if (!pu) {
+        this.$Message.error(this.$t('Data.lianjieshibai'))
+        return
+      }
+      pu.swSetPuSnapshot({
+        istart: 1,
+        callback:  (options, response) => {
+          if (response.emms.code === jSW.RcCode.RC_CODE_S_OK) {
+            setTimeout( () => pu.swSetPuSnapshot({ istart: 0 }) , 500)
+            this.$Message.success( this.$t('Data.zhuapai')  + (checked ? this.$t('Data.chenggong') : this.$t('Data.tingzhi')))
+          } else {
+            this.$Message.error(this.$t('Data.lianjieshibai')+ ' ' + this.$tools.findErrorCode(response.emms.code))
+          }
+        }
+      });
+      // this.$prompt('请输入邮箱',  this.$t('Data.yuanchengzhuapai'), {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
+      //   inputErrorMessage: '邮箱格式不正确'
+      // }).then(({ value }) => {
+      //   this.$message({
+      //     type: 'success',
+      //     message: '你的邮箱是: ' + value
+      //   });
+      // }).catch(() => {
+      //   this.$message({
+      //     type: 'info',
+      //     message: '取消输入'
+      //   });
+      // });
+    },
+    puRecordVideo(id, checked, type) {
+      this.optionsRecord.fileType = type
+      if (!checked) {
+        this.doPuRecord(id, false, this.optionsRecord)
+        return
+      }
+      let title = this.$t('Data.yuanchengluxiang')
+      let target = this.$t('Data.luxiang')
+      if (type === 8) {
+        title = this.$t('Data.yuanchengluyin')
+        target = this.$t('Data.luyin')
+      }
+      const h = this.$createElement;
+      this.optionsRecord.time = 100
+      this.$msgbox({
+        title: title,
+        message: h('p', null, [
+          h('i', null, target + this.$t('Data.shijian') + "(s); -1 "+ this.$t('Data.biaoshiyizhilu')),
+          h('div',{class: 'el-input'}, [
+            h('input', {
+              domProps: {
+                value: this.optionsRecord.time,
+                type: 'number'
+              },
+              class: 'el-input__inner',
+              on: {
+                input:  (value) => {
+                  this.optionsRecord.time =  event.target.value
+                },
+              }
+            }),
+          ]),
+          h('i', null, target + this.$t('Data.wenjianming')),
+          h('div',{class: 'el-input'}, [
+            h('input', {
+              domProps: {
+                value: this.optionsRecord.filename
+              },
+              class: 'el-input__inner',
+              on: {
+                input:  (event) => {
+                  this.optionsRecord.filename = event.target.value
+                },
+              }
+            }),
+          ]),
+        ]),
+        showCancelButton: true,
+        confirmButtonText: this.$t('Data.queding'),
+        cancelButtonText: this.$t('Data.quxiao'),
+      }).then(res=>{
+        console.log(res, this.optionsRecord.time, this.optionsRecord.filename)
+        if (!this.optionsRecord.time) {
+          this.$Message.error(this.$t('Data.shijiangeshibuzhengque'))
+          return
+        }
+        this.doPuRecord(id, true, this.optionsRecord)
+      })
+    },
+    doPuRecord(id, isRecord, {time = 0, filename = '', fileType }) {
+      let pu = this.session.swGetPu(id);
+      if (!pu) {
+        this.$Message.error(this.$t('Data.lianjieshibai'))
+        return
+      }
+      console.log('fileType:' ,fileType)
+      pu.swSetPuManualrecord({
+        isstart: isRecord ? 1 : 0,
+        ilength: time || 0,
+        szFileName: filename || '',
+        iFileType: fileType,
+        iChannel: 0,
+        callback: (sender, response, data) => {
+          if (response.emms.code === jSW.RcCode.RC_CODE_S_OK) {
+            let str = this.$t('Data.luxiang')
+            if (fileType === 8) {
+              str = this.$t('Data.luyin')
+            }
+            this.$Message.success(str + (isRecord ? this.$t('Data.kaishi') : this.$t('Data.tingzhi')))
+          } else {
+            this.$Message.error(this.$t('Data.lianjieshibai')+ ' ' + this.$tools.findErrorCode(response.emms.code))
+          }
+        }
+      })
+    },
+    puRecordImage(id) {
+
     },
     FindPuNode() {
       let funcFindPuNode = (el) => {
@@ -231,13 +415,45 @@ export default {
         {
           return result
         }
-      }       
+      }
 
       return null
     },
-    BoxRightClick(e) {
+    getCurrPuRecordStatus(pu) {
+      if (!pu) {
+        pu = this.session.swGetPu(this.rigthClickPuID);
+        if (!pu) {
+          this.$Message.error(this.$t('Data.lianjieshibai'))
+          return false
+        }
+      }
+
+      return new Promise((resolve, reject)=>{
+        let rc = pu.swGetPuRecordStatus({
+          callback: (options, response, data)=>{
+            if( rc !== 0 || !data ){
+              this.$Message.error(this.$t('Data.huoqushebeizhuangtaishibai'))
+              resolve(false)
+            }else{
+              console.log("status: ", data)
+              for (const key in data) {
+                this.normalMenu.forEach(item=>{
+                  if (item['key'] === key) {
+                    item.isChecked = data[key]
+                  }
+                })
+              }
+              resolve(true)
+
+            }
+          }
+        })
+      })
+
+    },
+    async BoxRightClick(e) {
       // let div = document.querySelector('.TermTree')
-      if (e.target.classList.contains("TermTree") && this.noShowChannel) {
+      if (e.target.classList.contains("TermTree") && (this.showLocateMenu || this.showMenu) ) {
         this.rigthClickPuID = e.target.getAttribute("puid");
         // let PuIdData = this.TermListData[0].children.find(
         //   (el) => el.pu_id == this.rigthClickPuID
@@ -247,6 +463,17 @@ export default {
         if (PuIdData == null || !PuIdData.isOnline) {
           return;
         }
+
+        let pu = this.session.swGetPu(this.rigthClickPuID);
+
+        if (!pu) {
+          this.$Message.error(this.$t('Data.lianjieshibai'))
+          return
+        }
+        let flag = await this.getCurrPuRecordStatus(pu)
+
+
+        if (!flag) return
 
         if (!this.$store.state.locateCheckData[this.rigthClickPuID]) {
           this.$set(this.$store.state.locateCheckData, this.rigthClickPuID, [
@@ -382,7 +609,7 @@ export default {
       this.SearchStatus = true;
       data.puList.forEach((ele, i) => {
         let children = [];
-        if (!this.noShowChannel) {
+        if (!this.showLocateMenu) {
           ele._arr_channel.forEach((el, i) => {
             children.push({
               label: this.$t("Monitor.channel") + i,
@@ -448,7 +675,7 @@ export default {
         // this.Total = this.session[name].length;
         if (i >= (CurrentPage - 1) * 100 && i < (CurrentPage - 1) * 100 + 100) {
           let children = [];
-          if (this.noShowChannel) {
+          if (this.showLocateMenu) {
           } else {
             ele._arr_channel.forEach((el, i) => {
               if (ele._info_pu.onlinestatus != 0)
@@ -541,7 +768,7 @@ export default {
               // })
               that.$emit("on-online-term", giveLocateOnlineTerm);
               that.isFirst = false;
-            } 
+            }
             },
             filterCallback: function(puInfo, puId) {
               for(let i = 0; i < SortTemp.length; i++){
@@ -633,6 +860,7 @@ export default {
       // console.log('allCheck',this.$refs.tree.getCheckedKeys())
       // if(this.TreeLoading)return
       console.log("ONline");
+
       if (this.Cb_isOnline && !this.isFirst) {
         this.GetTermList(this.CurrentPage - 1, 100, true);
       }
@@ -641,8 +869,17 @@ export default {
         this.GetTermList(this.CurrentPage - 1, 100, false);
       }
     },
+    record_status(val) {
+
+      if (val.target !== this.rigthClickPuID) {
+        return
+      }
+      console.log("record status change :", this.rigthClickPuID)
+
+      this.getCurrPuRecordStatus()
+    },
     Cb_isOnline(val) {
-      if (val == true) {
+      if (val === true) {
         localStorage.setItem("cb_online", val);
       } else {
         localStorage.removeItem("cb_online");
@@ -660,6 +897,7 @@ export default {
     ...mapState({
       session: "session",
       notify: "notify",
+      record_status: "record_status"
     }),
   },
   mounted() {
@@ -748,32 +986,33 @@ export default {
     &:nth-child(n + 2) {
       border-top: 1px solid #ccc;
     }
-    li {
-      padding-left: 24px;
-      position: relative;
-      height: 28px;
-      background-color: rgba(110, 107, 107, 0.2);
-      > i {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        font-weight: 700;
-        font-size: 16px;
 
-        color: #000;
-        border: 1px solid skyblue;
-        background-color: #fff;
-        line-height: 20px;
-        position: absolute;
-        left: 2px;
-        top: 4px;
-        text-align: center;
-      }
-    }
   }
 }
 
-.right-menu a {
+.right_menu_li {
+  padding-left: 24px;
+  position: relative;
+  height: 28px;
+  background-color: rgba(110, 107, 107, 0.2);
+  > i {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    font-weight: 700;
+    font-size: 16px;
+
+    color: #000;
+    border: 1px solid skyblue;
+    background-color: #fff;
+    line-height: 20px;
+    position: absolute;
+    left: 2px;
+    top: 4px;
+    text-align: center;
+  }
+}
+.right-menu a, .right_menu_li a{
   // width: 100px;
   height: 28px;
   background: #fff;
@@ -783,9 +1022,9 @@ export default {
   color: #1a1a1a;
 }
 
-.right-menu a:hover {
-  background: #eee;
+.right-menu a:hover , .right_menu_li a:hover {
   color: #fff;
+  background: #42b983;
 }
 
 body,
@@ -793,16 +1032,16 @@ html {
   height: 100%;
 }
 
-.rightMenu-ul a {
+.rightMenu-ul a, .right_menu_li a {
   text-decoration: none;
+
 }
 
-.right-menu a {
+.right-menu a, .right_menu_li a {
   padding: 5px;
 }
-
-.right-menu a:hover {
-  background: #42b983;
+.el-tooltip__popper.is-light  {
+  padding: 0;
 }
 </style>
 

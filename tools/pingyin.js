@@ -1,18 +1,18 @@
 const pinyin = require('pinyin')
 const request = require('request')
-var fs = require('fs')
-var path = require('path')
-var process = require('process')
+const fs = require('fs')
+const path = require('path')
+const process = require('process')
 const { exec } = require('child_process')
 
 let FilePath = path.resolve('public/lang/data.json')
-let data 
+let data
 eval('data = ' + fs.readFileSync(FilePath).toString())
 // console.log(data)
 
 if (!data.zh.Data && !data.en.Data) {
-  data.zh.Data = {} 
-  data.en.Data = {} 
+  data.zh.Data = {}
+  data.en.Data = {}
 }
 
 function saveData () {
@@ -35,7 +35,7 @@ function Fangyi (str, target) {
       let en = body.translateResult[0][0].tgt
       if (!en) {
         return
-      } 
+      }
       switch (target) {
         case '1':
           exec('clip').stdin.end(`{{$t('Data.${code}')}}`)
@@ -82,7 +82,7 @@ function Fangyi (str, target) {
       console.log(`{{$t('Data.${code}')}}`)
       console.log(`$t('Data.${code}')`)
       console.log(`this.$t('Data.${code}')`)
-      
+
       saveData()
     }
   }).catch(error => {
@@ -96,7 +96,7 @@ function GetYoudao (str) {
   return new Promise((resolve, reject) => {
     let url = `http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i=${encodeURIComponent(str)}`
     // let url = `http://www.baidu.com`
-    console.log(url)    
+    console.log(url)
     request(url, (error, response, body) => {
       if (error) {
         reject(error)
