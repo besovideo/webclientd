@@ -40,7 +40,7 @@
     "css-loader": "^3.2.0",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
-    "jquery": "3.4.1",
+    "jquery": "3.5.0",
     "less": "^3.0.4",
     "less-loader": "^5.0.0",
     "rightmenu": "^1.1.0",
