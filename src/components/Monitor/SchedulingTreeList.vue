@@ -65,7 +65,7 @@
           </span>
 
           <span style="float:right;display:inline-block" v-if="data.isMeeting">
-            <el-dropdown trigger="click" size="medium" @command="MenuHandle">    
+            <el-dropdown trigger="click" size="medium" @command="MenuHandle">
               <img
                 :src="require('@/assets/images/PersonSet.png')"
                 width="15"
@@ -108,7 +108,7 @@
               alt
               @click.stop="LiaotianClick(data)"
             />
-            
+
           </span>
           <span style="float:right;display:inline-block" v-if="data.root">
             <el-dropdown trigger="click" size="medium" @command="MenuHandle">
@@ -124,10 +124,10 @@
                 <el-dropdown-item icon="el-icon-plus" :command="{type:'create'}">{{$t('Data.chuangjianhuiyi')}}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
-            
+
           </span>
           <!-- <span class="pu_id" v-if="data.isMeeting">
-            {{ (data.id==undefined) ?"":`(${data.id.slice(5)})` }} 
+            {{ (data.id==undefined) ?"":`(${data.id.slice(5)})` }}
           </span>-->
         </span>
       </el-tree>
@@ -139,7 +139,7 @@
       :title="$t('Data.chuangjianhuiyi')"
       :visible.sync="CreateDialog"
       :width="lang=='en'?'900px':'700px'"
-      
+
       :before-close="HandleDialogClose"
       center >
       <el-form :model="CreateForm" :rules="CreateRules" ref="CreateForm" :label-width="lang=='en'?'140px':'90px'" size="medium">
@@ -206,9 +206,9 @@
 
     <!-- 发起语音 -->
     <div class="speak_fixed">
-      <p style="height: 50%;line-height:25px;font-size:14px;padding-left:10px">{{$t('Data.dangqianhuiyi')}} <span>{{this.NowSpeakConf}}</span></p> 
+      <p style="height: 50%;line-height:25px;font-size:14px;padding-left:10px">{{$t('Data.dangqianhuiyi')}} <span>{{this.NowSpeakConf}}</span></p>
       <!-- <p style="height: 50%;line-height:25px;font-size:14px;padding-left:10px">{{$t('Data.zhengzaifayan')}} <span>{{this.NowSpeaker == this.user ? $t('Data.dangqianyonghu'): this.NowSpeaker}}</span></p>  -->
-      <p style="height: 50%;line-height:25px;font-size:14px;padding-left:10px">{{$t('Data.zhengzaifayan')}} <span>{{this.NowSpeaker}}</span></p> 
+      <p style="height: 50%;line-height:25px;font-size:14px;padding-left:10px">{{$t('Data.zhengzaifayan')}} <span>{{this.NowSpeaker}}</span></p>
     </div>
     <!-- 发起语音 -->
   </div>
@@ -402,7 +402,7 @@ export default {
           if (valid) {
             this._DOCreateConf()
           } else {
-            
+
             return false;
           }
         });
@@ -427,7 +427,7 @@ export default {
             }
         });
         }).catch(() => {
-          
+
         });
     },
     DoDeletePerson(data){
@@ -464,11 +464,11 @@ export default {
               tag: null
           });
         }).catch(() => {
-          
+
         });
     },
     DoInviteSpeak(data){
-      
+
       let confManager = this.session.swGetConfManager();
       let conf = confManager.swGetConfByConfId(data[0].parent.data.id);
       if (conf == null) {
@@ -493,10 +493,10 @@ export default {
           },
           tag: null
       });
-        
+
     },
     DoStopSpeak(data){
-      
+
       let confManager = this.session.swGetConfManager();
       let conf = confManager.swGetConfByConfId(data[0].parent.data.id);
       if (conf == null) {
@@ -521,7 +521,7 @@ export default {
           },
           tag: null
       });
-        
+
     },
     DoInvaiteJoinClick(){
       if(this.CheckBoxOnlineJoin.data.length==0){
@@ -575,7 +575,7 @@ export default {
         case 'deleteMeet':
           this.DoDeleteMeet(data.val)
         break
-        case 'startMeet': 
+        case 'startMeet':
           var confManager = this.session.swGetConfManager();
 
           var conf = confManager.swGetConfByConfId(data.val.id);
@@ -630,7 +630,7 @@ export default {
               }
               this.OnlineUserList = users
               this.CheckBoxOnlineJoin.data = []
-              this.CheckBoxOnlineJoin.id = data.val.id              
+              this.CheckBoxOnlineJoin.id = data.val.id
               this.InvaiteDialog = true
             }
           })
@@ -657,7 +657,7 @@ export default {
         break
       }
     },
-      
+
     LiaotianClick(data) {
       // let _IM = Vue.extend(IM)
       // let im = new _IM({
@@ -685,8 +685,8 @@ export default {
             console.log("error==============")
           }
         });
-     
-      
+
+
     },
     TermSearch(val, page) {},
     HandleChannelClick(data, node,el) {
@@ -697,7 +697,7 @@ export default {
       let conf = confManager.swGetConfByConfId(data.id)
       // conf.swParticipatorLeave({
       //   callback : (sender, response, json)=>{
-          
+
       //   }
       // })
       conf.swParticipatorReturn({
@@ -951,7 +951,7 @@ export default {
         isSpeak: data.isSpeak,
       };
       Conf[0].bIsStarted = conf._conf_base_info.bIsStarted
-      
+
 
       for (let obj in temp) {
         Term[0][obj] = temp[obj];
@@ -1107,7 +1107,7 @@ export default {
       });
     })
     //  清楚数据
-    
+
 
     this.jSW = window.jSW
     console.log("SchedulingTreeList,created");
@@ -1130,7 +1130,7 @@ export default {
         let mList = this.GetLayImGroup(list);
         layui.use(["layim"], layim => {
           this.layim  = window.layim = layim;
-          
+
           layim.config({
             brief: false, //是否简约模式（如果true则不显示主面板）
             title: "IM",
@@ -1191,10 +1191,10 @@ export default {
         });
       }
     });
-    
+
   },
   destroyed() {
-    
+
     $(".layui-layim-min").remove()
     $(".layui-layim").remove()
     $(".layui-layim-chat").remove()

@@ -2,6 +2,7 @@
 node_modules
 /dist
 /dist_
+/pkg
 
 # local env files
 .env.local
@@ -21,3 +22,5 @@ yarn-error.log*
 *.sln
 *.sw?
 dist.zip
+*-lock.json
+*.lock

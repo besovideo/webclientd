@@ -4,7 +4,7 @@
  @Author：贤心
  @Site：http://layim.layui.com
  @License：LGPL
-    
+
  */
 
 layui.define(['layer', 'laytpl', 'upload'], function (exports) {
@@ -389,7 +389,7 @@ layui.define(['layer', 'laytpl', 'upload'], function (exports) {
         if (!href) return str;
         return '<a href="' + href + '" target="_blank">' + (text || href) + '</a>';
       }).replace(html(), '\<$1 $2\>').replace(html('/'), '\</$1\>') //转移HTML代码
-      .replace(/\n/g, '<br>') //转义换行 
+      .replace(/\n/g, '<br>') //转义换行
     return content;
   };
 
@@ -434,6 +434,7 @@ layui.define(['layer', 'laytpl', 'upload'], function (exports) {
           , group: data.group || [] //群组信息
           , history: local.history || {} //历史会话信息
         };
+        // console.log("layim 437",obj);
         cache = $.extend(cache, obj);
         popim(laytpl(elemTpl).render(obj));
         if (local.close || options.min) {
@@ -1226,7 +1227,7 @@ layui.define(['layer', 'laytpl', 'upload'], function (exports) {
               var list = li.find('.layui-layim-list>li');
               li.find('.layui-layim-list>li').eq(index).remove();
               cache.friend[index1].list.splice(index, 1); //从cache的friend里面也删除掉好友
-              li.find('.layim-count').html(cache.friend[index1].list.length); //刷新好友数量  
+              li.find('.layim-count').html(cache.friend[index1].list.length); //刷新好友数量
               //如果一个好友都没了
               if (cache.friend[index1].list.length === 0) {
                 li.find('.layui-layim-list').html('<li class="layim-null">该分组下已无好友了</li>');
@@ -1668,8 +1669,8 @@ layui.define(['layer', 'laytpl', 'upload'], function (exports) {
     //表情
     , face: function (othis, e) {
       var content = '', thatChat = thisChat();
-      
-      
+
+
       // for (var key in faces) {
       //   content += '<li title="' + key + '"><img src="' + faces[key] + '"></li>';
       // }
@@ -1677,7 +1678,7 @@ layui.define(['layer', 'laytpl', 'upload'], function (exports) {
       emojiarr.forEach(el => {
         content += '<li title="[' + el.id + ']"><img src="' + el.url + '"></li>';
       })
-      
+
       content = '<ul class="layui-clear layim-face-list">' + content + '</ul>';
 
 
@@ -1723,7 +1724,7 @@ layui.define(['layer', 'laytpl', 'upload'], function (exports) {
             sendMessage();
           });
         });
-        return 
+        return
         //修改代码
       layui.upload.render({
         url: upload.url || ''

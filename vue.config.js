@@ -3,7 +3,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')// npm install --save-de
 
 module.exports = {
   devServer: {
-    // https: true
+    https: true
   },
   css: {
     loaderOptions: {
@@ -19,6 +19,11 @@ module.exports = {
       new CopyWebpackPlugin([
         {
           from: './static/layui-src/src', // 新增可以被index.html访问的静态文件目录,支持多个
+          to: this.outputDir,
+          ignore: ['.*']
+        },
+        {
+          from: './static/dompurify',
           to: this.outputDir,
           ignore: ['.*']
         },
