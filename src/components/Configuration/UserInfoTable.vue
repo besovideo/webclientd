@@ -113,7 +113,7 @@
           <el-input :disabled="true" v-model="UserEditer.data.id"></el-input>
         </el-form-item>
         <el-form-item :label="this.$t('Data.yonghuxingming')">
-          <el-input v-model="UserEditer.data.name"></el-input>
+          <el-input v-input-filter:f v-model="UserEditer.data.name"></el-input>
         </el-form-item>
         <el-form-item label>
           <el-checkbox
@@ -156,13 +156,13 @@
           ></el-checkbox>
         </el-form-item>
         <el-form-item :label="this.$t('Data.lianxidianhua')">
-          <el-input v-model="UserEditer.data.phone"></el-input>
+          <el-input v-input-filter:f v-model="UserEditer.data.phone"></el-input>
         </el-form-item>
         <el-form-item :label="this.$t('Data.youxiang')">
-          <el-input v-model="UserEditer.data.email"></el-input>
+          <el-input v-input-filter:f v-model="UserEditer.data.email"></el-input>
         </el-form-item>
         <el-form-item :label="$t('Data.yonghumiaoshu')">
-          <el-input type="textarea" v-model="UserEditer.data.description"></el-input>
+          <el-input v-input-filter:f type="textarea" v-model="UserEditer.data.description"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -261,7 +261,7 @@ export default {
               return;
             }
             if(this.UserEditer.UpdatePasswd){
-              
+
               _user.swModPwd({
                 data: {
                   password: this.UserEditer.data.id==this.user? this.UserEditer.data.oldpasswd:"",

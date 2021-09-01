@@ -10,7 +10,7 @@
           <div class="search_filter">
               <el-form :inline="true" label-width="80px" >
                 <el-form-item :label="$t('Data.shebei')">
-<!--                  <el-input size="medium" :value="filter.name + ' ' + filter.id"  :title="filter.name + ' ' + filter.id" readonly style="cursor: pointer"></el-input>-->
+<!--                  <el-input v-input-filter:f size="medium" :value="filter.name + ' ' + filter.id"  :title="filter.name + ' ' + filter.id" readonly style="cursor: pointer"></el-input>-->
                   <el-tag v-if="filter.id">{{ `${filter.name} (${filter.id})` }}</el-tag>
                   <el-tag v-else>{{ $t('Data.qingshuangjixuanzeshebei') }}</el-tag>
                 </el-form-item>

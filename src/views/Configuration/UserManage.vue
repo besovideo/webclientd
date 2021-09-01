@@ -1,5 +1,5 @@
 <template>
-  <div id="ConfigureList" style="height:100%;width:100%">  
+  <div id="ConfigureList" style="height:100%;width:100%">
     <div class="left">
       <user-manage-tree-list @on-getdata="GetGroupData" @on-all-click="handleAllClick" @on-group-click="handleGroupClick" @on-user-click="handleUserClick"/>
     </div>
@@ -59,13 +59,13 @@
         center >
         <el-form :label-width="lang=='en'?'170px':'90px'" size="medium">
           <el-form-item :label="$t('Data.yonghuzuID')" >
-            <el-input v-model="AddGroup.id"></el-input>
+            <el-input v-input-filter:f v-model="AddGroup.id"></el-input>
           </el-form-item>
           <el-form-item :label="$t('Data.yonghuzumingcheng')" >
-            <el-input v-model="AddGroup.name"></el-input>
+            <el-input v-input-filter:f v-model="AddGroup.name"></el-input>
           </el-form-item>
           <el-form-item :label="$t('Data.miaoshu')" >
-            <el-input type="textarea" v-model="AddGroup.desc"></el-input>
+            <el-input v-input-filter:f type="textarea" v-model="AddGroup.desc"></el-input>
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -84,16 +84,16 @@
         center >
         <el-form :label-width="lang=='en'?'170px':'90px'" size="medium">
           <el-form-item :label="$t('Data.zhanghao')" >
-            <el-input v-model="AddUser.id"></el-input>
+            <el-input v-input-filter:f v-model="AddUser.id"></el-input>
           </el-form-item>
           <el-form-item :label="$t('Data.yonghumingcheng')" >
-            <el-input v-model="AddUser.name"></el-input>
+            <el-input v-input-filter:f v-model="AddUser.name"></el-input>
           </el-form-item>
           <el-form-item :label="$t('Data.dianhua')" >
-            <el-input type="phone" v-model="AddUser.phone"></el-input>
+            <el-input v-input-filter:f type="phone" v-model="AddUser.phone"></el-input>
           </el-form-item>
           <el-form-item :label="$t('Data.youxiang')" >
-            <el-input type="email" v-model="AddUser.email"></el-input>
+            <el-input v-input-filter:f type="email" v-model="AddUser.email"></el-input>
           </el-form-item>
           <el-form-item :label="$t('Data.yonghumima')" >
             <el-input type="password" v-model="AddUser.passwd"></el-input>
@@ -106,7 +106,7 @@
           </el-form-item>
 
           <el-form-item :label="$t('Data.miaoshu')" >
-            <el-input type="textarea" v-model="AddUser.desc"></el-input>
+            <el-input v-input-filter:f type="textarea" v-model="AddUser.desc"></el-input>
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -203,12 +203,12 @@ export default {
     //点击用户后逻辑
     handleUserClick(data,node,event){
       this.group_info = undefined
-      this.User_info = data._user      
+      this.User_info = data._user
       console.log('用户',data,node);
       this.$nextTick(()=>{
         let userinfo = this.$refs['userinfo']
         userinfo.SetData(this.User_info)
-      })      
+      })
     },
     //添加用户组按钮 逻辑
     HandleAddGroup(target){
@@ -230,7 +230,7 @@ export default {
             this.$store.state.ErrorCode = option.emms.code
             if (option.emms.code != 0) {
               this.$Message.error(this.$t('Data.tianjiashibai'))
-              return 
+              return
             }
             this.$Message.success(this.$t('Data.tianjiachenggong'))
             this.AddGroupDialog = false
@@ -257,8 +257,8 @@ export default {
     HandleAddUser(target){
       if(target == 'ADD'){
         if(
-          this.AddUser.id.trim()=="" || 
-          this.AddUser.name.trim()=="" || 
+          this.AddUser.id.trim()=="" ||
+          this.AddUser.name.trim()=="" ||
           this.AddUser.passwd.trim()=="" )
         {
             this.$Message.error(this.$t('Data.yonghuID,mingcheng,mimabunengweikong'))
@@ -321,7 +321,7 @@ export default {
   },
   created(){
 
-  }  
+  }
 }
 </script>
 <style lang="less">
@@ -335,7 +335,7 @@ export default {
   .body{
     flex:1;
     margin-left: 5px;
-    overflow: hidden; 
+    overflow: hidden;
     height: 100%;
     header{
       height: 60px;
@@ -370,8 +370,8 @@ export default {
         }
       }
     }
-    
-    
+
+
     ._content{
       height: calc(100% - 81px);
       overflow: auto;

@@ -930,6 +930,13 @@ layui.define(['layer', 'laytpl', 'upload'], function (exports) {
     historyElem.find('.layim-null').remove();
   };
 
+  // 替换非法字符 对应 src\directives\inputFilter.js:19
+  var replaceForbiddenChar = function (pre = '') {
+    const rs = pre.trim().replace(/[`&<>:"/;'\\]/g, '')
+    console.log('ReplaceForbiddenChar', pre, rs)
+    return rs
+  }
+
   //发送消息
   var sendMessage = function () {
     var data = {
@@ -940,7 +947,7 @@ layui.define(['layer', 'laytpl', 'upload'], function (exports) {
     };
     var thatChat = thisChat(), ul = thatChat.elem.find('.layim-chat-main ul');
     var maxLength = cache.base.maxLength || 3000;
-    data.content = thatChat.textarea.val();
+    data.content = replaceForbiddenChar(thatChat.textarea.val());
     if (data.content.replace(/\s/g, '') !== '') {
 
       if (data.content.length > maxLength) {
@@ -1352,7 +1359,8 @@ layui.define(['layer', 'laytpl', 'upload'], function (exports) {
     , sign: function () {
       var input = layimMain.find('.layui-layim-remark');
       input.on('change', function () {
-        var value = this.value;
+        var value = replaceForbiddenChar(this.value);
+        this.value = value;
         layui.each(call.sign, function (index, item) {
           item && item(value);
         });

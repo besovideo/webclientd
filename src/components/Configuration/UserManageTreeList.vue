@@ -1,6 +1,6 @@
 <template>
   <div id="TermList">
-    <Input class="search"  v-model="filterText"  search clearable placeholder  />
+    <Input class="search" v-inputFilter:f-iview-search  v-model="filterText"  search clearable placeholder  />
     <div class="TreeList _TreeList">
       <el-tree
         v-loading="TreeLoading"
@@ -45,7 +45,7 @@
           <span style="float:right;display:inline-block">
           </span>
           <!-- <span class="pu_id" v-if="data.isMeeting">
-            {{ (data.id==undefined) ?"":`(${data.id.slice(5)})` }} 
+            {{ (data.id==undefined) ?"":`(${data.id.slice(5)})` }}
           </span>-->
         </span>
       </el-tree>
@@ -160,7 +160,7 @@ export default {
 
       console.log(temp);
       this.TreeLoading = false
-      
+
       this.$nextTick(()=>{
         this.$emit('on-getdata',temp)
       })
@@ -249,7 +249,7 @@ export default {
   },
   created(){
     this.GetGroupInit()
-  }  
+  }
 }
 </script>
 <style lang="less">

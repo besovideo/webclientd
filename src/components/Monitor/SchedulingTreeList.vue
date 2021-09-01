@@ -38,18 +38,20 @@
               alt
             />
             <span
-              class="unselectable"
+              class="unselectable global_text_overflow_ellipsis"
+              :style="{ maxWidth: '140px',verticalAlign: 'top'}"
               v-if="data.root"
             >{{ node.label }}</span>
             <span
-              class="unselectable"
+              class="unselectable global_text_overflow_ellipsis"
+              :style="{ maxWidth: '140px',verticalAlign: 'top'}"
               v-if="data.isMeeting"
             >{{ node.label }}</span>
 
             <el-dropdown trigger="click" v-if="data.isPerson" size="medium" @command="MenuHandle">
               <span
-                class="unselectable"
-                :style="{color:data.isOnline==0?'#ccc':'inherit',paddingLeft:10}"
+                class="unselectable global_text_overflow_ellipsis"
+                :style="{color:data.isOnline==0?'#ccc':'inherit',paddingLeft:10, maxWidth: '140px',verticalAlign: 'top'}"
               >{{ node.label }}</span>
               <el-dropdown-menu slot="dropdown" v-if="node.parent.data.UserIsAdmin">
                 <el-dropdown-item icon="el-icon-microphone" :disabled="!data.isOnline" :command="{type:'InviteSpeak',val:[node,data]}">{{$t('Data.dianmingfayan')}}</el-dropdown-item>
@@ -144,7 +146,7 @@
       center >
       <el-form :model="CreateForm" :rules="CreateRules" ref="CreateForm" :label-width="lang=='en'?'140px':'90px'" size="medium">
         <el-form-item :label="$t('Data.huiyimingcheng')" prop="name">
-          <el-input v-model="CreateForm.name"></el-input>
+          <el-input v-input-filter:f v-model="CreateForm.name"></el-input>
         </el-form-item>
         <el-form-item :label="$t('Data.qunzuleixing')" prop="type">
           <el-radio-group v-model="CreateForm.type" size="medium">
@@ -218,6 +220,8 @@
 import { mapState } from "vuex";
 import Vue from "vue";
 import IM from "@/components/Monitor/IM.vue";
+import { replaceForbiddenChar } from '@/directives/inputFilter.js'
+
 export default {
   props: ["noShowChannel"],
   components: { IM },
@@ -862,6 +866,7 @@ export default {
       }
 
       let _data = [];
+      console.log("_data", _data);
 
       switch (itype) {
         case this.imsgtypes.TEXT:
@@ -985,6 +990,9 @@ export default {
         tag: null
       });
     },
+    ReplaceForbiddenChar(content) {
+      return replaceForbiddenChar(content);
+    },
     FilterEmoji(content) {
       let contentList = content.split(/(face\[\d+?\])/);
       let tempList = [];
@@ -1000,7 +1008,7 @@ export default {
         } else {
           tempList.push({
             type: this.imsgtypes.TEXT,
-            msg: el
+            msg: this.ReplaceForbiddenChar(el)
           });
         }
       });
@@ -1160,7 +1168,7 @@ export default {
             window.layim_sendMessage = res => {
               var mine = res.mine; //包含我发送的消息及我的信息
               var to = res.to; //对方的信息
-              console.log(res.mine);
+              console.log("res.mine",res.mine);
               if (to.type == "group" && mine.content.indexOf('img[')==-1 && mine.content.indexOf('file(')==-1) {
                 this.ConfSendWords(this.FilterEmoji(mine.content), to.id);
               }

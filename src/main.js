@@ -17,6 +17,7 @@ import rightMenu from 'rightmenu'
 import '@/components/Monitor/TreeList.less'
 import lodash from 'lodash'
 import './plugins/lang.js'
+import inputFilter from '@/directives/inputFilter.js'
 
 import moment from "moment";
 
@@ -26,7 +27,7 @@ Vue.prototype.$moment = moment
 Vue.prototype.$config = window
 
 
-
+Vue.directive('inputFilter', inputFilter)
 
 Vue.use(rightMenu)
 Vue.use(VueI18n)

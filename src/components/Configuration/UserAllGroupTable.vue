@@ -23,7 +23,7 @@
         :show-overflow-tooltip="true"
         >
         <template slot-scope="scope">
-          <span >{{ scope.row.data.description }}</span> 
+          <span >{{ scope.row.data.description }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('Data.caozuo')" fixed="right" width="200">
@@ -38,7 +38,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
 
     <!-- 编辑 操作框 -->
       <el-dialog
@@ -50,10 +50,10 @@
         center >
         <el-form :label-width="lang=='en'?'170px':'90px'" size="medium">
           <el-form-item :label="$t('Data.yonghuzumingcheng')" >
-            <el-input v-model="Editer.name"></el-input>
+            <el-input v-input-filter:f v-model="Editer.name"></el-input>
           </el-form-item>
           <el-form-item :label="$t('Data.yonghuzumiaoshu')" >
-            <el-input type="textarea" v-model="Editer.desc"></el-input>
+            <el-input v-input-filter:f type="textarea" v-model="Editer.desc"></el-input>
           </el-form-item>
           <!-- <el-form-item :label="$t('Data.ziyuan')" >
             <el-select v-model="Editer.resources" multiple filterable style="width:100%">
@@ -76,7 +76,7 @@
     <!-- 编辑 操作框 -->
 
 
-  </div>  
+  </div>
 </template>
 <script>
 
@@ -107,7 +107,7 @@ export default {
     }
   },
   methods:{
-    // 被父组件调用，设置表格信息 
+    // 被父组件调用，设置表格信息
     SetGroupData(data){
       let temp = []
       data.forEach(group => {
@@ -180,7 +180,7 @@ export default {
         resources:data.data.resources,
         data: data.data
       }
-    },  
+    },
     // 删除 按钮逻辑处理
     handleDelete(i,data){
       this.$confirm(`${this.$t('Data.cicaozuojiangshanchu')} ${data.name} (${data.id}) ${this.$t('Data.qunzu')}`, this.$t('Data.jinggao'), {
@@ -197,7 +197,7 @@ export default {
                 if(option.emms.code == 20114){
                   this.$Message.error(this.$t('Data.yonghuzuzhongyouchengyuan,wufashanchu'))
                 }else{
-                  this.$Message.error(this.$t('Data.shanchushibai'))                  
+                  this.$Message.error(this.$t('Data.shanchushibai'))
                 }
                 return
               }
@@ -206,7 +206,7 @@ export default {
             tag: data.id
           });
         }).catch(() => {
-          
+
         });
     }
   }

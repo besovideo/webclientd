@@ -55,10 +55,10 @@
     >
       <el-form :label-width="lang=='en'?'170px':'90px'" size="medium">
         <el-form-item :label="$t('Data.yonghuzumingcheng')">
-          <el-input v-model="Editer.name"></el-input>
+          <el-input v-input-filter:f v-model="Editer.name"></el-input>
         </el-form-item>
         <el-form-item :label="$t('Data.yonghuzumiaoshu')">
-          <el-input type="textarea" v-model="Editer.desc"></el-input>
+          <el-input v-input-filter:f type="textarea" v-model="Editer.desc"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -82,7 +82,7 @@
           <el-input :disabled="true" v-model="UserEditer.data.id"></el-input>
         </el-form-item>
         <el-form-item :label="this.$t('Data.yonghuxingming')">
-          <el-input v-model="UserEditer.data.name"></el-input>
+          <el-input v-input-filter:f v-model="UserEditer.data.name"></el-input>
         </el-form-item>
         <el-form-item label>
           <el-checkbox
@@ -125,13 +125,13 @@
           ></el-checkbox>
         </el-form-item>
         <el-form-item :label="this.$t('Data.lianxidianhua')">
-          <el-input v-model="UserEditer.data.phone"></el-input>
+          <el-input v-input-filter:f v-model="UserEditer.data.phone"></el-input>
         </el-form-item>
         <el-form-item :label="this.$t('Data.youxiang')">
-          <el-input v-model="UserEditer.data.email"></el-input>
+          <el-input v-input-filter:f v-model="UserEditer.data.email"></el-input>
         </el-form-item>
         <el-form-item :label="$t('Data.yonghumiaoshu')">
-          <el-input type="textarea" v-model="UserEditer.data.description"></el-input>
+          <el-input v-input-filter:f type="textarea" v-model="UserEditer.data.description"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">

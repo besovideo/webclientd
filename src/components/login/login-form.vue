@@ -1,6 +1,6 @@
 <template>
   <Form ref="loginForm" :model="form" :rules="rules" @keydown.enter.native="handleSubmit">
-    
+
       <!-- <Row>
         <Col span="18" >
           <FormItem prop="Server">
@@ -46,7 +46,7 @@
       </Input>
     </FormItem>
     <div style="position: relative;transform: translateY(-10px);height: 20px">
-      
+
     </div>
 
     <div id="cb_rember">
@@ -61,7 +61,7 @@
 export default {
   name: 'LoginForm',
   props: {
-    
+
   },
   data () {
     return {
@@ -125,7 +125,7 @@ export default {
 }
 .portSet > .ivu-form-item-content {
   display: flex;
-  
+
 }
 </style>
 

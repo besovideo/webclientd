@@ -308,4 +308,10 @@ body {
 .ivu-message{
   z-index:99999999999999!important;
 }
+.global_text_overflow_ellipsis {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 </style>

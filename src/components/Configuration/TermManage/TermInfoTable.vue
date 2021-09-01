@@ -4,7 +4,7 @@
         <el-tab-pane :label="$t('Data.jibenxinxi')">
           <div class="info_left" :style="{width:'50%',float:'left'}">
               <h1>{{$t('Data.yingjian/ruanjianxinxi')}}</h1>
-              <PrimaryInfoList :label='$t("Data.zhizaoshang")'> 
+              <PrimaryInfoList :label='$t("Data.zhizaoshang")'>
                 <el-input v-model="DataInfo.szManufacturer" :disabled="true" />
               </PrimaryInfoList>
               <!-- <div class="term_list">
@@ -14,7 +14,7 @@
                 <p class="itemright">
                 </p>
               </div> -->
-              
+
               <PrimaryInfoList :label='$t("Data.shebeixinghao")'>
                 <el-input v-model="DataInfo.szProductName" :disabled="true" />
               </PrimaryInfoList>
@@ -28,7 +28,7 @@
                 <el-input v-model="DataInfo.szID" :disabled="true" />
               </PrimaryInfoList>
               <PrimaryInfoList :label='$t("Data.shebeiming")'>
-                <el-input v-model="DataInfo_name" />
+                <el-input v-input-filter:f v-model="DataInfo_name" />
               </PrimaryInfoList>
               <PrimaryInfoList :label='$t("Data.lanyadizhi")'>
                 <el-input v-model="DataInfo.szBluetoothAddr" :disabled="true" />
@@ -107,8 +107,8 @@
             <el-input v-model="DataInfo.iLatitude" :disabled="true" />
           </PrimaryInfoList>
         </el-tab-pane>
-      </el-tabs> 
-  </div>  
+      </el-tabs>
+  </div>
 </template>
 <script>
 import {mapState} from 'vuex'
@@ -265,7 +265,7 @@ export default {
 //   .itemleft{
 //     min-width:80px;
 //     text-align: right;
-//     // padding-right: 10px; 
+//     // padding-right: 10px;
 //     margin-right: 10px
 //   }
 //   .itemright{

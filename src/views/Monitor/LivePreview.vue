@@ -6,7 +6,7 @@
         </TabPane>
         <TabPane label="我的收藏" name="Collection" tab="list"></TabPane>
       </Tabs>-->
-      <Input class="search" @on-search="searchPu" search clearable placeholder/>
+      <Input class="search" v-inputFilter:f-iview-search @on-search="searchPu" search clearable placeholder/>
       <div class="showonline">
         <Checkbox class="cb" v-model="isOnline">{{$t('Monitor.Showonlyonlinedevices')}}</Checkbox>
       </div>
@@ -509,7 +509,7 @@ export default {
               // this.videoDivList[
               //   target
               // ].chanel.swHide({hdlg:1})
-             strVideoDivId.lastElementChild.remove() 
+             strVideoDivId.lastElementChild.remove()
               this.videoDivList[
                 target
               ].chanel  = undefined
@@ -519,7 +519,7 @@ export default {
 
             // videoList[0].chanel.swClose({hdlg:1})
             // this.videoDivList[this.videoTarget].chanel.swClose({hdlg:1});
-            
+
           }
         });
 

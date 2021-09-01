@@ -1,6 +1,7 @@
 <template>
   <div id="TermList">
     <Input
+      v-inputFilter:f-iview-search
       class="search"
       @on-search="TermSearch"
       v-model="Search"
